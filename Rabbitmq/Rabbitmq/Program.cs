@@ -2,9 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
 using System.Threading;
 using System.Xml;
+using System.Xml.Schema;
 
 namespace Rabbitmq
 {
@@ -22,7 +24,7 @@ namespace Rabbitmq
             cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
             ramCounter = new PerformanceCounter("Memory", "Available MBytes");
 
-
+            
 
             var factory = new ConnectionFactory() { HostName = "10.3.56.6" };
             using (var connection = factory.CreateConnection())
@@ -34,24 +36,72 @@ namespace Rabbitmq
                                      autoDelete: false,
                                      arguments: null);
 
+                    
                 while (true)
                 {
-                    //set message in xml
-                    //string xmlmessage = "<heartbeat><header><code> 2000 </code >" +
+                    
+                    ////Update the XML
+                    //XmlDocument doc2 = (XmlDocument)doc.Clone();
+                    XmlDocument doc = new XmlDocument();
+                    doc.Load("XMLHeartBeat.xml");
+
+                    //XmlNode root = doc.DocumentElement;
+                    XmlNode myDateNode = doc.SelectSingleNode("//timestamp");
+                    XmlNode myCPUNode = doc.SelectSingleNode("//CPUload");
+                    XmlNode myRAMNode = doc.SelectSingleNode("//RAMload");
+                    //XmlNode myOriginNode = doc.SelectSingleNode("//origin");
+                    //myOriginNode.InnerText = "No"; //this should make an Error
+                    //myCPUNode.InnerText = "Arturo"; //this should make an Error
+                    myDateNode.InnerText = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K");
+                    myCPUNode.InnerText = getCurrentCpuUsage();
+                    myRAMNode.InnerText = getAvailableRAM();
+
+                    if (IsFileReady("XMLHeartBeat.xml"))
+                    {
+                        doc.Save("XMLHeartBeat.xml");
+                        Console.WriteLine("Ready");
+                    }
+
+
+
+
+                    //Console.WriteLine(myDateNode.InnerXml); //for testing
+
+                    //XmlDocument doc = new XmlDocument();
+                    //doc.LoadXml("<?xml version='1.0' ?>" +
+                    //"<heartbeat><header><code> 2000 </code >" +
                     //"<origin>Office</origin>" +
                     //$"<timestamp> {DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K")} </timestamp ></header>" +
                     //$"<body><nameService> Website </nameService><CPUload>{getCurrentCpuUsage()}</CPUload>" +
                     //$"<RAMload> {getAvailableRAM()} </RAMload></body>" +
-                    //"</heartbeat>";
+                    //"</heartbeat>");
 
-                    XmlDocument doc = new XmlDocument();
-                    doc.LoadXml("<?xml version='1.0' ?>" +
-                    "<heartbeat><header><code> 2000 </code >" +
-                    "<origin>Office</origin>" +
-                    $"<timestamp> {DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K")} </timestamp ></header>" +
-                    $"<body><nameService> Website </nameService><CPUload>{getCurrentCpuUsage()}</CPUload>" +
-                    $"<RAMload> {getAvailableRAM()} </RAMload></body>" +
-                    "</heartbeat>");
+                    //doc.LoadXml("XMLHeartBeat.xml");
+
+
+                    //Validate agains XSD
+                    try
+                    {
+                        XmlReaderSettings settings = new XmlReaderSettings();
+                        settings.Schemas.Add("", "XMLHeartBeat.xsd");
+                        settings.ValidationType = ValidationType.Schema;
+
+                        XmlReader reader = XmlReader.Create("XMLHeartBeat.xml", settings);
+                        XmlDocument document = new XmlDocument();
+                        document.Load(reader);
+
+                        ValidationEventHandler eventHandler = new ValidationEventHandler(ValidationEventHandler);
+
+                        // the document will now fail to successfully validate
+                        document.Validate(eventHandler);
+
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                        break;
+                    }
 
                     string message = doc.InnerXml;
                     //string message = doc.InnerText; //shows only values
@@ -63,6 +113,7 @@ namespace Rabbitmq
                                          basicProperties: null,
                                          body: body);
                     Console.WriteLine(" [x] Sent {0}", message);
+
 
                     //stop the program for 1 second
                     Thread.Sleep(1000);
@@ -82,5 +133,42 @@ namespace Rabbitmq
         {
             return ramCounter.NextValue().ToString();
         }
+
+        static void ValidationEventHandler(object sender, ValidationEventArgs e)
+        {
+            switch (e.Severity)
+            {
+                case XmlSeverityType.Error:
+                    Console.WriteLine("Error: {0}", e.Message);
+                    Console.WriteLine("what?");
+                    break;
+                case XmlSeverityType.Warning:
+                    Console.WriteLine("Warning {0}", e.Message);
+                    Console.WriteLine("woot");
+                    break;
+            }
+        }
+
+        public static bool IsFileReady(string filename)
+        {
+            // If the file can be opened for exclusive access it means that the file
+            // is no longer locked by another process.
+            try
+            {
+                using (FileStream inputStream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.None))
+                    return inputStream.Length > 0;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        //public static void WaitForFile(string filename)
+        //{
+        //    //This will lock the execution until the file is ready
+        //    //TODO: Add some logic to make it async and cancelable
+        //    while (!IsFileReady(filename)) { Console.WriteLine("Not ready"); }
+        //}
     }
 }
