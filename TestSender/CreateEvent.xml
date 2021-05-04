@@ -8,10 +8,12 @@
     <timestamp>2021-05-25T12:00:00+01:00</timestamp>
   </header>
   <body>
+    <agenda>Lessenrooster</agenda>
     <name>DhB Goes Tomorrowland</name>
     <startEvent>2021-05-25T12:00:00</startEvent>
     <endEvent>2021-05-27T02:00:00</endEvent>
     <description>Desiderius hogeschool Brussel gaat op uistap met alle studenten naar Tomorrowland, Poggers!</description>
     <location>Avenue Montana 34, 1180 Bruxelles</location>
+    <guests>mroreoehb@outlook.com</guests>
   </body>
 </event>

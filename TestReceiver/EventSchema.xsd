@@ -43,6 +43,13 @@
         <xs:element name="body">
           <xs:complexType>
             <xs:sequence>
+              <xs:element name="agenda">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="64" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
               <xs:element name="name">
                 <xs:simpleType>
                   <xs:restriction base="xs:string">
@@ -60,6 +67,13 @@
                 </xs:simpleType>
               </xs:element>
               <xs:element name="location">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="64" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="guests">
                 <xs:simpleType>
                   <xs:restriction base="xs:string">
                     <xs:maxLength value="64" />
