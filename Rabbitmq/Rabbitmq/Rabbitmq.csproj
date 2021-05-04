@@ -9,6 +9,7 @@
     <PackageReference Include="RabbitMQ.Client" Version="6.2.1" />
     <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="5.0.1" />
     <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="5.0.1" />
+    <PackageReference Include="System.Management" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
