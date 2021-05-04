@@ -14,10 +14,14 @@ class EmitLogDirect
             channel.ExchangeDeclare(exchange: "direct_logs",
                                     type: "direct");
 
-            var severity = (args.Length > 0) ? args[0] : "info";
-            var message = (args.Length > 1)
-                          ? string.Join(" ", args.Skip(1).ToArray())
-                          : "Hello World!";
+            //var severity = (args.Length > 0) ? args[0] : "info";
+            //var message = (args.Length > 1)
+            //              ? string.Join(" ", args.Skip(1).ToArray())
+            //              : "Hello World!";
+
+            var severity = "info";
+            var message = "here your mesage or XML";
+
             var body = Encoding.UTF8.GetBytes(message);
             channel.BasicPublish(exchange: "direct_logs",
                                  routingKey: severity,

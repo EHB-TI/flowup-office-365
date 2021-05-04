@@ -15,22 +15,27 @@ class ReceiveLogsDirect
                                     type: "direct");
             var queueName = channel.QueueDeclare().QueueName;
 
-            if (args.Length < 1)
-            {
-                Console.Error.WriteLine("Usage: {0} [info] [warning] [error]",
-                                        Environment.GetCommandLineArgs()[0]);
-                Console.WriteLine(" Press [enter] to exit.");
-                Console.ReadLine();
-                Environment.ExitCode = 1;
-                return;
-            }
+            //if (args.Length < 1)
+            //{
+            //    Console.Error.WriteLine("Usage: {0} [info] [warning] [error]",
+            //                            Environment.GetCommandLineArgs()[0]);
+            //    Console.WriteLine(" Press [enter] to exit.");
+            //    Console.ReadLine();
+            //    Environment.ExitCode = 1;
+            //    return;
+            //}
 
-            foreach (var severity in args)
-            {
-                channel.QueueBind(queue: queueName,
-                                  exchange: "direct_logs",
-                                  routingKey: severity);
-            }
+            //foreach (var severity in args)
+            //{
+            //    channel.QueueBind(queue: queueName,
+            //                      exchange: "direct_logs",
+            //                      routingKey: severity);
+            //}
+            
+            
+            channel.QueueBind(queue: queueName,
+                                exchange: "direct_logs",
+                                routingKey: "info");
 
             Console.WriteLine(" [*] Waiting for messages.");
 
