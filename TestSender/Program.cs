@@ -1,6 +1,5 @@
-﻿using System;
-using System.Linq;
-using RabbitMQ.Client;
+﻿using RabbitMQ.Client;
+using System;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
@@ -11,6 +10,7 @@ class EmitLogDirect
     public static void Main(string[] args)
     {
         var factory = new ConnectionFactory() { HostName = "localhost" };
+        //var factory = new ConnectionFactory() { HostName = "10.3.56.6" };
         using (var connection = factory.CreateConnection())
         using (var channel = connection.CreateModel())
         {
@@ -48,7 +48,7 @@ class EmitLogDirect
                 Console.WriteLine("XML is ongeldig");
             }
 
-            var severity = "info";
+            var severity = "createevnt";
             string message = doc.InnerXml;
 
             var body = Encoding.UTF8.GetBytes(message);

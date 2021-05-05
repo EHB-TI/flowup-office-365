@@ -11,6 +11,7 @@ class ReceiveLogsDirect
     public static void Main(string[] args)
     {
         var factory = new ConnectionFactory() { HostName = "localhost" };
+        //var factory = new ConnectionFactory() { HostName = "10.3.56.6" };
         using (var connection = factory.CreateConnection())
         using (var channel = connection.CreateModel())
         {
@@ -45,6 +46,12 @@ class ReceiveLogsDirect
             channel.QueueBind(queue: queueName,
                                 exchange: "direct_logs",
                                 routingKey: "info");
+            channel.QueueBind(queue: queueName,
+                                exchange: "direct_logs",
+                                routingKey: "createevnt");
+            channel.QueueBind(queue: queueName,
+                                exchange: "direct_logs",
+                                routingKey: "deleteevent");
 
             Console.WriteLine(" [*] Waiting for messages.");
 
