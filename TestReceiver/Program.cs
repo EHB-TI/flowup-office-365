@@ -10,8 +10,8 @@ class ReceiveLogsDirect
 {
     public static void Main(string[] args)
     {
-        var factory = new ConnectionFactory() { HostName = "localhost" };
-        //var factory = new ConnectionFactory() { HostName = "10.3.56.6" };
+        //var factory = new ConnectionFactory() { HostName = "localhost" };
+        var factory = new ConnectionFactory() { HostName = "10.3.56.6" };
         using (var connection = factory.CreateConnection())
         using (var channel = connection.CreateModel())
         {
@@ -43,15 +43,13 @@ class ReceiveLogsDirect
             //Used to do this do this when validation is good of wrong
             bool xmlValidation = true;
 
+            
             channel.QueueBind(queue: queueName,
                                 exchange: "direct_logs",
-                                routingKey: "info");
-            channel.QueueBind(queue: queueName,
-                                exchange: "direct_logs",
-                                routingKey: "createevnt");
-            channel.QueueBind(queue: queueName,
-                                exchange: "direct_logs",
-                                routingKey: "deleteevent");
+                                routingKey: "event");
+            //channel.QueueBind(queue: queueName,
+            //                    exchange: "direct_logs",
+            //                    routingKey: "info");
 
             Console.WriteLine(" [*] Waiting for messages.");
 
@@ -61,9 +59,9 @@ class ReceiveLogsDirect
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
                 var routingKey = ea.RoutingKey;
-                //Console.WriteLine(" [x] Received '{0}':'{1}'",
-                //                  routingKey, message);
-                Console.WriteLine(message);
+                Console.WriteLine(" [x] Received '{0}':'{1}'",
+                                  routingKey, message);
+                //Console.WriteLine(message);
 
                 //Convert string message to xmlDoc and after to XDoc to Validate
                 XmlDocument xmlDoc = new XmlDocument();

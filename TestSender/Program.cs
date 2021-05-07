@@ -1,4 +1,5 @@
-﻿using RabbitMQ.Client;
+﻿using MySql.Data.MySqlClient;
+using RabbitMQ.Client;
 using System;
 using System.Text;
 using System.Xml;
@@ -9,8 +10,34 @@ class EmitLogDirect
 {
     public static void Main(string[] args)
     {
-        var factory = new ConnectionFactory() { HostName = "localhost" };
-        //var factory = new ConnectionFactory() { HostName = "10.3.56.6" };
+        string cs = @"server=10.3.56.10;userid=Office;password=Office2021;database=FlowUpDB";
+
+        using var con = new MySqlConnection(cs);
+        con.Open();
+
+        //var stm = "SELECT VERSION()";
+        //var cmd = new MySqlCommand(stm, con);
+
+        //var version = cmd.ExecuteScalar().ToString();
+        //Console.WriteLine($"MySQL version: {version}");
+
+        string sql = "SELECT * FROM VoorbeeldTabel";
+        using var cmd = new MySqlCommand(sql, con);
+
+        using MySqlDataReader rdr = cmd.ExecuteReader();
+
+        while (rdr.Read())
+        {
+            //Console.WriteLine("{0} {1} {2}", rdr.GetInt32(0), rdr.GetString(1),
+            //        rdr.GetInt32(2));
+            Console.WriteLine("{0,-2} {1} {2,-6} {3,-6} {4,-1} {5}", rdr.GetInt32(0), rdr.GetValue(1), rdr.GetString(2), rdr.GetString(3), rdr.GetInt32(4), rdr.GetString(5));
+        }
+
+
+
+
+        //var factory = new ConnectionFactory() { HostName = "localhost" };
+        var factory = new ConnectionFactory() { HostName = "10.3.56.6" };
         using (var connection = factory.CreateConnection())
         using (var channel = connection.CreateModel())
         {
@@ -48,7 +75,7 @@ class EmitLogDirect
                 Console.WriteLine("XML is ongeldig");
             }
 
-            var severity = "createevnt";
+            var severity = "info";
             string message = doc.InnerXml;
 
             var body = Encoding.UTF8.GetBytes(message);
