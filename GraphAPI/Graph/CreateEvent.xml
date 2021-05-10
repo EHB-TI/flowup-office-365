@@ -8,12 +8,12 @@
     <timestamp>2021-05-25T12:00:00+01:00</timestamp>
   </header>
   <body>
-    <agenda>XML2Agenda</agenda>
+    <agenda>XML1Agenda</agenda>
     <name>XML1Subject or Name or Tittle</name>
-    <startEvent>2021-05-22T15:00:00</startEvent>
-    <endEvent>2021-05-24T17:00:00</endEvent>
-    <description>XML2Description or Body</description>
-    <location>XML2Location</location>
+    <startEvent>2021-05-20T12:00:00</startEvent>
+    <endEvent>2021-05-21T02:00:00</endEvent>
+    <description>XML1Description or Body</description>
+    <location>XML1Location</location>
     <guests>arthur.de.keersmaeker@student.ehb.be,flowupdesiderius@outlook.com</guests>
   </body>
 </event>

@@ -10,7 +10,17 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0" />
     <PackageReference Include="Microsoft.Graph" Version="3.22.0" />
     <PackageReference Include="Microsoft.Identity.Client" Version="4.25.0" />
+    <PackageReference Include="RabbitMQ.Client" Version="6.2.1" />
     <PackageReference Include="TimeZoneConverter" Version="3.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="CreateEvent.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="EventSchema.xsd">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
