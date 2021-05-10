@@ -60,6 +60,7 @@ namespace Rabbitmq
 
                     channel.BasicPublish(exchange: "",
                                          routingKey: "hello", //tell to what qeue it has to go
+                                                              //routingKey: "monitoring", //tell to what qeue it has to go
                                          basicProperties: null,
                                          body: body);
                     Console.WriteLine(" [x] Sent {0}", message);
