@@ -52,14 +52,21 @@ namespace GraphTutorial
 
 
 
-            var factory = new ConnectionFactory() { HostName = "localhost" };
-            //var factory = new ConnectionFactory() { HostName = "10.3.56.6" };
+            //var factory = new ConnectionFactory() { HostName = "localhost" };
+            var factory = new ConnectionFactory() { HostName = "10.3.56.6" };
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
             {
+                //channel.ExchangeDeclare(exchange: "direct_logs",
+                //                        type: "direct");
                 channel.ExchangeDeclare(exchange: "direct_logs",
                                         type: "direct");
-                var queueName = channel.QueueDeclare().QueueName;
+                var queueName = "officeQueue";
+                channel.QueueDeclare(queue: queueName,
+                                     durable: true,
+                                     exclusive: false,
+                                     autoDelete: false,
+                                     arguments: null);
 
 
                 XmlSchemaSet schema = new XmlSchemaSet();
@@ -74,6 +81,7 @@ namespace GraphTutorial
                                     routingKey: "event");
 
                 Console.WriteLine(" [*] Waiting for messages.");
+                Console.WriteLine($"Access token: {accessToken}\n");
 
                 var consumer = new EventingBasicConsumer(channel);
                 consumer.Received += (model, ea) =>
@@ -103,7 +111,7 @@ namespace GraphTutorial
                         XmlNode myOriginNode = xmlDoc.SelectSingleNode("//origin");
                         XmlNode myNameNode = xmlDoc.SelectSingleNode("//name");
                         XmlNode myLocationNode = xmlDoc.SelectSingleNode("//location");
-                        XmlNode myGueststNode = xmlDoc.SelectSingleNode("//guests");
+                        //XmlNode myGueststNode = xmlDoc.SelectSingleNode("//guests");
                         Console.WriteLine("Method is: " + myMethodNode.InnerXml);
                         Console.WriteLine("Origin is: " + myOriginNode.InnerXml);
                         Console.WriteLine("Name is: " + myNameNode.InnerXml);
@@ -111,8 +119,9 @@ namespace GraphTutorial
 
 
                         var attendeeList = new List<string>();
-                        //attendeeList.Add("arthur.de.keersmaeker@student.ehb.be");
-                        attendeeList = myGueststNode.InnerXml.Split(',').ToList();
+                        ////attendeeList.Add("arthur.de.keersmaeker@student.ehb.be");
+                        //attendeeList = myGueststNode.InnerXml.Split(',').ToList();
+                        //attendeeList = [];
 
 
                         string userTimeZone = user.MailboxSettings.TimeZone;
@@ -174,7 +183,7 @@ namespace GraphTutorial
             //        body).Wait();
         }
 
-        
+
 
         // <LoadAppSettingsSnippet>
         static IConfigurationRoot LoadAppSettings()

@@ -36,6 +36,13 @@
                   </xs:restriction>
                 </xs:simpleType>
               </xs:element>
+              <xs:element name="version">
+                <xs:simpleType>
+                  <xs:restriction base="xs:integer">
+                    <xs:minInclusive value="1"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
               <xs:element name="timestamp" type="xs:dateTime" />
             </xs:sequence>
           </xs:complexType>
@@ -43,13 +50,6 @@
         <xs:element name="body">
           <xs:complexType>
             <xs:sequence>
-              <xs:element name="agenda">
-                <xs:simpleType>
-                  <xs:restriction base="xs:string">
-                    <xs:maxLength value="64" />
-                  </xs:restriction>
-                </xs:simpleType>
-              </xs:element>
               <xs:element name="name">
                 <xs:simpleType>
                   <xs:restriction base="xs:string">
@@ -73,7 +73,6 @@
                   </xs:restriction>
                 </xs:simpleType>
               </xs:element>
-              <xs:element name="guests"/>
             </xs:sequence>
           </xs:complexType>
         </xs:element>

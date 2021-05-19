@@ -47,7 +47,8 @@
 
 //            int choice = -1;
 
-//            while (choice != 0) {
+//            while (choice != 0)
+//            {
 //                Console.WriteLine("Please choose one of the following options:");
 //                Console.WriteLine("0. Exit");
 //                Console.WriteLine("1. Display access token");
@@ -65,7 +66,7 @@
 //                    choice = -1;
 //                }
 
-//                switch(choice)
+//                switch (choice)
 //                {
 //                    case 0:
 //                        // Exit the program
@@ -135,7 +136,8 @@
 
 //            // Require a subject
 //            var subject = GetUserInput("subject", true,
-//                (input) => {
+//                (input) =>
+//                {
 //                    return GetUserYesNo($"Subject: {input} - is that right?");
 //                });
 
@@ -148,7 +150,8 @@
 //                do
 //                {
 //                    attendee = GetUserInput("attendee", false,
-//                        (input) => {
+//                        (input) =>
+//                        {
 //                            return GetUserYesNo($"{input} - add attendee?");
 //                        });
 
@@ -161,7 +164,8 @@
 //            }
 
 //            var startString = GetUserInput("event start", true,
-//                (input) => {
+//                (input) =>
+//                {
 //                    // Validate that input is a date
 //                    return (DateTime.TryParse(input, out var result));
 //                });
@@ -169,7 +173,8 @@
 //            var start = DateTime.Parse(startString);
 
 //            var endString = GetUserInput("event end", true,
-//                (input) => {
+//                (input) =>
+//                {
 //                    // Validate that input is a date
 //                    // and is later than start
 //                    return (DateTime.TryParse(input, out var result) &&
