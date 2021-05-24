@@ -1,0 +1,17 @@
+\\vmware-host\Shared Folders\Desktop\uuidMaker\uuidMaker\bin\Debug\netcoreapp3.1\uuidMaker.exe
+\\vmware-host\Shared Folders\Desktop\uuidMaker\uuidMaker\bin\Debug\netcoreapp3.1\uuidMaker.deps.json
+\\vmware-host\Shared Folders\Desktop\uuidMaker\uuidMaker\bin\Debug\netcoreapp3.1\uuidMaker.runtimeconfig.json
+\\vmware-host\Shared Folders\Desktop\uuidMaker\uuidMaker\bin\Debug\netcoreapp3.1\uuidMaker.runtimeconfig.dev.json
+\\vmware-host\Shared Folders\Desktop\uuidMaker\uuidMaker\bin\Debug\netcoreapp3.1\uuidMaker.dll
+\\vmware-host\Shared Folders\Desktop\uuidMaker\uuidMaker\bin\Debug\netcoreapp3.1\uuidMaker.pdb
+\\vmware-host\Shared Folders\Desktop\uuidMaker\uuidMaker\bin\Debug\netcoreapp3.1\RabbitMQ.Client.dll
+\\vmware-host\Shared Folders\Desktop\uuidMaker\uuidMaker\bin\Debug\netcoreapp3.1\System.Threading.Channels.dll
+\\vmware-host\Shared Folders\Desktop\uuidMaker\uuidMaker\obj\Debug\netcoreapp3.1\uuidMaker.csprojAssemblyReference.cache
+\\vmware-host\Shared Folders\Desktop\uuidMaker\uuidMaker\obj\Debug\netcoreapp3.1\uuidMaker.AssemblyInfoInputs.cache
+\\vmware-host\Shared Folders\Desktop\uuidMaker\uuidMaker\obj\Debug\netcoreapp3.1\uuidMaker.AssemblyInfo.cs
+\\vmware-host\Shared Folders\Desktop\uuidMaker\uuidMaker\obj\Debug\netcoreapp3.1\uuidMaker.csproj.CoreCompileInputs.cache
+\\vmware-host\Shared Folders\Desktop\uuidMaker\uuidMaker\obj\Debug\netcoreapp3.1\uuidMaker.csproj.CopyComplete
+\\vmware-host\Shared Folders\Desktop\uuidMaker\uuidMaker\obj\Debug\netcoreapp3.1\uuidMaker.dll
+\\vmware-host\Shared Folders\Desktop\uuidMaker\uuidMaker\obj\Debug\netcoreapp3.1\uuidMaker.pdb
+\\vmware-host\Shared Folders\Desktop\uuidMaker\uuidMaker\obj\Debug\netcoreapp3.1\uuidMaker.genruntimeconfig.cache
+\\vmware-host\Shared Folders\Desktop\uuidMaker\uuidMaker\bin\Debug\netcoreapp3.1\EventSchema.xsd
