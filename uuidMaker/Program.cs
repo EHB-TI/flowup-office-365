@@ -7,9 +7,9 @@ namespace uuidMaker
     {
         static void Main(string[] args)
         {
-            Task task = new Task(() => Producer.sendMessage());
+            /*Task task = new Task(() => Producer.sendMessage());
             task.Start();
-            Consumer.getMessage();
+            Consumer.getMessage();*/
         }
     }
 }
