@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "bv6bavQgaIyK4OSbQLr104cmlMrHODaV1YweWns3yyciqThNLM3akHw4Wsc0QLkfXPI+MsvfEwgs9w56VMg/ow==",
+  "dgSpecHash": "u+YPnnM6kW9f/BfeN9dMqLULrXxpwCZZOZRPrLAdcACNLLFY7CThVp3k/m5Mc/OJJtp2PNXfkq7GjGp+cifAGA==",
   "success": true,
-  "projectFilePath": "\\\\vmware-host\\Shared Folders\\Documents\\GitHub\\flowup-office-365\\uuidMaker\\uuidMaker.csproj",
+  "projectFilePath": "C:\\Users\\Mihriban Yelboga\\GitHub\\flowup-office-365\\uuidMaker\\uuidMaker.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Mihriban Yelboga\\.nuget\\packages\\rabbitmq.client\\6.2.1\\rabbitmq.client.6.2.1.nupkg.sha512",
     "C:\\Users\\Mihriban Yelboga\\.nuget\\packages\\system.memory\\4.5.4\\system.memory.4.5.4.nupkg.sha512",

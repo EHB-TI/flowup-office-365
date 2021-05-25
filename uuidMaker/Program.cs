@@ -10,6 +10,9 @@ namespace uuidMaker
             /*Task task = new Task(() => Producer.sendMessage());
             task.Start();
             Consumer.getMessage();*/
+            Uuid.createEvent();
+
+
         }
     }
 }
