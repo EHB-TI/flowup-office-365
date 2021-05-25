@@ -68,7 +68,7 @@ namespace uuidMaker
                         else
                         {
                             schema = new XmlSchemaSet();
-                            schema.Add("", "error.xsd");
+                            schema.Add("", "Error.xsd");
                             Console.WriteLine("XML is ongeldig");
                             xml = XDocument.Parse(message, LoadOptions.SetLineInfo);
                             xmlValidation = true;
