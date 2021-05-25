@@ -114,11 +114,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "\\\\vmware-host\\Shared Folders\\Desktop\\uuidMaker\\uuidMaker\\uuidMaker.csproj",
+      "projectUniqueName": "\\\\vmware-host\\Shared Folders\\Documents\\GitHub\\flowup-office-365\\uuidMaker\\uuidMaker.csproj",
       "projectName": "uuidMaker",
-      "projectPath": "\\\\vmware-host\\Shared Folders\\Desktop\\uuidMaker\\uuidMaker\\uuidMaker.csproj",
+      "projectPath": "\\\\vmware-host\\Shared Folders\\Documents\\GitHub\\flowup-office-365\\uuidMaker\\uuidMaker.csproj",
       "packagesPath": "C:\\Users\\Mihriban Yelboga\\.nuget\\packages\\",
-      "outputPath": "\\\\vmware-host\\Shared Folders\\Desktop\\uuidMaker\\uuidMaker\\obj\\",
+      "outputPath": "\\\\vmware-host\\Shared Folders\\Documents\\GitHub\\flowup-office-365\\uuidMaker\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Mihriban Yelboga\\AppData\\Roaming\\NuGet\\NuGet.Config",

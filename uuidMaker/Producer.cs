@@ -11,7 +11,8 @@ namespace uuidMaker
 {
     class Producer
     {
-        public static void sendMessage()
+        //de kant dat de bericht stuurt
+        public static void sendMessage(string severity,string message)
         {
             var factory = new ConnectionFactory() { HostName = "10.3.56.6" };
             using (var connection = factory.CreateConnection())
@@ -19,12 +20,12 @@ namespace uuidMaker
             {
                 channel.ExchangeDeclare(exchange: "direct_logs",
                                         type: "direct");
-
-                string message =
+                //xml hardcoded om te testen
+                /*string message =
 
     "<event><header>" +
      "<UUID></UUID>" +
-     "<sourceEntityId>test123</sourceEntityId>" +
+     "<sourceEntityId>aaa77</sourceEntityId>" +
      "<organiserUUID></organiserUUID>" +
      "<organiserSourceEntityId>1</organiserSourceEntityId >" +
      "<method>CREATE</method>" +
@@ -39,16 +40,17 @@ namespace uuidMaker
      "<description>Description Office</description>" +
      "<location>Location Office</location>" +
    "</body>" +
- "</event>";
+ "</event>";*/
                 
 
                 XmlSchemaSet schema = new XmlSchemaSet();
-
+                //event xsd validatie
                 schema.Add("", "EventSchema.xsd");
 
-               
-                XDocument xml = XDocument.Parse(message, LoadOptions.SetLineInfo);
 
+
+                //xml file zal loaden
+                XDocument xml = XDocument.Parse(message, LoadOptions.SetLineInfo);
                 bool xmlValidation = true;
 
                 xml.Validate(schema, (sender, e) =>
@@ -59,15 +61,15 @@ namespace uuidMaker
                 if (xmlValidation)
                 {
                     Console.WriteLine("XML is geldig");
-                    var severity = "UUID";
+                    //var severity = "UUID";
                     var body = Encoding.UTF8.GetBytes(message);
                     channel.BasicPublish(exchange: "direct_logs",
                                          routingKey: severity,
                                          basicProperties: null,
                                          body: body);
+
                     
                     Console.WriteLine(" [x] Sent '{0}':'{1}'", severity, message);
-
                 }
                 else
                 {
