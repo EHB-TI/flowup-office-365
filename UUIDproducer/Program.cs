@@ -9,7 +9,7 @@ namespace UUIDproducer
         {
 
 
-            Uuid.createEvent();
+            Uuid.deleteEvent();
 
 
             /*

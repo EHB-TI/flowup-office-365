@@ -37,7 +37,7 @@ namespace UUIDproducer
                     Console.WriteLine(" [x] Received '{0}':'{1}'", routingKey, message);
 
 
-                    //event xsd validatie
+                    //xsd event validation
                     XmlSchemaSet schema = new XmlSchemaSet();
                     schema.Add("", "EventSchema.xsd");
                     XDocument xml = XDocument.Parse(message, LoadOptions.SetLineInfo);
@@ -93,7 +93,6 @@ namespace UUIDproducer
                         }
 
                         Console.WriteLine(error);
-
 
                     }
 
@@ -184,29 +183,29 @@ namespace UUIDproducer
 
             string message = "";
             xElements = xmlEvent.Descendants("UUID");
-            xElements = xmlEvent.Descendants("organiserUUID");
+            //xElements = xmlEvent.Descendants("organiserUUID");
 
 
             foreach (var el in xElements)
             {
                 message =
-     "<event><header>" +
-     "<UUID>" + el.Value + "</UUID>" +
-     "<sourceEntityId>" + sourceEntityId + "</sourceEntityId>" +
-     "<organiserUUID>" + el.Value + "</organiserUUID>" +
-     "<organiserSourceEntityId>" + organiserSourceEntityId + "</organiserSourceEntityId >" +
-     "<method>" + method + "</method>" +
-     "<origin>" + origin + "</origin>" +
-     "<version>" + version + "</version>" +
-     "<timestamp>" + timestamp + "</timestamp>" +
-   "</header>" +
-   "<body>" +
-    " <name>" + name + "</name>" +
-     "<startEvent>" + startEvent + "</startEvent>" +
-     "<endEvent>" + endEvent + "</endEvent>" +
-     "<description>" + description + "</description>" +
-     "<location>" + location + "</location>" +
-    "</body></event>";
+            "<event><header>" +
+            "<UUID>" + el.Value + "</UUID>" +
+            "<sourceEntityId>" + sourceEntityId + "</sourceEntityId>" +
+            "<organiserUUID>" + el.Value + "</organiserUUID>" +
+            "<organiserSourceEntityId>" + organiserSourceEntityId + "</organiserSourceEntityId >" +
+            "<method>" + method + "</method>" +
+            "<origin>" + origin + "</origin>" +
+            "<version>" + version + "</version>" +
+            "<timestamp>" + timestamp + "</timestamp>" +
+            "</header>" +
+            "<body>" +
+            "<name>" + name + "</name>" +
+            "<startEvent>" + startEvent + "</startEvent>" +
+            "<endEvent>" + endEvent + "</endEvent>" +
+            "<description>" + description + "</description>" +
+            "<location>" + location + "</location>" +
+            "</body></event>";
             }
 
 

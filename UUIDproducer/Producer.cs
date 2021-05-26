@@ -15,11 +15,12 @@ namespace UUIDproducer
 {
     class Producer
     {
+        //versturen van message aan de consumer
         public static void sendMessage(string message, string severity)
         {
 
-            Thread.Sleep(3000);
-
+           
+            //connectie
             var factory = new ConnectionFactory() { HostName = "10.3.56.6" };
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
@@ -27,12 +28,7 @@ namespace UUIDproducer
                 channel.ExchangeDeclare(exchange: "direct_logs",
                                         type: "direct");
 
-                
-
-
-
                 XmlSchemaSet schema = new XmlSchemaSet();
-
                 schema.Add("", "EventSchema.xsd");
 
                 XDocument xml = XDocument.Parse(message, LoadOptions.SetLineInfo);
@@ -49,7 +45,7 @@ namespace UUIDproducer
 
                 if (xmlValidation)
                 {
-                    Console.WriteLine("valid");
+                    Console.WriteLine("XML is geldig");
 
                     
 
@@ -64,21 +60,13 @@ namespace UUIDproducer
                     Console.WriteLine(" [x] Sent '{0}':'{1}'", severity, message);
 
                     XDocument doc = XDocument.Parse(message);
-                    
-
+                   
                 }
                 else
                 {
-                    Console.WriteLine("not valid");
+                    Console.WriteLine("XML is niet geldig");
                 }
 
-
-
-
-
-
-
-                
             }
 
             Console.WriteLine(" Press [enter] to exit.");

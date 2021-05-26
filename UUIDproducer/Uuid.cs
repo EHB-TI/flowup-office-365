@@ -7,7 +7,7 @@ namespace UUIDproducer
 {
     class Uuid
     {
-
+       //maken van event met xml file
         public static void createEvent()
         {
             string message =
@@ -35,33 +35,7 @@ namespace UUIDproducer
             Consumer.getMessage();
 
         }
-        public static void deleteEvent()
-        {
-            string message =
-                          "<event><header>" +
-                          "<UUID></UUID>" +
-                          "<sourceEntityId>sm2019</sourceEntityId>" +
-                          "<organiserUUID></organiserUUID>" +
-                          "<organiserSourceEntityId>1</organiserSourceEntityId>" +
-                          "<method>DELETE</method>" +
-                          "<origin>Office</origin>" +
-                          "<version>1</version>" +
-                          "<timestamp>" + DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K") + "</timestamp>" +
-                          "</header>" +
-                          "<body>" +
-                          "<name>Office</name>" +
-                          "<startEvent>2021-05-25T12:00:00</startEvent>" +
-                          "<endEvent>2021-05-27T02:00:00</endEvent>" +
-                          "<description>Description Office</description>" +
-                          "<location>Location Office</location>" +
-                          "</body></event>";
-
-            Task task = new Task(() => Producer.sendMessage(message,Severitys.UUID.ToString()));
-
-            task.Start();
-            Consumer.getMessage();
-
-        }
+        //updaten van event aan de hand van xml
         public static void updateEvent()
         {
             string message =
@@ -89,7 +63,34 @@ namespace UUIDproducer
             task.Start();
             Consumer.getMessage();
         }
+        //deleten van event met xml file
+        public static void deleteEvent()
+        {
+            string message =
+                          "<event><header>" +
+                          "<UUID></UUID>" +
+                          "<sourceEntityId>5</sourceEntityId>" +
+                          "<organiserUUID></organiserUUID>" +
+                          "<organiserSourceEntityId>5</organiserSourceEntityId>" +
+                          "<method>DELETE</method>" +
+                          "<origin>Office</origin>" +
+                          "<version>5</version>" +
+                          "<timestamp>" + DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K") + "</timestamp>" +
+                          "</header>" +
+                          "<body>" +
+                          "<name>Office</name>" +
+                          "<startEvent>2021-05-25T12:00:00</startEvent>" +
+                          "<endEvent>2021-05-27T02:00:00</endEvent>" +
+                          "<description>Description Office</description>" +
+                          "<location>Location Office</location>" +
+                          "</body></event>";
 
+            Task task = new Task(() => Producer.sendMessage(message, Severitys.UUID.ToString()));
+
+            task.Start();
+            Consumer.getMessage();
+
+        }
 
     }
 }
