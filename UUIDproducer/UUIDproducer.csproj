@@ -10,6 +10,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Alter.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Errorxsd.xsd">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

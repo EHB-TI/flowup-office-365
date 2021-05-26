@@ -22,7 +22,7 @@ namespace UUIDproducer
             "<timestamp>" + DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K") + "</timestamp>" +
             "</header>" +
             "<body>" +
-            "<name>Office</name>" +
+            "<name>EventNameOffice</name>" +
             "<startEvent>2021-06-12T12:00:00</startEvent>" +
             "<endEvent>2021-06-13T02:00:00</endEvent>" +
             "<description>testing</description>" +
@@ -30,6 +30,34 @@ namespace UUIDproducer
             "</body></event>";
 
             Task task = new Task(() => Producer.sendMessage(message, Severitys.UUID.ToString()));
+
+            task.Start();
+            Consumer.getMessage();
+
+        }
+       //maken van MOCK event met xml file
+        public static void createMockEvent()
+        {
+            string message =
+            "<event><header>" +
+            "<UUID>00375B22-6E01-644F-A8B0-7F92DB53FCB4</UUID>" +
+            "<sourceEntityId></sourceEntityId>" +
+            "<organiserUUID>7EF2F652-F4E1-9345-B06A-9227087E6B3C</organiserUUID>" +
+            "<organiserSourceEntityId></organiserSourceEntityId>" +
+            "<method>CREATE</method>" +
+            "<origin>FrontEnd</origin>" +
+            "<version>1</version>" +
+            "<timestamp>" + DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K") + "</timestamp>" +
+            "</header>" +
+            "<body>" +
+            "<name>EventNameOffice</name>" +
+            "<startEvent>2021-06-12T12:00:00</startEvent>" +
+            "<endEvent>2021-06-13T02:00:00</endEvent>" +
+            "<description>testing</description>" +
+            "<location>Location Office</location>" +
+            "</body></event>";
+
+            Task task = new Task(() => Producer.sendMessage(message, "event"));
 
             task.Start();
             Consumer.getMessage();

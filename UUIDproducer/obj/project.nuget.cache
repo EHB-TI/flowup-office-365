@@ -1,12 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "We6ZaM0GVxnFt2N63B78nRgkXnqlY0lEdyEpnGIFLqe6p+ZI3R1E/HsGm1AdzP5PLwM9qsw6CC3KSkHvWJMGiA==",
+  "dgSpecHash": "1cKN1vD5uHBqXSA3sFK+O+d+MTZSI5tAWjd3oXZDqmK15qRnOfgHg0K5Ritip/OQ66Eh1ANHSvtw0dxjFOZDXw==",
   "success": true,
-  "projectFilePath": "\\\\vmware-host\\Shared Folders\\Documents\\GitHub\\flowup-office-365\\UUIDproducer\\UUIDproducer.csproj",
+  "projectFilePath": "C:\\Users\\akeer\\Documents\\School\\2IntegrationProject\\FlowUpGit\\flowup-office-365\\UUIDproducer\\UUIDproducer.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\Mihriban Yelboga\\.nuget\\packages\\rabbitmq.client\\6.2.1\\rabbitmq.client.6.2.1.nupkg.sha512",
-    "C:\\Users\\Mihriban Yelboga\\.nuget\\packages\\system.memory\\4.5.4\\system.memory.4.5.4.nupkg.sha512",
-    "C:\\Users\\Mihriban Yelboga\\.nuget\\packages\\system.threading.channels\\4.7.1\\system.threading.channels.4.7.1.nupkg.sha512"
+    "C:\\Users\\akeer\\.nuget\\packages\\rabbitmq.client\\6.2.1\\rabbitmq.client.6.2.1.nupkg.sha512",
+    "C:\\Users\\akeer\\.nuget\\packages\\system.memory\\4.5.4\\system.memory.4.5.4.nupkg.sha512",
+    "C:\\Users\\akeer\\.nuget\\packages\\system.threading.channels\\4.7.1\\system.threading.channels.4.7.1.nupkg.sha512"
   ],
   "logs": []
 }

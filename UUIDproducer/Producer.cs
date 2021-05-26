@@ -18,9 +18,9 @@ namespace UUIDproducer
         //versturen van message aan de consumer
         public static void sendMessage(string message, string severity)
         {
-
             //connectie
             var factory = new ConnectionFactory() { HostName = "10.3.56.6" };
+            //var factory = new ConnectionFactory() { HostName = "localhost" };
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
             {
@@ -33,21 +33,16 @@ namespace UUIDproducer
                 XDocument xml = XDocument.Parse(message, LoadOptions.SetLineInfo);
 
 
-                bool xmlValidation = true;
+                //bool xmlValidation = true;
 
-                xml.Validate(schema, (sender, e) =>
-                {
-                    xmlValidation = false;
-                });
+                //xml.Validate(schema, (sender, e) =>
+                //{
+                //    xmlValidation = false;
+                //});
 
-
-
-                if (xmlValidation)
-                {
+                //if (xmlValidation)
+                //{
                     Console.WriteLine("XML is geldig");
-
-                    
-
 
                     var body = Encoding.UTF8.GetBytes(message);
                     channel.BasicPublish(exchange: "direct_logs",
@@ -60,11 +55,11 @@ namespace UUIDproducer
 
                     XDocument doc = XDocument.Parse(message);
                    
-                }
-                else
-                {
-                    Console.WriteLine("XML is niet geldig");
-                }
+                //}
+                //else
+                //{
+                //    Console.WriteLine("XML is niet geldig");
+                //}
 
             }
 

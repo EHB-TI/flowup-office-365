@@ -8,8 +8,13 @@ namespace UUIDproducer
         static void Main(string[] args)
         {
 
+            //Consumer.getMessage();
 
-            Uuid.createEvent();
+
+            //Uuid.createEvent();
+
+
+            Uuid.createMockEvent();
 
 
             /*

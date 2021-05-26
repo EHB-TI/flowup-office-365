@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "\\\\vmware-host\\Shared Folders\\Documents\\GitHub\\flowup-office-365\\UUIDproducer\\UUIDproducer.csproj": {}
+    "C:\\Users\\akeer\\Documents\\School\\2IntegrationProject\\FlowUpGit\\flowup-office-365\\UUIDproducer\\UUIDproducer.csproj": {}
   },
   "projects": {
-    "\\\\vmware-host\\Shared Folders\\Documents\\GitHub\\flowup-office-365\\UUIDproducer\\UUIDproducer.csproj": {
+    "C:\\Users\\akeer\\Documents\\School\\2IntegrationProject\\FlowUpGit\\flowup-office-365\\UUIDproducer\\UUIDproducer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "\\\\vmware-host\\Shared Folders\\Documents\\GitHub\\flowup-office-365\\UUIDproducer\\UUIDproducer.csproj",
+        "projectUniqueName": "C:\\Users\\akeer\\Documents\\School\\2IntegrationProject\\FlowUpGit\\flowup-office-365\\UUIDproducer\\UUIDproducer.csproj",
         "projectName": "UUIDproducer",
-        "projectPath": "\\\\vmware-host\\Shared Folders\\Documents\\GitHub\\flowup-office-365\\UUIDproducer\\UUIDproducer.csproj",
-        "packagesPath": "C:\\Users\\Mihriban Yelboga\\.nuget\\packages\\",
-        "outputPath": "\\\\vmware-host\\Shared Folders\\Documents\\GitHub\\flowup-office-365\\UUIDproducer\\obj\\",
+        "projectPath": "C:\\Users\\akeer\\Documents\\School\\2IntegrationProject\\FlowUpGit\\flowup-office-365\\UUIDproducer\\UUIDproducer.csproj",
+        "packagesPath": "C:\\Users\\akeer\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\akeer\\Documents\\School\\2IntegrationProject\\FlowUpGit\\flowup-office-365\\UUIDproducer\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Mihriban Yelboga\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\akeer\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -60,7 +60,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.203\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
         }
       }
     }
