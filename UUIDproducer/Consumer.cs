@@ -25,7 +25,7 @@ namespace UUIDproducer
 
                 channel.QueueBind(queue: queueName,
                 exchange: "direct_logs",
-                routingKey: "Office");
+                routingKey: "UUID");
                 Console.WriteLine(" [*] Waiting for messages.");
 
                 var consumer = new EventingBasicConsumer(channel);
@@ -58,14 +58,11 @@ namespace UUIDproducer
                         Console.WriteLine("XML is geldig");
                         XDocument xmlEvent = XDocument.Parse(message, LoadOptions.SetLineInfo);
 
-                        string xmlStuur = createEventXml(xmlEvent);
+                        //string xmlStuur = createEventXml(xmlEvent);
 
                         Console.WriteLine(xmlEvent);
 
-                        //sturen van bericht
-                        Producer.sendMessage(xmlStuur, Severitys.Event.ToString());
-
-
+                       //sturen van bericht
                     }
                     //error afhandeling
                     else
@@ -85,12 +82,12 @@ namespace UUIDproducer
                         XDocument xmlEvent = XDocument.Parse(message);
                         string error = "";
 
-                        IEnumerable<XElement> xElements = xmlEvent.Descendants("description");
+                        /*IEnumerable<XElement> xElements = xmlEvent.Descendants("description");
                         foreach (var element in xElements)
                         {
                             error = element.Value;
 
-                        }
+                        }*/
 
                         Console.WriteLine(error);
 
@@ -107,7 +104,7 @@ namespace UUIDproducer
 
         }
 
-        private static string createEventXml(XDocument xmlEvent)
+        /*private static string createEventXml(XDocument xmlEvent)
         {
             //xml file attributen event
             string sourceEntityId = "";
@@ -183,7 +180,7 @@ namespace UUIDproducer
 
             string message = "";
             xElements = xmlEvent.Descendants("UUID");
-            //xElements = xmlEvent.Descendants("organiserUUID");
+            xElements = xmlEvent.Descendants("organiserUUID");
 
 
             foreach (var el in xElements)
@@ -212,5 +209,5 @@ namespace UUIDproducer
             return message;
 
         }
-    }
+    }*/
 }

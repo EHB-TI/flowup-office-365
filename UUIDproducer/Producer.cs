@@ -19,7 +19,6 @@ namespace UUIDproducer
         public static void sendMessage(string message, string severity)
         {
 
-           
             //connectie
             var factory = new ConnectionFactory() { HostName = "10.3.56.6" };
             using (var connection = factory.CreateConnection())

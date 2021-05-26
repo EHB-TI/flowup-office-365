@@ -13,7 +13,7 @@ namespace UUIDproducer
             string message =
             "<event><header>" +
             "<UUID></UUID>" +
-            "<sourceEntityId>miritest12</sourceEntityId>" +
+            "<sourceEntityId>miritest</sourceEntityId>" +
             "<organiserUUID></organiserUUID>" +
             "<organiserSourceEntityId>1</organiserSourceEntityId>" +
             "<method>CREATE</method>" +
@@ -71,10 +71,10 @@ namespace UUIDproducer
                           "<UUID></UUID>" +
                           "<sourceEntityId>5</sourceEntityId>" +
                           "<organiserUUID></organiserUUID>" +
-                          "<organiserSourceEntityId>5</organiserSourceEntityId>" +
+                          "<organiserSourceEntityId></organiserSourceEntityId>" +
                           "<method>DELETE</method>" +
                           "<origin>Office</origin>" +
-                          "<version>5</version>" +
+                          "<version>1</version>" +
                           "<timestamp>" + DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K") + "</timestamp>" +
                           "</header>" +
                           "<body>" +
