@@ -13,6 +13,9 @@
     <None Update="Alter.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="AlterError.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Errorxsd.xsd">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

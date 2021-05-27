@@ -67,10 +67,15 @@ namespace UUIDproducer
                     // Console.WriteLine("create event");
 
                     //}
+                    //XML from RabbitMQ
+
+                    //Alter XML to change
+                    XmlDocument docAlter = new XmlDocument();
+
                     if (xmlValidation)
                     {
                         
-                        Console.WriteLine("XML is geldig");
+                        Console.WriteLine("XML is valid");
 
 
                         XmlNode myMethodNode = xmlDoc.SelectSingleNode("//method");
@@ -86,50 +91,35 @@ namespace UUIDproducer
                             Console.WriteLine("Updating origin \"" + myOriginNode.InnerXml + "\" of XML...");
 
 
-                            XmlDocument doc = new XmlDocument();
-                            doc.Load("Alter.xml");
-                            doc = xmlDoc;
+                            //XmlDocument doc1 = new XmlDocument();
+                            //doc1.LoadXml(message);
 
-                            doc.SelectSingleNode("//event/header/origin").InnerText = "Office";
-                            doc.Save("Alter.xml");
+                            //XmlWriterSettings settings = new XmlWriterSettings();
+                            //settings.Indent = true;
+                            //XmlWriter writer = XmlWriter.Create("Alter.xml", settings);
+                            //doc1.Save(writer);
 
 
-                            doc.Save(Console.Out);
-                            //Console.WriteLine(doc.InnerXml);
+                            docAlter.Load("Alter.xml");
+                            docAlter = xmlDoc;
+
+                            docAlter.SelectSingleNode("//event/header/origin").InnerText = "Office";
+                            docAlter.Save("Alter.xml");
+
+
+                            docAlter.Save(Console.Out);
+                            Console.WriteLine(docAlter.InnerXml);
                             //Console.WriteLine(docMessage.InnerXml);
                             //Console.WriteLine(docMessageConverted.InnerXml);
 
 
-                            Task task = new Task(() => Producer.sendMessage(doc.InnerXml, "UUID"));
+                            Task task = new Task(() => Producer.sendMessage(docAlter.InnerXml, "UUID"));
                             task.Start();
 
                             Console.WriteLine("Sending message to UUID...");
 
                         }
-                        //Event comes from UUID Master, we get a message back from UUID
-                        if(myOriginNode.InnerXml == "UUID" && myMethodNode.InnerXml == "CREATE" && myOrganiserSourceId.InnerXml == "" && routingKey == "Office")
-                        {
-                            Console.WriteLine("Waiting for message from UUID...");
-                            Console.WriteLine(message);
-
-
-                            //XmlDocument doc = new XmlDocument();
-                            //doc.Load("Alter.xml");
-                            //doc = xmlDoc;
-
-                            //doc.SelectSingleNode("//event/header/origin").InnerText = "Office changed";
-                            //doc.Save("Alter.xml");
-
-
-                            //Console.WriteLine(doc.InnerXml);
-                            ////Console.WriteLine(docMessage.InnerXml);
-                            ////Console.WriteLine(docMessageConverted.InnerXml);
-
-
-                            //Task task = new Task(() => Producer.sendMessage(doc.InnerXml, "UUID"));
-                            //task.Start();
-
-                        }
+                        
                         //Delete Event
                         if(myOriginNode.InnerXml == "FrontEnd" && myMethodNode.InnerXml == "DELETE")
                         {
@@ -178,12 +168,18 @@ namespace UUIDproducer
                         //Console.WriteLine(xmlStuur);
                         //sturen van bericht
                     }
-                    //error afhandeling
+                    //XML from UUID
                     else
                     {
+                        XmlNode myCodeNode = xmlDoc.SelectSingleNode("//code");
+                        XmlNode myOriginNode = xmlDoc.SelectSingleNode("//origin");
+                        XmlNode myobjectSourceId = xmlDoc.SelectSingleNode("//objectSourceId");
+                        XmlNode myErrorMessage = xmlDoc.SelectSingleNode("//description");
+
+
                         schema = new XmlSchemaSet();
                         schema.Add("", "Errorxsd.xsd");
-                        Console.WriteLine("XML is ongeldig");
+                        Console.WriteLine("Errors XML received");
                         xml = XDocument.Parse(message, LoadOptions.SetLineInfo);
                         xmlValidation = true;
 
@@ -193,17 +189,104 @@ namespace UUIDproducer
                         });
 
 
-                        XDocument xmlEvent = XDocument.Parse(message);
-                        string error = "";
+                        //XDocument xmlEvent = XDocument.Parse(message);
+                        //string error = "";
+                        //string code = "";
 
-                        /*IEnumerable<XElement> xElements = xmlEvent.Descendants("description");
-                        foreach (var element in xElements)
+                        //IEnumerable<XElement> xElements = xmlEvent.Descendants("description");
+                        //IEnumerable<XElement> xElements1 = xmlEvent.Descendants("code");
+                        //foreach (var element in xElements)
+                        //{
+                        //    error = element.Value;
+
+                        //}
+                        //foreach (var element in xElements1)
+                        //{
+                        //    code = element.Value;
+
+                        //}
+
+                        //Console.WriteLine(error);
+                        //Console.WriteLine(code);
+                        Console.WriteLine("Code node" + myCodeNode.InnerXml);
+
+                        //Event comes from UUID Master, we get a message back from UUID
+                        if (myOriginNode.InnerXml == "UUID" && myobjectSourceId.InnerXml == "" && routingKey == "Office")
                         {
-                            error = element.Value;
+                            Console.WriteLine("Waiting for message from UUID...");
+                            Console.WriteLine(message);
+                            Console.WriteLine("Alter message is:");
+                            Console.WriteLine(docAlter.InnerXml);
 
-                        }*/
 
-                        Console.WriteLine(error);
+                            switch (myCodeNode.InnerXml)
+                            {
+                                case "1000":
+                                    Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                                    break;
+                                case "1001":
+                                    Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                                    break;
+                                case "1002":
+                                    Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                                    break;
+                                case "1003":
+                                    Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                                    break;
+                                case "1004":
+                                    Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                                    break;
+                                case "1005":
+                                    Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                                    break;
+                                    //DB Error
+                                case "2000":
+                                    Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                                    break;
+                                    //Create
+                                case "3000":
+                                    Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                                    break;
+                                case "3001":
+                                    Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                                    break;
+                                case "3002":
+                                    Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                                    break;
+                                    //Update
+                                case "4000":
+                                    Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                                    break;
+                                case "4001":
+                                    Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                                    break;
+                                    //Delete
+                                case "5000":
+                                    Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                                    break;
+                                default:
+                                    Console.WriteLine("Default case");
+                                    break;
+                            }
+
+
+                            //XmlDocument doc = new XmlDocument();
+                            //doc.Load("Alter.xml");
+                            //doc = xmlDoc;
+
+                            //doc.SelectSingleNode("//event/header/origin").InnerText = "Office changed";
+                            //doc.Save("Alter.xml");
+
+
+                            //Console.WriteLine(doc.InnerXml);
+                            ////Console.WriteLine(docMessage.InnerXml);
+                            ////Console.WriteLine(docMessageConverted.InnerXml);
+
+
+                            //Task task = new Task(() => Producer.sendMessage(doc.InnerXml, "UUID"));
+                            //task.Start();
+
+                        }
 
                     }
 
