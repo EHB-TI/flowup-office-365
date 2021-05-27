@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<error>
+  <header>
+    <code>1000</code>
+    <origin>AD</origin>
+    <timestamp>2021-05-25T12:00:00+01:00</timestamp>
+  </header>
+  <body>
+    <objectUUID>333ade47-03d1-40bb-9912-9a6c86a60169</objectUUID>
+    <objectSourceId>22</objectSourceId>
+    <objectOrigin>FrontEnd</objectOrigin>
+    <description>Object does not follow XSD pattern</description>
+  </body>
+</error>
