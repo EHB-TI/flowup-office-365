@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<heartbeat>
+      <header>
+          <code>2000</code>
+          <origin>Office</origin>
+          <timestamp>2021-05-03T10:24:13+02:00</timestamp></header>
+      <body>
+          <nameService>Website</nameService>
+          <CPUload>10</CPUload>
+          <RAMload>5632</RAMload></body></heartbeat>
