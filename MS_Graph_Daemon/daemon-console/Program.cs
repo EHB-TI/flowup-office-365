@@ -95,6 +95,7 @@ namespace daemon_console
 
             if (result != null)
             {
+                //gitchange
                 var httpClient = new HttpClient();
 
                 //Method to get the events from GrapCrudMethods
