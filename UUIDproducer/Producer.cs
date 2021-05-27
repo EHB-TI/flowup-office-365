@@ -42,7 +42,7 @@ namespace UUIDproducer
 
                 //if (xmlValidation)
                 //{
-                    Console.WriteLine("XML is geldig");
+                    //Console.WriteLine("XML valid to send");
 
                     var body = Encoding.UTF8.GetBytes(message);
                     channel.BasicPublish(exchange: "direct_logs",
