@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<event>
+  <header>
+    <UUID>5698cd59-3acc-4f15-9ce2-83545cbfe0ba</UUID>
+    <organiserUUID>333ade47-03d1-40bb-9912-9a6c86a60169</organiserUUID>
+    <method>UPDATE</method>
+    <origin>Office</origin>
+    <version>1</version>
+    <timestamp>2021-05-25T12:00:00+01:00</timestamp>
+  </header>
+  <body>
+    <name>Name Office</name>
+    <startEvent>2021-05-25T12:00:00</startEvent>
+    <endEvent>2021-05-27T02:00:00</endEvent>
+    <description>Description Office</description>
+    <location>Location Office</location>
+  </body>
+</event>
