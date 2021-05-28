@@ -117,7 +117,7 @@ namespace UUIDproducer
                             Task task = new Task(() => Producer.sendMessage(docAlter.InnerXml, "UUID"));
                             task.Start();
 
-                            Console.WriteLine("Origin changed to Office, sending it to UUID...");
+                            Console.WriteLine("Origin changed to Office, sending now it to UUID...");
 
                         }
                         else if(myOriginNode.InnerXml == "UUID" && myMethodNode.InnerXml == "CREATE" && myOrganiserSourceId.InnerXml != "" && routingKey == "Office")
@@ -160,11 +160,7 @@ namespace UUIDproducer
 
                             int iNewRowIdentity = Convert.ToInt32(cmd.ExecuteScalar());
                             Console.WriteLine("Envet Id in database is: " + iNewRowIdentity);
-
-
-                            //cmd.ExecuteNonQuery();
-
-                            //Console.WriteLine("Event inserted in database");
+                            Console.WriteLine("Event inserted in database");
 
 
 
