@@ -427,7 +427,7 @@ namespace UUIDproducer
 
                             Console.WriteLine("Origin changed to Office, sending now it to UUID...");
                         }
-                        else if(myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "DELETE" && mySourceIdUser.InnerXml == "" && routingKey == "Office")
+                        else if (myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "DELETE" && mySourceIdUser.InnerXml == "" && routingKey == "Office")
                         {
                             Console.WriteLine("Got a delete message from " + mySourceIdUser.InnerXml);
                             Console.WriteLine("The full message from the UUID is: " + xmlDoc.InnerXml);
@@ -444,7 +444,7 @@ namespace UUIDproducer
                     }
 
                     //XML from UUID
-                    /*else
+                    else
                     {
                         XmlNode myCodeNode = xmlDoc.SelectSingleNode("//code");
                         XmlNode myOriginNodeUserUser = xmlDoc.SelectSingleNode("//origin");
@@ -486,7 +486,7 @@ namespace UUIDproducer
                         Console.WriteLine("Code node" + myCodeNode.InnerXml);
 
                         //Event comes from UUID Master, we get a message back from UUID
-                        if (myOriginNodeUser.InnerXml == "UUID" && myobjectSourceId.InnerXml == "" && routingKey == "Office")
+                        if (myobjectSourceId.InnerXml == "UUID" && myobjectSourceId.InnerXml == "" && routingKey == "Office")
                         {
                             Console.WriteLine("Waiting for message from UUID...");
                             Console.WriteLine(message);
@@ -544,19 +544,19 @@ namespace UUIDproducer
                                     break;
                             }
 
-                        }*/
+                        }
+
+                    };
+
+                    channel.BasicConsume(queue: queueName,
+                    autoAck: true,
+                    consumer: consumer);
+
+                    Console.WriteLine(" Press [enter] to exit.");
+                    Console.ReadLine();
+
 
                 };
-
-                channel.BasicConsume(queue: queueName,
-                autoAck: true,
-                consumer: consumer);
-
-                Console.WriteLine(" Press [enter] to exit.");
-                Console.ReadLine();
-
-
-            }
 
             //private static string createEventXml(XDocument xmlEvent)
             //{

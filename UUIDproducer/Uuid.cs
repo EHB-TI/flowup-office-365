@@ -183,15 +183,15 @@ namespace UUIDproducer
         {
             string message =
               "<user><header>" +
-              "<UUID>333ade47-03d1-40bb-9912-9a6c86a60169</UUID>" +
+              "<UUID></UUID>" +
               "<method>DELETE</method>" +
               "<origin>AD</origin>" +
               "<version>1</version>" +
-              "<sourceEntityId>aaa77</sourceEntityId>" +
+              "<sourceEntityId>7</sourceEntityId>" +
               "<timestamp>" + DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K") + "</timestamp>" +
               "</header>" +
               "<body>" +
-              "<firstname>mihriban</firstname>" +
+              "<firstname>test6666</firstname>" +
               "<lastname>yelboga</lastname>" +
               "<email>mihriban.yelboga@student.ehb.be</email>" +
               "<birthday>1997-09-26</birthday>" +
@@ -200,7 +200,7 @@ namespace UUIDproducer
               "</body></user>";
 
 
-            Task task = new Task(() => Producer.sendMessage(message,"user");
+            Task task = new Task(() => Producer.sendMessage(message,"user"));
 
             task.Start();
             Console.WriteLine("Starting up producer...");
