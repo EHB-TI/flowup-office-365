@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
+using daemon_console;
 using MySql.Data.MySqlClient;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -20,7 +21,16 @@ namespace UUIDproducer
         //de kant dat de bericht gaat krijgen
         public static void getMessage()
         {
-
+            //try
+            //{
+            //    Program.RunAsync().GetAwaiter().GetResult();
+            //}
+            //catch (Exception ex)
+            //{
+            //    Console.ForegroundColor = ConsoleColor.Red;
+            //    Console.WriteLine(ex.Message);
+            //    Console.ResetColor();
+            //}
 
             var factory = new ConnectionFactory() { HostName = "10.3.56.6" };
             //var factory = new ConnectionFactory() { HostName = "localhost" };
@@ -140,8 +150,17 @@ namespace UUIDproducer
                         //Create Event comes from UUID we use it and pass it again to UUID
                         else if (myOriginNode.InnerXml == "UUID" && myMethodNode.InnerXml == "CREATE" && myOrganiserSourceId.InnerXml != "" && routingKey == "Office")
                         {
-                            
 
+                            try
+                            {
+                                Program.RunAsync().GetAwaiter().GetResult();
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine(ex.Message);
+                                Console.ResetColor();
+                            }
 
                             Console.WriteLine("Got a message from " + myOriginNode.InnerXml);
                             Console.WriteLine("Putting data in database and calendar");

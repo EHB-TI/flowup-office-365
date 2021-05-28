@@ -13,6 +13,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates; //Only import this if you are using certificate
 using System.Threading.Tasks;
+using UUIDproducer;
 using DateTimeTimeZone = Microsoft.Graph.DateTimeTimeZone;
 
 namespace daemon_console
@@ -27,22 +28,24 @@ namespace daemon_console
         static void Main(string[] args)
         {
 
-            try
-            {
-                RunAsync().GetAwaiter().GetResult();
-            }
-            catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(ex.Message);
-                Console.ResetColor();
-            }
+            Consumer.getMessage();
 
-            Console.WriteLine("Press any key to exit");
-            Console.ReadKey();
+            //try
+            //{
+            //    RunAsync().GetAwaiter().GetResult();
+            //}
+            //catch (Exception ex)
+            //{
+            //    Console.ForegroundColor = ConsoleColor.Red;
+            //    Console.WriteLine(ex.Message);
+            //    Console.ResetColor();
+            //}
+
+            //Console.WriteLine("Press any key to exit");
+            //Console.ReadKey();
         }
 
-        private static async Task RunAsync()
+        public static async Task RunAsync()
         {
             AuthenticationConfig config = AuthenticationConfig.ReadFromJsonFile("appsettings.json");
 
