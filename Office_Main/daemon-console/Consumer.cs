@@ -103,11 +103,11 @@ namespace UUIDproducer
                         //XML head
                         XmlNode myMethodNode = xmlDoc.SelectSingleNode("//method");
                         XmlNode myOriginNode = xmlDoc.SelectSingleNode("//origin");
+                        XmlNode myUserId = xmlDoc.SelectSingleNode("//organiserUUID");
                         XmlNode myOrganiserSourceId = xmlDoc.SelectSingleNode("//organiserSourceEntityId");
                         XmlNode mySourceEntityId = xmlDoc.SelectSingleNode("//sourceEntityId");
                         //XML body
                         XmlNode myEventName = xmlDoc.SelectSingleNode("//name");
-                        XmlNode myUserId = xmlDoc.SelectSingleNode("//organiserUUID");
                         XmlNode myStartEvent = xmlDoc.SelectSingleNode("//startEvent");
                         XmlNode myEndEvent = xmlDoc.SelectSingleNode("//endEvent");
                         XmlNode myDescription = xmlDoc.SelectSingleNode("//description");
@@ -150,6 +150,8 @@ namespace UUIDproducer
                         //Create Event comes from UUID we use it and pass it again to UUID
                         else if (myOriginNode.InnerXml == "UUID" && myMethodNode.InnerXml == "CREATE" && myOrganiserSourceId.InnerXml != "" && routingKey == "Office")
                         {
+
+                            Console.WriteLine(myStartEvent.InnerXml);
 
                             try
                             {
