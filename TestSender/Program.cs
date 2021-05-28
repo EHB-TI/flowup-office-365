@@ -21,8 +21,10 @@ class EmitLogDirect
                                     type: "direct");
 
 
+            //XmlDocument doc = new XmlDocument();
+            //doc.Load("CreateEvent.xml");
             XmlDocument doc = new XmlDocument();
-            doc.Load("CreateEvent.xml");
+            doc.Load("DeleteEvent.xml");
 
             XmlSchemaSet schema = new XmlSchemaSet();
 
