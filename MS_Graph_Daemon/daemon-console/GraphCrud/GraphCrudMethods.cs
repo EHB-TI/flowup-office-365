@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates; //Only import this if you are using certificate
+using System.Text;
 using System.Threading.Tasks;
 
 namespace daemon_console.GraphCrud
@@ -17,18 +18,23 @@ namespace daemon_console.GraphCrud
         AuthenticationConfig config = AuthenticationConfig.ReadFromJsonFile("appsettings.json");
 
         //Get events of specific user with Graph api
-        public static async void getEvents(HttpClient httpClient, string accessToken, Action<JObject> Display)
+        public static async void getEvents(string accessToken, Action<JObject> Display)
         {
+            var httpClient = new HttpClient();
             var apiCaller = new ProtectedApiCallHelper(httpClient);
             await apiCaller.CallWebApiAndProcessResultASync($"https://graph.microsoft.com/v1.0/users/Admin@flowupdesiderius.onmicrosoft.com/events", accessToken, Display);
             httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
 
         }
 
-        
+
         //Create events of specific user with graph api
-        public static async void createEvent(HttpClient httpClient, string accessToken, string subject, string eventContent, string startTime, string endTime, string locationName, List<Attendee> attendees, bool allowNewTimeProposal)
+        public static async void createEvent(string accessToken, string subject, string eventContent, string startTime, string endTime, string locationName, List<Attendee> attendees, bool allowNewTimeProposal)
         {
+            var httpClient = new HttpClient();
+
+            
+
             // Initialize the content of the post request 
             var @event = new Event
             {
@@ -40,35 +46,25 @@ namespace daemon_console.GraphCrud
                 },
                 Start = new Microsoft.Graph.DateTimeTimeZone
                 {
-                    DateTime = "2017-04-15T12:00:00",
+                    DateTime = startTime,
                     TimeZone = "Pacific Standard Time"
                 },
                 End = new Microsoft.Graph.DateTimeTimeZone
                 {
-                    DateTime = "2017-04-15T12:00:00",
+                    DateTime = endTime,
                     TimeZone = "Pacific Standard Time"
                 },
                 Location = new Location
                 {
                     DisplayName = locationName
                 },
-                
 
-                Attendees = new List<Attendee>()
-                    {
-        new Attendee
-        {
-            EmailAddress = new EmailAddress
-            {
-                Address = "samanthab@contoso.onmicrosoft.com",
-                Name = "Samantha Booth"
-            },
-            Type = AttendeeType.Required
-        } },
                 AllowNewTimeProposals = allowNewTimeProposal,
-                TransactionId = "7E163156-7762-4BEB-A1C6-729EA81755A7"
+                TransactionId = generateTransactionId()
 
             };
+
+            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
 
             string eventAsJson = JsonConvert.SerializeObject(@event);
             var content = new StringContent(eventAsJson);
@@ -93,6 +89,27 @@ namespace daemon_console.GraphCrud
                 Console.WriteLine("Event has successfully been deleted!");
             else
                 Console.WriteLine(responseDelete.StatusCode);
+        }
+
+        public static string generateTransactionId()
+        {
+            int length = 28;
+
+            // creating a StringBuilder object()
+            StringBuilder str_build = new StringBuilder();
+            Random random = new Random();
+
+            char letter;
+
+            for (int i = 0; i < length; i++)
+            {
+                double flt = random.NextDouble();
+                int shift = Convert.ToInt32(Math.Floor(25 * flt));
+                letter = Convert.ToChar(shift + 65);
+                str_build.Append(letter);
+            }
+
+            return str_build.ToString();
         }
     }
 }

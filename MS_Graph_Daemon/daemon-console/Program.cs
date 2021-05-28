@@ -13,7 +13,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates; //Only import this if you are using certificate
 using System.Threading.Tasks;
-
+using DateTimeTimeZone = Microsoft.Graph.DateTimeTimeZone;
 
 namespace daemon_console
 {
@@ -95,17 +95,16 @@ namespace daemon_console
 
             if (result != null)
             {
-                //gitchange
-                var httpClient = new HttpClient();
 
                 //Method to get the events from GrapCrudMethods
-                GraphCrudMethods.getEvents(httpClient,result.AccessToken,Display);
+                //GraphCrudMethods.getEvents(result.AccessToken,Display);
 
 
                 List<Attendee> attendees = new List<Attendee>();
 
                 //Method to create events from GrapCrudMethods
-                GraphCrudMethods.createEvent(httpClient, result.AccessToken, "Hello", "Testevent", "2021-05-27T12:00:00", "2021-05-28T12:00:00", "Ehb", attendees, false);
+                GraphCrudMethods.createEvent(result.AccessToken, "Hello", "Testevent", "2021-05-27T12:00:00", "2021-05-28T12:00:00", "Ehb", attendees, false);
+
             }
         }
 
