@@ -40,6 +40,9 @@ namespace UUIDproducer
                 channel.QueueBind(queue: queueName,
                 exchange: "direct_logs",
                 routingKey: "Office");
+                //channel.QueueBind(queue: queueName,
+                //exchange: "direct_logs",
+                //routingKey: "FrontEnd");
                 Console.WriteLine(" [*] Waiting for messages.");
 
                 var consumer = new EventingBasicConsumer(channel);
@@ -80,15 +83,21 @@ namespace UUIDproducer
                         
                         Console.WriteLine("XML is valid");
 
-
+                        //XML head
                         XmlNode myMethodNode = xmlDoc.SelectSingleNode("//method");
                         XmlNode myOriginNode = xmlDoc.SelectSingleNode("//origin");
                         XmlNode myOrganiserSourceId = xmlDoc.SelectSingleNode("//organiserSourceEntityId");
-                        //XmlNode myNameNode = xmlDoc.SelectSingleNode("//name");
-                        //XmlNode myLocationNode = xmlDoc.SelectSingleNode("//location");
+                        XmlNode mySourceEntityId = xmlDoc.SelectSingleNode("//sourceEntityId");
+                        //XML body
+                        XmlNode myEventName = xmlDoc.SelectSingleNode("//name");
+                        XmlNode myUserId = xmlDoc.SelectSingleNode("//organiserUUID");
+                        XmlNode myStartEvent = xmlDoc.SelectSingleNode("//startEvent");
+                        XmlNode myEndEvent = xmlDoc.SelectSingleNode("//endEvent");
+                        XmlNode myDescription = xmlDoc.SelectSingleNode("//description");
+                        XmlNode myLocation = xmlDoc.SelectSingleNode("//location");
 
-                        //Event comes from Front end and we pass it to UUID to compare
-                        if(myOriginNode.InnerXml == "FrontEnd" && myMethodNode.InnerXml == "CREATE" && myOrganiserSourceId.InnerXml == "" && routingKey == "event")
+                        //Create Event comes from FrontEnd and we pass it to UUID to compare
+                        if (myOriginNode.InnerXml == "FrontEnd" && myMethodNode.InnerXml == "CREATE" && myOrganiserSourceId.InnerXml == "" && routingKey == "event")
                         {
                             Console.WriteLine("Got a message from " + myOriginNode.InnerXml);
                             Console.WriteLine("Updating origin \"" + myOriginNode.InnerXml + "\" of XML...");
@@ -120,20 +129,12 @@ namespace UUIDproducer
                             Console.WriteLine("Origin changed to Office, sending now it to UUID...");
 
                         }
-                        else if(myOriginNode.InnerXml == "UUID" && myMethodNode.InnerXml == "CREATE" && myOrganiserSourceId.InnerXml != "" && routingKey == "Office")
+                        
+                        //Create Event comes from UUID we use it and pass it again to UUID
+                        else if (myOriginNode.InnerXml == "UUID" && myMethodNode.InnerXml == "CREATE" && myOrganiserSourceId.InnerXml != "" && routingKey == "Office")
                         {
                             Console.WriteLine("Got a message from " + myOriginNode.InnerXml);
                             Console.WriteLine("Putting data in database and calendar");
-
-
-                            XmlNode myEventName = xmlDoc.SelectSingleNode("//name");
-                            XmlNode myUserId = xmlDoc.SelectSingleNode("//organiserUUID");
-                            XmlNode myStartEvent = xmlDoc.SelectSingleNode("//startEvent");
-                            XmlNode myEndEvent = xmlDoc.SelectSingleNode("//endEvent");
-                            XmlNode myDescription = xmlDoc.SelectSingleNode("//description");
-                            XmlNode myLocation = xmlDoc.SelectSingleNode("//location");
-
-
 
                             string cs = @"server=10.3.56.8;userid=root;password=IUM_VDFt8ZQzc_sF;database=OfficeDB;Old Guids=True";
                             using var con = new MySqlConnection(cs);
@@ -141,8 +142,6 @@ namespace UUIDproducer
 
                             var sql = "INSERT INTO Event(name, userId, startEvent, endEvent, description, location) VALUES(@name, @userId, @startEvent, @endEvent, @description, @location); SELECT @@IDENTITY";
                             using var cmd = new MySqlCommand(sql, con);
-
-
 
 
                             //Parse data to put into database
@@ -162,8 +161,6 @@ namespace UUIDproducer
                             Console.WriteLine("Envet Id in database is: " + iNewRowIdentity);
                             Console.WriteLine("Event inserted in database");
 
-
-
                             docAlter.Load("Alter.xml");
                             docAlter = xmlDoc;
 
@@ -171,27 +168,124 @@ namespace UUIDproducer
                             docAlter.SelectSingleNode("//event/header/sourceEntityId").InnerText = iNewRowIdentity.ToString();
                             docAlter.Save("Alter.xml");
 
+                            docAlter.Save(Console.Out);
 
+                            Task task = new Task(() => Producer.sendMessage(docAlter.InnerXml, "UUID"));
+                            task.Start();
+
+                            Console.WriteLine("Sending message to UUID...");
+                        }
+
+                        //Update Event comes from FrontEnd and we pass it to UUID to compare
+                        if (myOriginNode.InnerXml == "FrontEnd" && myMethodNode.InnerXml == "UPDATE" && myOrganiserSourceId.InnerXml == "" && routingKey == "event")
+                        {
+                            Console.WriteLine("Got a message from " + myOriginNode.InnerXml);
+                            Console.WriteLine("Updating origin from \"" + myOriginNode.InnerXml + " to \"Office\"");
+
+
+                            docAlter.Load("Alter.xml");
+                            docAlter = xmlDoc;
+
+                            docAlter.SelectSingleNode("//event/header/origin").InnerText = "Office";
+                            docAlter.Save("Alter.xml");
                             docAlter.Save(Console.Out);
 
 
                             Task task = new Task(() => Producer.sendMessage(docAlter.InnerXml, "UUID"));
                             task.Start();
 
-                            Console.WriteLine("Sending message to UUID...");
+                            Console.WriteLine("Origin changed to Office, sending now it to UUID...");
 
                         }
 
-                        //Delete Event
-                        if (myOriginNode.InnerXml == "FrontEnd" && myMethodNode.InnerXml == "DELETE")
+                        //Update Event comes from UUID, we update our side and tell the UUID
+                        else if (myOriginNode.InnerXml == "UUID" && myMethodNode.InnerXml == "UPDATE" && myOrganiserSourceId.InnerXml != "" && routingKey == "Office")
                         {
-                            Console.WriteLine("Deleting event, and putting it in database");
+                            Console.WriteLine("Got a message from " + myOriginNode.InnerXml);
+                            //Console.WriteLine("Source id is: " + myDescription.InnerXml);
+                            Console.WriteLine("Updating event data in database and calendar");
+
+                            string cs = @"server=10.3.56.8;userid=root;password=IUM_VDFt8ZQzc_sF;database=OfficeDB;Old Guids=True";
+                            using var con = new MySqlConnection(cs);
+                            con.Open();
+
+                            var sql = "UPDATE Event SET name = @name, userId = @userId, startEvent = @startEvent, endEvent = @endEvent, description = @description, location = @loaction WHERE eventId = '" + mySourceEntityId.InnerXml + "'";
+                            using var cmd = new MySqlCommand(sql, con);
+
+
+                            //Parse data to put into database
+                            DateTime parsedDateStart;
+                            DateTime parsedDateEnd;
+                            parsedDateStart = DateTime.Parse(myStartEvent.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
+                            parsedDateEnd = DateTime.Parse(myEndEvent.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
+
+                            cmd.Parameters.AddWithValue("@name", myEventName.InnerXml);
+                            cmd.Parameters.AddWithValue("@userId", myOrganiserSourceId.InnerXml);
+                            cmd.Parameters.AddWithValue("@startEvent", parsedDateStart);
+                            cmd.Parameters.AddWithValue("@endEvent", parsedDateEnd);
+                            cmd.Parameters.AddWithValue("@description", myDescription.InnerXml);
+                            cmd.Parameters.AddWithValue("@location", myLocation.InnerXml);
+                            cmd.Prepare();
+                            cmd.ExecuteNonQuery();
+                            Console.WriteLine("Event inserted in database");
+
+                            docAlter.Load("Alter.xml");
+                            docAlter = xmlDoc;
+
+                            docAlter.SelectSingleNode("//event/header/origin").InnerText = "Office";
+                            docAlter.SelectSingleNode("//event/header/sourceEntityId").InnerText = mySourceEntityId.InnerXml;
+                            docAlter.Save("Alter.xml");
+
+                            docAlter.Save(Console.Out);
+
+                            Task task = new Task(() => Producer.sendMessage(docAlter.InnerXml, "UUID"));
+                            task.Start();
+
+                            Console.WriteLine("Sending update message to UUID (last step)...");
                         }
-                        //Update Event
-                        if(myOriginNode.InnerXml == "FrontEnd" && myMethodNode.InnerXml == "UPDATE")
+                        
+                        //Delete Event comes from Front end and we pass it to UUID to compare
+                        if (myOriginNode.InnerXml == "FrontEnd" && myMethodNode.InnerXml == "DELETE" && myOrganiserSourceId.InnerXml == "" && routingKey == "event")
                         {
-                            Console.WriteLine("Updating event, and putting it in database");
+                            Console.WriteLine("Got a message from " + myOriginNode.InnerXml);
+                            Console.WriteLine("Updating origin from \"" + myOriginNode.InnerXml + " to \"Office\"");
+
+
+                            docAlter.Load("Alter.xml");
+                            docAlter = xmlDoc;
+
+                            docAlter.SelectSingleNode("//event/header/origin").InnerText = "Office";
+                            docAlter.Save("Alter.xml");
+                            docAlter.Save(Console.Out);
+
+
+                            Task task = new Task(() => Producer.sendMessage(docAlter.InnerXml, "UUID"));
+                            task.Start();
+
+                            Console.WriteLine("Origin changed to Office, sending delete now it to UUID...");
+
                         }
+                        
+                        //Get delete info from UUID and delete it in db and in calendar
+                        else if (myOriginNode.InnerXml == "UUID" && myMethodNode.InnerXml == "DELETE" && myOrganiserSourceId.InnerXml != "" && routingKey == "Office")
+                        {
+                            Console.WriteLine("Got a delete message from " + myOriginNode.InnerXml);
+                            //Console.WriteLine("Source id is: " + myDescription.InnerXml);
+                            Console.WriteLine("Deleting event data in database and calendar");
+
+                            string cs = @"server=10.3.56.8;userid=root;password=IUM_VDFt8ZQzc_sF;database=OfficeDB;Old Guids=True";
+                            using var con = new MySqlConnection(cs);
+                            con.Open();
+
+                            var sql = "DELETE FROM Event WHERE eventId = '" + mySourceEntityId.InnerXml + "'";
+                            using var cmd = new MySqlCommand(sql, con);
+                            
+                            //cmd.Prepare();
+                            cmd.ExecuteNonQuery();
+                            Console.WriteLine("Event deleted in database");
+
+                        }
+
 
                         //Subscribe to Event
                         if(myOriginNode.InnerXml == "FrontEnd" && myMethodNode.InnerXml == "SUBSCRIBE")
@@ -204,24 +298,6 @@ namespace UUIDproducer
                             Console.WriteLine("Unsusbscribing from event, and putting it in database");
                         }
 
-                        //Create User
-                        if(myOriginNode.InnerXml == "AD" && myMethodNode.InnerXml == "CREATE")
-                        {
-                            Console.WriteLine("Creating user, and putting it in database");
-                        }
-                        //Delete User
-                        if(myOriginNode.InnerXml == "AD" && myMethodNode.InnerXml == "DELETE")
-                        {
-                            Console.WriteLine("Deleting user, and putting it in database");
-                        }
-                        //Update User
-                        if(myOriginNode.InnerXml == "AD" && myMethodNode.InnerXml == "UPDATE")
-                        {
-                            Console.WriteLine("Updating user, and putting it in database");
-                        }
-                      
-
-
                         //XDocument xmlEvent = XDocument.Parse(message, LoadOptions.SetLineInfo);
                         //Console.WriteLine(xmlEvent);
 
@@ -230,7 +306,7 @@ namespace UUIDproducer
                         //Console.WriteLine(xmlStuur);
                         //sturen van bericht
                     }
-                    //XML from UUID
+                    //XML error from UUID
                     else
                     {
                         XmlNode myCodeNode = xmlDoc.SelectSingleNode("//code");

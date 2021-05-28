@@ -14,7 +14,9 @@ namespace UUIDproducer
             //Uuid.createEvent();
 
 
-            Uuid.createMockEvent();
+            //Uuid.createMockEvent();
+            Uuid.updateMockEvent();
+            //Uuid.updateMockEventFromFrontEnd();
 
 
             /*
