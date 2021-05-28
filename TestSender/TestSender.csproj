@@ -11,6 +11,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="DeleteEvent.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="CreateEvent.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
