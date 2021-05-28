@@ -29,10 +29,10 @@ namespace UUIDproducer
 
                 XmlSchemaSet schema = new XmlSchemaSet();
                 schema.Add("", "EventSchema.xsd");
-                Console.WriteLine("error root:");
-                Console.WriteLine(message);
+                ///Console.WriteLine("error root:");
+                
                 XDocument xml = XDocument.Parse(message, LoadOptions.SetLineInfo);
-
+                Console.WriteLine(message);
 
                 //bool xmlValidation = true;
 

@@ -153,16 +153,16 @@ namespace UUIDproducer
         {
             string message =
               "<user><header>" +
-              "<UUID>333ade47-03d1-40bb-9912-9a6c86a60169</UUID>" +
+              "<UUID></UUID>" +
               "<method>UPDATE</method>" +
               "<origin>AD</origin>" +
               "<version>1</version>" +
-              "<sourceEntityId>aaa77</sourceEntityId>" +
+              "<sourceEntityId></sourceEntityId>" +
               "<timestamp>" + DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K") + "</timestamp>" +
               "</header>" +
               "<body>" +
-              "<firstname>mihriban</firstname>" +
-              "<lastname>yelboga</lastname>" +
+              "<firstname>mihribanyel</firstname>" +
+              "<lastname>yelbogaaa</lastname>" +
               "<email>mihriban.yelboga@student.ehb.be</email>" +
               "<birthday>1997-09-26</birthday>" +
               "<role>student</role>" +
@@ -174,6 +174,8 @@ namespace UUIDproducer
             Task task = new Task(() => Producer.sendMessage(message, "user"));
 
             task.Start();
+            Console.WriteLine("Starting up producer...");
+
             Consumer.getMessage();
         }
         //deleten van user met xml file
@@ -198,9 +200,10 @@ namespace UUIDproducer
               "</body></user>";
 
 
-            Task task = new Task(() => Producer.sendMessage(message, "user"));
+            Task task = new Task(() => Producer.sendMessage(message,"user");
 
             task.Start();
+            Console.WriteLine("Starting up producer...");
             Consumer.getMessage();
 
         }

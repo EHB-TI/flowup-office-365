@@ -14,7 +14,7 @@ namespace UUIDproducer
             //Uuid.createEvent();
 
             //Consumer.getMessage();
-            Uuid.createMockUser();
+            Uuid.updateMockUser();
 
 
             /*

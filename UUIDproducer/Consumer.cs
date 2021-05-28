@@ -54,7 +54,8 @@ namespace UUIDproducer
                     //xsd event validation
                     XmlSchemaSet schema = new XmlSchemaSet();
                     schema.Add("", "EventSchema.xsd");
-
+                    XmlSchemaSet schemaUser = new XmlSchemaSet();
+                    schemaUser.Add("", "UserSchema.xsd");
 
                     //XDocument xml = XDocument.Parse(message, LoadOptions.SetLineInfo);
                     XmlDocument xmlDoc = new XmlDocument();
@@ -69,8 +70,7 @@ namespace UUIDproducer
                         xmlValidation = false;
                     });
 
-                    XmlSchemaSet schemaUser = new XmlSchemaSet();
-                    schemaUser.Add("", "UserSchema.xsd");
+
 
                     xml.Validate(schemaUser, (sender, e) =>
                     {
@@ -85,7 +85,7 @@ namespace UUIDproducer
 
                     //Alter XML to change
                     XmlDocument docAlter = new XmlDocument();
-                    
+
 
 
                     if (xmlValidation)
@@ -97,8 +97,16 @@ namespace UUIDproducer
                         XmlNode myMethodNode = xmlDoc.SelectSingleNode("//method");
                         XmlNode myOriginNode = xmlDoc.SelectSingleNode("//origin");
                         XmlNode myOrganiserSourceId = xmlDoc.SelectSingleNode("//organiserSourceEntityId");
+                        XmlNode mySourceEntityId = xmlDoc.SelectSingleNode("//sourceEntityId");
                         //XmlNode myNameNode = xmlDoc.SelectSingleNode("//name");
                         //XmlNode myLocationNode = xmlDoc.SelectSingleNode("//location");
+                        //XML body
+                        XmlNode myEventName = xmlDoc.SelectSingleNode("//name");
+                        XmlNode myUserId = xmlDoc.SelectSingleNode("//organiserUUID");
+                        XmlNode myStartEvent = xmlDoc.SelectSingleNode("//startEvent");
+                        XmlNode myEndEvent = xmlDoc.SelectSingleNode("//endEvent");
+                        XmlNode myDescription = xmlDoc.SelectSingleNode("//description");
+                        XmlNode myLocation = xmlDoc.SelectSingleNode("//location");
 
                         //Event comes from Front end and we pass it to UUID to compare
                         if (myOriginNode.InnerXml == "FrontEnd" && myMethodNode.InnerXml == "CREATE" && myOrganiserSourceId.InnerXml == "" && routingKey == "event")
@@ -139,12 +147,6 @@ namespace UUIDproducer
                             Console.WriteLine("Putting data in database and calendar");
 
 
-                            XmlNode myEventName = xmlDoc.SelectSingleNode("//name");
-                            XmlNode myUserId = xmlDoc.SelectSingleNode("//organiserUUID");
-                            XmlNode myStartEvent = xmlDoc.SelectSingleNode("//startEvent");
-                            XmlNode myEndEvent = xmlDoc.SelectSingleNode("//endEvent");
-                            XmlNode myDescription = xmlDoc.SelectSingleNode("//description");
-                            XmlNode myLocation = xmlDoc.SelectSingleNode("//location");
 
 
 
@@ -224,10 +226,21 @@ namespace UUIDproducer
                         XmlDocument docAlterUser = new XmlDocument();
                         Console.WriteLine("XML user is valid");
 
-
+                        //XML HEAD
                         XmlNode myMethodNodeUser = xmlDoc.SelectSingleNode("//method");
                         XmlNode myOriginNodeUser = xmlDoc.SelectSingleNode("//origin");
                         XmlNode mySourceIdUser = xmlDoc.SelectSingleNode("//sourceEntityId");
+                        XmlNode myUserVersion = xmlDoc.SelectSingleNode("//version");
+
+                        //XML BODY
+                        XmlNode myFirstName = xmlDoc.SelectSingleNode("//firstname");
+                        XmlNode myLastName = xmlDoc.SelectSingleNode("//lastname");
+                        XmlNode myEmail = xmlDoc.SelectSingleNode("//email");
+                        XmlNode myBirthday = xmlDoc.SelectSingleNode("//birthday");
+                        XmlNode myRole = xmlDoc.SelectSingleNode("//role");
+                        XmlNode myStudy = xmlDoc.SelectSingleNode("//study");
+
+
                         //Create User
                         if (myOriginNodeUser.InnerXml == "AD" && myMethodNodeUser.InnerXml == "CREATE" && mySourceIdUser.InnerXml == "" && routingKey == "user")
                         {
@@ -257,18 +270,11 @@ namespace UUIDproducer
                         else if (myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "CREATE" && mySourceIdUser.InnerXml == "" && routingKey == "Office")
                         {
 
+                            Console.WriteLine("Got a message from " + myOriginNodeUser.InnerXml);
+
                             Console.WriteLine("Creating user, and putting it in database");
                             //Console.WriteLine("Putting data in database and calendar");
 
-
-                            //selection of attributes in the database
-                            XmlNode myUserId = xmlDoc.SelectSingleNode("//sourceEntityId");
-                            XmlNode myFirstName = xmlDoc.SelectSingleNode("//firstname");
-                            XmlNode myLastName = xmlDoc.SelectSingleNode("//lastname");
-                            XmlNode myEmail = xmlDoc.SelectSingleNode("//email");
-                            XmlNode myBirthday = xmlDoc.SelectSingleNode("//birthday");
-                            XmlNode myRole = xmlDoc.SelectSingleNode("//role");
-                            XmlNode myStudy = xmlDoc.SelectSingleNode("//study");
 
 
                             //connection to the database
@@ -277,7 +283,7 @@ namespace UUIDproducer
                             con.Open();
 
 
-                            var sql = "INSERT INTO User(firstname,lastname,email,birthday,role,study) VALUES(@firstname, @lastname, @email, @birthday,@role,@study); SELECT @@IDENTITY";
+                            var sql = "INSERT INTO User(firstname,lastname,email,birthday,role,study) VALUES(@firstname, @lastname, @email, @birthday,@role,@study);SELECT @@IDENTITY";
                             using var cmd = new MySqlCommand(sql, con);
 
 
@@ -297,6 +303,8 @@ namespace UUIDproducer
                             cmd.Parameters.AddWithValue("@birthday", parsedBirthday);
                             cmd.Parameters.AddWithValue("@role", myRole.InnerXml);
                             cmd.Parameters.AddWithValue("@study", myStudy.InnerXml);
+                            cmd.Prepare();
+                            cmd.ExecuteNonQuery();
 
 
                             int iNewRowIdentity = Convert.ToInt32(cmd.ExecuteScalar());
@@ -309,7 +317,7 @@ namespace UUIDproducer
                             docAlter = xmlDoc;
 
                             docAlter.SelectSingleNode("//user/header/origin").InnerText = "Office";
-                            //docAlter.SelectSingleNode("//user/header/userId").InnerText = iNewRowIdentity.ToString();
+                            docAlter.SelectSingleNode("//user/header/userId").InnerText = mySourceIdUser.InnerXml;
                             docAlter.Save("AlterUser.xml");
 
 
@@ -321,113 +329,225 @@ namespace UUIDproducer
 
                             Console.WriteLine("Sending creating user message to UUID...");
                         }
+                        //update user comes from AD and we pass it to UUID to compare
+                        if (myOriginNodeUser.InnerXml == "AD" && myMethodNodeUser.InnerXml == "UPDATE" && mySourceIdUser.InnerXml == "" && routingKey == "user")
 
-                        //XML from UUID
-                        /*else
                         {
-                            XmlNode myCodeNode = xmlDoc.SelectSingleNode("//code");
-                            XmlNode myOriginNodeUserUser = xmlDoc.SelectSingleNode("//origin");
-                            XmlNode myobjectSourceId = xmlDoc.SelectSingleNode("//objectSourceId");
-                            XmlNode myErrorMessage = xmlDoc.SelectSingleNode("//description");
+
+                            Console.WriteLine("Got a message from " + myOriginNodeUser.InnerXml);
+                            Console.WriteLine("updating user, and putting it in database");
+
+                            docAlterUser.Load("AlterUser.xml");
+                            docAlter = xmlDoc;
+
+                            docAlterUser.SelectSingleNode("//user/header/origin").InnerText = "Office";
+                            docAlterUser.Save("AlterUser.xml");
+                            docAlterUser.Save(Console.Out);
 
 
-                            schema = new XmlSchemaSet();
-                            schema.Add("", "Errorxsd.xsd");
-                            Console.WriteLine("Errors XML received");
-                            xml = XDocument.Parse(message, LoadOptions.SetLineInfo);
-                            xmlValidation = true;
 
-                            xml.Validate(schema, (sender, e) =>
-                            {
-                                xmlValidation = false;
-                            });
+                            Task task = new Task(() => Producer.sendMessage(docAlterUser.InnerXml, "UUID"));
+                            task.Start();
 
-
-                            //XDocument xmlEvent = XDocument.Parse(message);
-                            //string error = "";
-                            //string code = "";
-
-                            //IEnumerable<XElement> xElements = xmlEvent.Descendants("description");
-                            //IEnumerable<XElement> xElements1 = xmlEvent.Descendants("code");
-                            //foreach (var element in xElements)
-                            //{
-                            //    error = element.Value;
-
-                            //}
-                            //foreach (var element in xElements1)
-                            //{
-                            //    code = element.Value;
-
-                            //}
-
-                            //Console.WriteLine(error);
-                            //Console.WriteLine(code);
-                            Console.WriteLine("Code node" + myCodeNode.InnerXml);
-
-                            //Event comes from UUID Master, we get a message back from UUID
-                            if (myOriginNodeUser.InnerXml == "UUID" && myobjectSourceId.InnerXml == "" && routingKey == "Office")
-                            {
-                                Console.WriteLine("Waiting for message from UUID...");
-                                Console.WriteLine(message);
-                                Console.WriteLine("Alter message is:");
-                                Console.WriteLine(docAlter.InnerXml);
+                            Console.WriteLine("Origin changed to Office, sending now it to UUID...");
+                        }
+                        //update user comes from UUID we update our side and tell the UUID
+                        else if (myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "UPDATE" && mySourceIdUser.InnerXml == "" && routingKey == "Office")
+                        {
+                            Console.WriteLine("Got a message from " + myOriginNodeUser.InnerXml);
+                            //Console.WriteLine("Source id is: " + myDescription.InnerXml);
+                            Console.WriteLine("Updating user data in database and calendar");
 
 
-                                switch (myCodeNode.InnerXml)
-                                {
-                                    case "1000":
-                                        Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                                        break;
-                                    case "1001":
-                                        Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                                        break;
-                                    case "1002":
-                                        Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                                        break;
-                                    case "1003":
-                                        Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                                        break;
-                                    case "1004":
-                                        Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                                        break;
-                                    case "1005":
-                                        Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                                        break;
-                                    //DB Error
-                                    case "2000":
-                                        Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                                        break;
-                                    //Create
-                                    case "3000":
-                                        Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                                        break;
-                                    case "3001":
-                                        Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                                        break;
-                                    case "3002":
-                                        Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                                        break;
-                                    //Update
-                                    case "4000":
-                                        Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                                        break;
-                                    case "4001":
-                                        Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                                        break;
-                                    //Delete
-                                    case "5000":
-                                        Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                                        break;
-                                    default:
-                                        Console.WriteLine("Default case");
-                                        break;
-                                }
+                            string cs = @"server=10.3.56.8;userid=root;password=IUM_VDFt8ZQzc_sF;database=OfficeDB;Old Guids=True";
+                            using var con = new MySqlConnection(cs);
+                            con.Open();
 
-                            }*/
+                            var sql = "UPDATE User SET firstname=@firstname, lastname=@lastname, email=@email,birthday=@birthday,role=@role,study=@study) WHERE userId= '" + mySourceIdUser.InnerXml + "'";
+                            using var cmd = new MySqlCommand(sql, con);
 
+                            //Parse data to put into database
+                            DateTime parsedBirthday;
+
+                            parsedBirthday = DateTime.Parse(myBirthday.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
+
+                            //cmd.Parameters.AddWithValue("@userId", mySourceIdUser.InnerXml);
+                            cmd.Parameters.AddWithValue("@firstname", myFirstName.InnerXml);
+                            cmd.Parameters.AddWithValue("@lastname", myLastName.InnerXml);
+                            cmd.Parameters.AddWithValue("@email", myEmail.InnerXml);
+                            cmd.Parameters.AddWithValue("@birthday", parsedBirthday);
+                            cmd.Parameters.AddWithValue("@role", myRole.InnerXml);
+                            cmd.Parameters.AddWithValue("@study", myStudy.InnerXml);
+                            cmd.Prepare();
+                            cmd.ExecuteNonQuery();
+
+
+
+                            int iNewRowIdentity = Convert.ToInt32(cmd.ExecuteScalar());
+                            Console.WriteLine("User Id in database is: " + iNewRowIdentity);
+                            Console.WriteLine("User inserted in database");
+
+
+
+                            docAlter.Load("AlterUser.xml");
+                            docAlter = xmlDoc;
+
+                            docAlter.SelectSingleNode("//user/header/origin").InnerText = "Office";
+                            docAlter.SelectSingleNode("//user/header/userId").InnerText = mySourceIdUser.InnerXml;
+                            docAlter.Save("AlterUser.xml");
+
+
+                            docAlter.Save(Console.Out);
+
+
+                            Task task = new Task(() => Producer.sendMessage(docAlterUser.InnerXml, "UUID"));
+                            task.Start();
+
+                            Console.WriteLine("Sending update user message to UUID...");
+
+
+                        }
+                        //Delete user comes from UUID we update our side and tell the UUID
+                        if (myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "DELETE" && mySourceIdUser.InnerXml == "" && routingKey == "Office")
+                        {
+                            Console.WriteLine("Got a message from " + myOriginNodeUser.InnerXml);
+                            Console.WriteLine("updating user, and putting it in database");
+
+                            docAlterUser.Load("AlterUser.xml");
+                            docAlter = xmlDoc;
+
+                            docAlterUser.SelectSingleNode("//user/header/origin").InnerText = "Office";
+                            docAlterUser.Save("AlterUser.xml");
+                            docAlterUser.Save(Console.Out);
+
+
+
+                            Task task = new Task(() => Producer.sendMessage(docAlterUser.InnerXml, "UUID"));
+                            task.Start();
+
+                            Console.WriteLine("Origin changed to Office, sending now it to UUID...");
+                        }
+                        else if(myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "DELETE" && mySourceIdUser.InnerXml == "" && routingKey == "Office")
+                        {
+                            Console.WriteLine("Got a delete message from " + mySourceIdUser.InnerXml);
+                            Console.WriteLine("The full message from the UUID is: " + xmlDoc.InnerXml);
+                            //Console.WriteLine("Source id is: " + myDescription.InnerXml);
+                            Console.WriteLine("Deleting user data in database and calendar");
+
+                            string cs = @"server=10.3.56.8;userid=root;password=IUM_VDFt8ZQzc_sF;database=OfficeDB;Old Guids=True";
+                            using var con = new MySqlConnection(cs);
+                            con.Open();
+
+                            var sql = "DELETE FROM User WHERE userId= '" + mySourceIdUser.InnerXml + "'";
+
+                        }
                     }
 
+                    //XML from UUID
+                    /*else
+                    {
+                        XmlNode myCodeNode = xmlDoc.SelectSingleNode("//code");
+                        XmlNode myOriginNodeUserUser = xmlDoc.SelectSingleNode("//origin");
+                        XmlNode myobjectSourceId = xmlDoc.SelectSingleNode("//objectSourceId");
+                        XmlNode myErrorMessage = xmlDoc.SelectSingleNode("//description");
+
+
+                        schema = new XmlSchemaSet();
+                        schema.Add("", "Errorxsd.xsd");
+                        Console.WriteLine("Errors XML received");
+                        xml = XDocument.Parse(message, LoadOptions.SetLineInfo);
+                        xmlValidation = true;
+
+                        xml.Validate(schema, (sender, e) =>
+                        {
+                            xmlValidation = false;
+                        });
+
+
+                        //XDocument xmlEvent = XDocument.Parse(message);
+                        //string error = "";
+                        //string code = "";
+
+                        //IEnumerable<XElement> xElements = xmlEvent.Descendants("description");
+                        //IEnumerable<XElement> xElements1 = xmlEvent.Descendants("code");
+                        //foreach (var element in xElements)
+                        //{
+                        //    error = element.Value;
+
+                        //}
+                        //foreach (var element in xElements1)
+                        //{
+                        //    code = element.Value;
+
+                        //}
+
+                        //Console.WriteLine(error);
+                        //Console.WriteLine(code);
+                        Console.WriteLine("Code node" + myCodeNode.InnerXml);
+
+                        //Event comes from UUID Master, we get a message back from UUID
+                        if (myOriginNodeUser.InnerXml == "UUID" && myobjectSourceId.InnerXml == "" && routingKey == "Office")
+                        {
+                            Console.WriteLine("Waiting for message from UUID...");
+                            Console.WriteLine(message);
+                            Console.WriteLine("Alter message is:");
+                            Console.WriteLine(docAlter.InnerXml);
+
+
+                            switch (myCodeNode.InnerXml)
+                            {
+                                case "1000":
+                                    Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                                    break;
+                                case "1001":
+                                    Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                                    break;
+                                case "1002":
+                                    Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                                    break;
+                                case "1003":
+                                    Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                                    break;
+                                case "1004":
+                                    Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                                    break;
+                                case "1005":
+                                    Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                                    break;
+                                //DB Error
+                                case "2000":
+                                    Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                                    break;
+                                //Create
+                                case "3000":
+                                    Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                                    break;
+                                case "3001":
+                                    Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                                    break;
+                                case "3002":
+                                    Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                                    break;
+                                //Update
+                                case "4000":
+                                    Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                                    break;
+                                case "4001":
+                                    Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                                    break;
+                                //Delete
+                                case "5000":
+                                    Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                                    break;
+                                default:
+                                    Console.WriteLine("Default case");
+                                    break;
+                            }
+
+                        }*/
+
                 };
+
                 channel.BasicConsume(queue: queueName,
                 autoAck: true,
                 consumer: consumer);
