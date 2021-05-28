@@ -108,18 +108,11 @@ namespace UUIDproducer
                         XmlNode myDescription = xmlDoc.SelectSingleNode("//description");
                         XmlNode myLocation = xmlDoc.SelectSingleNode("//location");
 
-                        //Event comes from Front end and we pass it to UUID to compare
+                        //Event comes from Front end we change the Origin to Office and we pass it to UUID to compare
                         if (myOriginNode.InnerXml == "FrontEnd" && myMethodNode.InnerXml == "CREATE" && myOrganiserSourceId.InnerXml == "" && routingKey == "event")
                         {
                             Console.WriteLine("Got a message from " + myOriginNode.InnerXml);
                             Console.WriteLine("Updating origin \"" + myOriginNode.InnerXml + "\" of XML...");
-
-
-
-                            //XmlWriterSettings settings = new XmlWriterSettings();
-                            //settings.Indent = true;
-                            //XmlWriter writer = XmlWriter.Create("Alter.xml", settings);
-                            //doc1.Save(writer);
 
 
                             docAlter.Load("Alter.xml");
@@ -128,11 +121,7 @@ namespace UUIDproducer
                             docAlter.SelectSingleNode("//event/header/origin").InnerText = "Office";
                             docAlter.Save("Alter.xml");
 
-
                             docAlter.Save(Console.Out);
-                            //Console.WriteLine(docAlter.InnerXml);
-                            //Console.WriteLine(docMessage.InnerXml);
-                            //Console.WriteLine(docMessageConverted.InnerXml);
 
 
                             Task task = new Task(() => Producer.sendMessage(docAlter.InnerXml, "UUID"));
@@ -443,6 +432,7 @@ namespace UUIDproducer
                         }
                     }
 
+<<<<<<< Updated upstream
                     //XML from UUID
                     else
                     {
@@ -546,6 +536,9 @@ namespace UUIDproducer
 
                         }
 
+=======
+
+>>>>>>> Stashed changes
                     };
 
                     channel.BasicConsume(queue: queueName,
@@ -558,111 +551,7 @@ namespace UUIDproducer
 
                 };
 
-            //private static string createEventXml(XDocument xmlEvent)
-            //{
-            //    //xml file attributen event
-            //    string sourceEntityId = "";
-            //    string organiserSourceEntityId = "";
-            //    string method = "";
-            //    string origin = "Office";
-            //    string version = "";
-            //    string timestamp = "";
-
-
-            //    string name = "";
-            //    string startEvent = "";
-            //    string endEvent = "";
-            //    string description = "";
-            //    string location = "";
-
-
-
-            //    IEnumerable<XElement> xElements = xmlEvent.Descendants("method");
-            //    foreach (var element in xElements)
-            //    {
-            //        method = element.Value;
-            //    }
-            //    xElements = xmlEvent.Descendants("sourceEntityId");
-            //    foreach (var element in xElements)
-            //    {
-            //        sourceEntityId = element.Value;
-            //    }
-            //    xElements = xmlEvent.Descendants("organiserSourceEntityId");
-            //    foreach (var element in xElements)
-            //    {
-            //        organiserSourceEntityId = element.Value;
-            //    }
-            //    xElements = xmlEvent.Descendants("version");
-            //    foreach (var element in xElements)
-            //    {
-            //        version = element.Value;
-            //    }
-            //    xElements = xmlEvent.Descendants("timestamp");
-            //    foreach (var element in xElements)
-            //    {
-            //        timestamp = element.Value;
-            //    }
-
-
-            //    xElements = xmlEvent.Descendants("name");
-            //    foreach (var element in xElements)
-            //    {
-            //        name = element.Value;
-            //    }
-
-            //    xElements = xmlEvent.Descendants("startEvent");
-            //    foreach (var element in xElements)
-            //    {
-            //        startEvent = element.Value;
-            //    }
-
-            //    xElements = xmlEvent.Descendants("endEvent");
-            //    foreach (var element in xElements)
-            //    {
-            //        endEvent = element.Value;
-            //    }
-            //    xElements = xmlEvent.Descendants("description");
-            //    foreach (var element in xElements)
-            //    {
-            //        description = element.Value;
-            //    }
-            //    xElements = xmlEvent.Descendants("location");
-            //    foreach (var element in xElements)
-            //    {
-            //        location = element.Value;
-            //    }
-
-            //    string message = "";
-            //    xElements = xmlEvent.Descendants("UUID");
-            //    xElements = xmlEvent.Descendants("organiserUUID");
-
-
-            //    foreach (var el in xElements)
-            //    {
-            //        message =
-            //    "<event><header>" +
-            //    "<UUID>" + el.Value + "</UUID>" +
-            //    "<sourceEntityId>" + sourceEntityId + "</sourceEntityId>" +
-            //    "<organiserUUID>" + el.Value + "</organiserUUID>" +
-            //    "<organiserSourceEntityId>" + organiserSourceEntityId + "</organiserSourceEntityId >" +
-            //    "<method>" + method + "</method>" +
-            //    "<origin>" + origin + "</origin>" +
-            //    "<version>" + version + "</version>" +
-            //    "<timestamp>" + timestamp + "</timestamp>" +
-            //    "</header>" +
-            //    "<body>" +
-            //    "<name>" + name + "</name>" +
-            //    "<startEvent>" + startEvent + "</startEvent>" +
-            //    "<endEvent>" + endEvent + "</endEvent>" +
-            //    "<description>" + description + "</description>" +
-            //    "<location>" + location + "</location>" +
-            //    "</body></event>";
-            //    }
-
-
-            //    return message;
-
-            //}
+            
         }
     }
 }
