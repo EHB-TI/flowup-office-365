@@ -125,11 +125,11 @@ namespace UUIDproducer
         {
             string message =
            "<user><header>" +
-              "<UUID></UUID>" +
+              "<UUID>9ce7723f-1442-433e-a8cf-98af6d8cc197</UUID>" +
               "<method>CREATE</method>" +
               "<origin>AD</origin>" +
               "<version>1</version>" +
-              "<sourceEntityId>aaa77</sourceEntityId>" +
+              "<sourceEntityId></sourceEntityId>" +
               "<timestamp>" + DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K") + "</timestamp>" +
               "</header>" +
               "<body>" +
@@ -144,15 +144,16 @@ namespace UUIDproducer
             Task task = new Task(() => Producer.sendMessage(message, "user"));
 
             task.Start();
+            Console.WriteLine("producer starting!");
             Consumer.getMessage();
 
         }
-        //updaten van event aan de hand van xml
-        public static void updateUser()
+        //updaten van user aan de hand van xml
+        public static void updateMockUser()
         {
             string message =
               "<user><header>" +
-              "<UUID></UUID>" +
+              "<UUID>333ade47-03d1-40bb-9912-9a6c86a60169</UUID>" +
               "<method>UPDATE</method>" +
               "<origin>AD</origin>" +
               "<version>1</version>" +
@@ -175,12 +176,12 @@ namespace UUIDproducer
             task.Start();
             Consumer.getMessage();
         }
-        //deleten van event met xml file
-        public static void deleteUser()
+        //deleten van user met xml file
+        public static void deleteMockUser()
         {
             string message =
               "<user><header>" +
-              "<UUID></UUID>" +
+              "<UUID>333ade47-03d1-40bb-9912-9a6c86a60169</UUID>" +
               "<method>DELETE</method>" +
               "<origin>AD</origin>" +
               "<version>1</version>" +

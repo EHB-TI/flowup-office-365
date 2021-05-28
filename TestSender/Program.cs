@@ -47,9 +47,24 @@ class EmitLogDirect
                 Console.WriteLine("XML is ongeldig");
             }
 
-            var severity = "event";
-            string message = doc.InnerXml;
-
+            var severity = "user";
+            //string message = doc.InnerXml;
+            string message = "<user><header>" +
+              "<UUID>9ce7723f-1442-433e-a8cf-98af6d8cc197</UUID>" +
+              "<method>CREATE</method>" +
+              "<origin>AD</origin>" +
+              "<version>1</version>" +
+              "<sourceEntityId></sourceEntityId>" +
+              "<timestamp>" + DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K") + "</timestamp>" +
+              "</header>" +
+              "<body>" +
+              "<firstname>mihriban</firstname>" +
+              "<lastname>yelboga</lastname>" +
+              "<email>mihriban.yelboga@student.ehb.be</email>" +
+              "<birthday>1997-09-26</birthday>" +
+              "<role>student</role>" +
+              "<study>Dig-X</study>" +
+              "</body></user>";
             var body = Encoding.UTF8.GetBytes(message);
             channel.BasicPublish(exchange: "direct_logs",
                                  routingKey: severity,

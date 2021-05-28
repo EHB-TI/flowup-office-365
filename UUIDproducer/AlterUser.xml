@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<user>
+  <header>
+    <UUID></UUID>
+    <method>CREATE</method>
+    <origin>ALTER</origin>
+    <version>1</version>
+    <sourceEntityId>7</sourceEntityId>
+    <timestamp>2021-05-25T12:00:00+01:00</timestamp>
+  </header>
+  <body>
+    <firstname>Mihriban</firstname>
+    <lastname>Yelboga</lastname>
+    <email>mihriban.yelboga@student.dhb.be</email>
+    <birthday>1997-09-26</birthday>
+    <role>student</role>
+    <study>Dig-X</study>
+  </body>
+</user>
+
