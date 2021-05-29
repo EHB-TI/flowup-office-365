@@ -108,12 +108,7 @@ namespace UUIDproducer
                     {
                         xmlValidationSubscribe = false;
                     });
-                    //if (routingKey == "Office")
-                    //{
-                    // Console.WriteLine("create event");
-
-                    //}
-                    //XML from RabbitMQ
+                  
 
                     //Alter XML to change
                     XmlDocument docAlter = new XmlDocument();
@@ -170,7 +165,7 @@ namespace UUIDproducer
 
                         }
                         
-                        //Create Event comes from UUID we use it and pass it again to UUID
+                        //Create Event comes from UUID we use it and pass it again to UUID (Last step create)
                         else if (myOriginNode.InnerXml == "UUID" && myMethodNode.InnerXml == "CREATE" && myOrganiserSourceId.InnerXml != "" && routingKey == "Office")
                         {
 
@@ -255,7 +250,7 @@ namespace UUIDproducer
                             Task task = new Task(() => Producer.sendMessage(docAlter.InnerXml, "UUID"));
                             task.Start();
 
-                            Console.WriteLine("Sending message to UUID...");
+                            Console.WriteLine("Sending message to UUID (Last step)...");
                         }
 
                         //Update Event comes from FrontEnd and we pass it to UUID to compare
@@ -366,16 +361,6 @@ namespace UUIDproducer
                             Console.WriteLine("Event deleted in database");
 
                         }
-
-
-                       
-
-                        //XDocument xmlEvent = XDocument.Parse(message, LoadOptions.SetLineInfo);
-                        //Console.WriteLine(xmlEvent);
-
-
-                        //string xmlStuur = createEventXml(xmlEvent);
-                        //Console.WriteLine(xmlStuur);
                     }
                     else if (xmlValidationUser)
                     {
@@ -415,9 +400,6 @@ namespace UUIDproducer
 
 
                             docAlterUser.Save(Console.Out);
-                            //Console.WriteLine(docAlter.InnerXml);
-                            //Console.WriteLine(docMessage.InnerXml);
-                            //Console.WriteLine(docMessageConverted.InnerXml);
 
 
                             Task task = new Task(() => Producer.sendMessage(docAlterUser.InnerXml, "UUID"));
@@ -645,9 +627,14 @@ namespace UUIDproducer
                     //XML error from UUID
                     else
                     {
+                        //header
                         XmlNode myCodeNode = xmlDoc.SelectSingleNode("//code");
                         XmlNode myOriginNode = xmlDoc.SelectSingleNode("//origin");
+                        XmlNode myTimestamp = xmlDoc.SelectSingleNode("//timestamp");
+                        //body
+                        XmlNode myobjectUUID = xmlDoc.SelectSingleNode("//objectUUID");
                         XmlNode myobjectSourceId = xmlDoc.SelectSingleNode("//objectSourceId");
+                        XmlNode myObjectOrigin = xmlDoc.SelectSingleNode("//objectOrigin");
                         XmlNode myErrorMessage = xmlDoc.SelectSingleNode("//description");
 
                         Console.WriteLine("Error XML received");
@@ -664,29 +651,8 @@ namespace UUIDproducer
                         });
 
 
-                        /*XDocument xmlEvent = XDocument.Parse(message);
-                        string error = "";
-                        string code = "";
-
-                        IEnumerable<XElement> xElements = xmlEvent.Descendants("description");
-                        IEnumerable<XElement> xElements1 = xmlEvent.Descendants("code");
-                        foreach (var element in xElements)
-                        {
-                            error = element.Value;
-
-                        }
-                        foreach (var element in xElements1)
-                        {
-                            code = element.Value;
-
-                        }
-
-                        Console.WriteLine(error);
-                        Console.WriteLine(code);
-                        Console.WriteLine("Code node" + myCodeNode.InnerXml);*/
-
+                        
                         //Event comes from UUID Master, we get a message back from UUID
-
                         switch (myCodeNode.InnerXml)
                         {
                             case "1000":
