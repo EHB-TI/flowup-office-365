@@ -304,12 +304,12 @@ namespace UUIDproducer
                             Console.WriteLine("User inserted in database");
 
 
-                            docAlter.Load("AlterUser.xml");
-                            docAlter = xmlDoc;
+                            docAlterUser.Load("AlterUser.xml");
+                            docAlterUser = xmlDoc;
 
-                            docAlter.SelectSingleNode("//user/header/origin").InnerText = "Office";
-                            docAlter.SelectSingleNode("//user/header/userId").InnerText = mySourceIdUser.InnerXml;
-                            docAlter.Save("AlterUser.xml");
+                            docAlterUser.SelectSingleNode("//user/header/origin").InnerText = "Office";
+                            docAlterUser.SelectSingleNode("//user/header/sourceEntityId").InnerText = iNewRowIdentity.ToString();
+                            docAlterUser.Save("AlterUser.xml");
 
 
                             docAlter.Save(Console.Out);
@@ -357,30 +357,30 @@ namespace UUIDproducer
                             {
 
                             
-                            using var con = new MySqlConnection(cs);
-                            con.Open();
+                                using var con = new MySqlConnection(cs);
+                                con.Open();
 
-                            var sql = "UPDATE User SET firstname=@firstname, lastname=@lastname, email=@email,birthday=@birthday,role=@role,study=@study) WHERE userId= '" + mySourceIdUser.InnerXml + "'";
-                            using var cmd = new MySqlCommand(sql, con);
+                                var sql = "UPDATE User SET firstname = @firstname, lastname  = @lastname, email = @email, birthday = @birthday, role = @role, study = @study WHERE userId = '" + mySourceIdUser.InnerXml + "'";
+                                using var cmd = new MySqlCommand(sql, con);
 
-                            //Parse data to put into database
-                            DateTime parsedBirthday;
+                                //Parse data to put into database
+                                DateTime parsedBirthday;
 
-                            parsedBirthday = DateTime.Parse(myBirthday.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
+                                parsedBirthday = DateTime.Parse(myBirthday.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
 
-                            //cmd.Parameters.AddWithValue("@userId", mySourceIdUser.InnerXml);
-                            cmd.Parameters.AddWithValue("@firstname", myFirstName.InnerXml);
-                            cmd.Parameters.AddWithValue("@lastname", myLastName.InnerXml);
-                            cmd.Parameters.AddWithValue("@email", myEmail.InnerXml);
-                            cmd.Parameters.AddWithValue("@birthday", parsedBirthday);
-                            cmd.Parameters.AddWithValue("@role", myRole.InnerXml);
-                            cmd.Parameters.AddWithValue("@study", myStudy.InnerXml);
-                            cmd.Prepare();
-                            cmd.ExecuteNonQuery();
+                                //cmd.Parameters.AddWithValue("@userId", mySourceIdUser.InnerXml);
+                                cmd.Parameters.AddWithValue("@firstname", myFirstName.InnerXml);
+                                cmd.Parameters.AddWithValue("@lastname", myLastName.InnerXml);
+                                cmd.Parameters.AddWithValue("@email", myEmail.InnerXml);
+                                cmd.Parameters.AddWithValue("@birthday", parsedBirthday);
+                                cmd.Parameters.AddWithValue("@role", myRole.InnerXml);
+                                cmd.Parameters.AddWithValue("@study", myStudy.InnerXml);
+                                cmd.Prepare();
+                                cmd.ExecuteNonQuery();
 
-                            Console.WriteLine("User inserted in database");
+                                Console.WriteLine("User inserted in database");
                             }
-                            catch(Exception e)
+                            catch(SqlException e)
                             {
                                 Console.WriteLine("User not yet in our database");
                                 Console.WriteLine("Exception is: " + e.Message);
@@ -451,7 +451,7 @@ namespace UUIDproducer
 
                             cmd.ExecuteNonQuery();
                             Console.WriteLine("User deleted from database");
-                            }catch(Exception e)
+                            }catch(SqlException e)
                             {
                                 Console.WriteLine("Exception message: " + e.Message);
                             }
