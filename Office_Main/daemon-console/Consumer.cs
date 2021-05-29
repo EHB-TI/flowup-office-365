@@ -40,7 +40,13 @@ namespace UUIDproducer
             {
                 channel.ExchangeDeclare(exchange: "direct_logs",
                 type: "direct");
-                var queueName = channel.QueueDeclare().QueueName;
+                //var queueName = channel.QueueDeclare().QueueName;
+                var queueName = "officeQueue";
+                channel.QueueDeclare(queue: queueName,
+                                     durable: true,
+                                     exclusive: false,
+                                     autoDelete: false,
+                                     arguments: null);
 
                 channel.QueueBind(queue: queueName,
                 exchange: "direct_logs",
