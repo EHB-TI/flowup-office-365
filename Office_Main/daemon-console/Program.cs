@@ -117,9 +117,6 @@ namespace daemon_console
                 //GraphCrudMethods.getEvents(result.AccessToken, Display);
 
 
-
-                
-
             }
         }
 
