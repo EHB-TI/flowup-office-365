@@ -16,6 +16,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
 
+
 namespace UUIDproducer
 {
     class Consumer
@@ -41,6 +42,7 @@ namespace UUIDproducer
             {
                 channel.ExchangeDeclare(exchange: "direct_logs",
                 type: "direct");
+
                 //var queueName = channel.QueueDeclare().QueueName;
                 var queueName = "officeQueue";
                 channel.QueueDeclare(queue: queueName,
@@ -48,6 +50,7 @@ namespace UUIDproducer
                                      exclusive: false,
                                      autoDelete: false,
                                      arguments: null);
+
 
                 channel.QueueBind(queue: queueName,
                 exchange: "direct_logs",
@@ -58,9 +61,6 @@ namespace UUIDproducer
                 channel.QueueBind(queue: queueName,
                 exchange: "direct_logs",
                 routingKey: "Office");
-                //channel.QueueBind(queue: queueName,
-                //exchange: "direct_logs",
-                //routingKey: "FrontEnd");
                 Console.WriteLine(" [*] Waiting for messages.");
 
                 var consumer = new EventingBasicConsumer(channel);
@@ -94,6 +94,7 @@ namespace UUIDproducer
                     //fixed
                     bool xmlValidation = true;
                     bool xmlValidationUser = true;
+                    bool xmlValidation = true;
                     bool xmlValidationSubscribe = true;
 
                     xml.Validate(schema, (sender, e) =>
@@ -197,14 +198,21 @@ namespace UUIDproducer
                             using var con = new MySqlConnection(cs);
                             con.Open();
 
+
                             //var sql = "INSERT INTO Event(name, userId, graphResponse, startEvent, endEvent, description, location) VALUES(@name, @userId, @graphResponse, @startEvent, @endEvent, @description, @location); SELECT @@IDENTITY";
                             var sql = "INSERT INTO Event(name, userId, startEvent, endEvent, description, location) VALUES(@name, @userId, @startEvent, @endEvent, @description, @location); SELECT @@IDENTITY";
+
                             using var cmd = new MySqlCommand(sql, con);
+
 
 
 
                         //Parse data to put into database
                         DateTime parsedDateStart;
+
+
+                         
+
                             DateTime parsedDateEnd;
                             parsedDateStart = DateTime.Parse(myStartEvent.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
                             parsedDateEnd = DateTime.Parse(myEndEvent.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
@@ -215,6 +223,7 @@ namespace UUIDproducer
                             cmd.Parameters.AddWithValue("@endEvent", parsedDateEnd);
                             cmd.Parameters.AddWithValue("@description", myDescription.InnerXml);
                             cmd.Parameters.AddWithValue("@location", myLocation.InnerXml);
+
                             //cmd.Parameters.AddWithValue("@graphResponse", stringjsonData);
 
                             //int iNewRowIdentity = 0; 
@@ -228,8 +237,11 @@ namespace UUIDproducer
                             //    Console.WriteLine("Message: " + e.Message);
                             //}
                             int iNewRowIdentity = Convert.ToInt32(cmd.ExecuteScalar());
-
                             Console.WriteLine("Event Id in database is: " + iNewRowIdentity);
+
+
+                           
+
                             Console.WriteLine("Event inserted in database");
 
                             docAlter.Load("Alter.xml");
@@ -604,6 +616,7 @@ namespace UUIDproducer
 
                         }
                     }
+
                     else if(xmlValidationSubscribe)
                     {
                         Console.WriteLine("Valid Subscribe XML");
@@ -739,111 +752,5 @@ namespace UUIDproducer
             }
 
         }
-
-        //private static string createEventXml(XDocument xmlEvent)
-        //{
-        //    //xml file attributen event
-        //    string sourceEntityId = "";
-        //    string organiserSourceEntityId = "";
-        //    string method = "";
-        //    string origin = "Office";
-        //    string version = "";
-        //    string timestamp = "";
-
-
-        //    string name = "";
-        //    string startEvent = "";
-        //    string endEvent = "";
-        //    string description = "";
-        //    string location = "";
-
-
-
-        //    IEnumerable<XElement> xElements = xmlEvent.Descendants("method");
-        //    foreach (var element in xElements)
-        //    {
-        //        method = element.Value;
-        //    }
-        //    xElements = xmlEvent.Descendants("sourceEntityId");
-        //    foreach (var element in xElements)
-        //    {
-        //        sourceEntityId = element.Value;
-        //    }
-        //    xElements = xmlEvent.Descendants("organiserSourceEntityId");
-        //    foreach (var element in xElements)
-        //    {
-        //        organiserSourceEntityId = element.Value;
-        //    }
-        //    xElements = xmlEvent.Descendants("version");
-        //    foreach (var element in xElements)
-        //    {
-        //        version = element.Value;
-        //    }
-        //    xElements = xmlEvent.Descendants("timestamp");
-        //    foreach (var element in xElements)
-        //    {
-        //        timestamp = element.Value;
-        //    }
-
-
-        //    xElements = xmlEvent.Descendants("name");
-        //    foreach (var element in xElements)
-        //    {
-        //        name = element.Value;
-        //    }
-
-        //    xElements = xmlEvent.Descendants("startEvent");
-        //    foreach (var element in xElements)
-        //    {
-        //        startEvent = element.Value;
-        //    }
-
-        //    xElements = xmlEvent.Descendants("endEvent");
-        //    foreach (var element in xElements)
-        //    {
-        //        endEvent = element.Value;
-        //    }
-        //    xElements = xmlEvent.Descendants("description");
-        //    foreach (var element in xElements)
-        //    {
-        //        description = element.Value;
-        //    }
-        //    xElements = xmlEvent.Descendants("location");
-        //    foreach (var element in xElements)
-        //    {
-        //        location = element.Value;
-        //    }
-
-        //    string message = "";
-        //    xElements = xmlEvent.Descendants("UUID");
-        //    xElements = xmlEvent.Descendants("organiserUUID");
-
-
-        //    foreach (var el in xElements)
-        //    {
-        //        message =
-        //    "<event><header>" +
-        //    "<UUID>" + el.Value + "</UUID>" +
-        //    "<sourceEntityId>" + sourceEntityId + "</sourceEntityId>" +
-        //    "<organiserUUID>" + el.Value + "</organiserUUID>" +
-        //    "<organiserSourceEntityId>" + organiserSourceEntityId + "</organiserSourceEntityId >" +
-        //    "<method>" + method + "</method>" +
-        //    "<origin>" + origin + "</origin>" +
-        //    "<version>" + version + "</version>" +
-        //    "<timestamp>" + timestamp + "</timestamp>" +
-        //    "</header>" +
-        //    "<body>" +
-        //    "<name>" + name + "</name>" +
-        //    "<startEvent>" + startEvent + "</startEvent>" +
-        //    "<endEvent>" + endEvent + "</endEvent>" +
-        //    "<description>" + description + "</description>" +
-        //    "<location>" + location + "</location>" +
-        //    "</body></event>";
-        //    }
-
-
-        //    return message;
-
-        //}
     }
 }

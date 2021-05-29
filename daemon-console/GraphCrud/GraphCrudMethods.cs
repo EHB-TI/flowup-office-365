@@ -90,6 +90,7 @@ namespace daemon_console.GraphCrud
                 Console.WriteLine(responseDelete.StatusCode);
         }
 
+
         public static async void unsubscribeEvent(string accessToken,string userName, string eventId)
         {
             var httpClient = new HttpClient();
@@ -100,6 +101,7 @@ namespace daemon_console.GraphCrud
             else
                 Console.WriteLine(responseDelete.StatusCode);
         }
+
 
 
         public static string generateTransactionId()

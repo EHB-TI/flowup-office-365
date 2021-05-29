@@ -1,0 +1,32 @@
+name: .NET
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: self-hosted
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+    # Indien dotnet publish niet werkt dan moet deze stap vervangen worden met 'dotnet build --no-restore'
+    # De stap dotnet publish -c Release zal dan moeten verplaatst worden naar 'Run Docker'
+      run: dotnet publish -c Release
+#    - name: Test
+#      run: dotnet test --no-build --verbosity normal
+      
+# Deze stap gaat enkel door wanneer de testen een succes zijn!    
+    - name: Run Docker
+      if: success()
+      run: bash startup.sh
