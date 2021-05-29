@@ -175,7 +175,7 @@ namespace UUIDproducer
                             using var con = new MySqlConnection(cs);
                             con.Open();
 
-                            var sql = "INSERT INTO Event(name, userId, startEvent, endEvent, description, location) VALUES(@name, @userId, @startEvent, @endEvent, @description, @location); SELECT @@IDENTITY";
+                            var sql = "INSERT INTO Event(name, userId,grapResponse, startEvent, endEvent, description, location) VALUES(@name, @userId,@grapResponse, @startEvent, @endEvent, @description, @location); SELECT @@IDENTITY";
                             using var cmd = new MySqlCommand(sql, con);
 
 
