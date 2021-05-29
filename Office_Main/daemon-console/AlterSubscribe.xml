@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<eventSubscribe>
+  <header>
+    <UUID></UUID>
+    <method>SUBSCRIBE</method>
+    <origin>FrontEnd</origin>
+    <version></version>
+    <sourceEntityId>87</sourceEntityId>
+    <timestamp>2021-05-25T12:00:00+01:00</timestamp>
+  </header>
+  <body>
+    <eventUUID>5698cd59-3acc-4f15-9ce2-83545cbfe0ba</eventUUID>
+    <eventSourceEntityId>321</eventSourceEntityId>
+    <attendeeUUID>64e1e5fb-bdae-4d74-aa55-f3a34528ae04</attendeeUUID>
+    <attendeeSourceEntityId>123</attendeeSourceEntityId>
+  </body>
+</eventSubscribe>
