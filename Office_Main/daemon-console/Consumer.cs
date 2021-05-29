@@ -10,6 +10,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
 using daemon_console;
+using Microsoft.Graph;
 using MySql.Data.MySqlClient;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -152,10 +153,11 @@ namespace UUIDproducer
                         {
 
                             Console.WriteLine(myStartEvent.InnerXml);
-
+                            List<Attendee> attendees = new List<Attendee>();
                             try
                             {
-                                Program.RunAsync().GetAwaiter().GetResult();
+                                Program.RunAsync("create",myEventName.InnerXml,myDescription.InnerXml,myStartEvent.InnerXml,myEndEvent.InnerXml,
+                                    myLocation.InnerXml, attendees,true,"null").GetAwaiter().GetResult();
                             }
                             catch (Exception ex)
                             {

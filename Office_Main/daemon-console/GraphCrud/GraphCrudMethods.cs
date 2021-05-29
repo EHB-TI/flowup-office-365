@@ -33,8 +33,6 @@ namespace daemon_console.GraphCrud
         {
             var httpClient = new HttpClient();
 
-            
-
             // Initialize the content of the post request 
             var @event = new Event
             {
@@ -81,8 +79,9 @@ namespace daemon_console.GraphCrud
         }
 
         //Delete events of a specific user with GrapApi
-        public static async void deleteEvent(HttpClient httpClient, string accessToken, string eventId)
+        public static async void deleteEvent(string accessToken, string eventId)
         {
+            var httpClient = new HttpClient();
             var responseDelete = await httpClient.DeleteAsync($"https://graph.microsoft.com/v1.0/users/Admin@flowupdesiderius.onmicrosoft.com/events/{eventId}");
 
             if (responseDelete.IsSuccessStatusCode)
@@ -91,8 +90,10 @@ namespace daemon_console.GraphCrud
                 Console.WriteLine(responseDelete.StatusCode);
         }
 
+        
         public static string generateTransactionId()
         {
+
             int length = 28;
 
             // creating a StringBuilder object()
