@@ -59,17 +59,30 @@ namespace UUIDproducer
                     schema.Add("", "EventSchema.xsd");
                     XmlSchemaSet schemaSubscribe = new XmlSchemaSet();
                     schema.Add("", "SubscribeSchema.xsd");
+                    XmlSchemaSet schemaUser = new XmlSchemaSet();
+                    schemaUser.Add("", "UserSchema.xsd");
                     //XDocument xml = XDocument.Parse(message, LoadOptions.SetLineInfo);
                     XmlDocument xmlDoc = new XmlDocument();
-                    xmlDoc.LoadXml(message);
+                    try
+                    {
+                        xmlDoc.LoadXml(message);
+                    }catch(Exception e)
+                    {
+                        Console.WriteLine("Weird message came in: " + message);
+                    }
                     XDocument xml = XDocument.Parse(xmlDoc.OuterXml);
 
                     bool xmlValidation = true;
+                    bool xmlValidationUser = true;
                     bool xmlValidationSubscribe = true;
 
                     xml.Validate(schema, (sender, e) =>
                     {
                         xmlValidation = false;
+                    });
+                    xml.Validate(schemaUser, (sender, e) =>
+                    {
+                        xmlValidationUser = false;
                     });
                     xml.Validate(schemaSubscribe, (sender, e) =>
                     {
@@ -301,6 +314,244 @@ namespace UUIDproducer
 
                         //string xmlStuur = createEventXml(xmlEvent);
                         //Console.WriteLine(xmlStuur);
+                    }
+                    else if (xmlValidationUser)
+                    {
+                        XmlDocument docAlterUser = new XmlDocument();
+                        Console.WriteLine("XML user is valid");
+
+                        //XML HEAD
+                        XmlNode myMethodNodeUser = xmlDoc.SelectSingleNode("//method");
+                        XmlNode myOriginNodeUser = xmlDoc.SelectSingleNode("//origin");
+                        XmlNode mySourceIdUser = xmlDoc.SelectSingleNode("//sourceEntityId");
+                        XmlNode myUserVersion = xmlDoc.SelectSingleNode("//version");
+
+                        //XML BODY
+                        XmlNode myFirstName = xmlDoc.SelectSingleNode("//firstname");
+                        XmlNode myLastName = xmlDoc.SelectSingleNode("//lastname");
+                        XmlNode myEmail = xmlDoc.SelectSingleNode("//email");
+                        XmlNode myBirthday = xmlDoc.SelectSingleNode("//birthday");
+                        XmlNode myRole = xmlDoc.SelectSingleNode("//role");
+                        XmlNode myStudy = xmlDoc.SelectSingleNode("//study");
+
+
+                        //CREATE User, message from AD
+                        //if (myOriginNodeUser.InnerXml == "AD" && myMethodNodeUser.InnerXml == "CREATE" && mySourceIdUser.InnerXml == "" && routingKey == "user")
+                        if (myOriginNodeUser.InnerXml == "AD" && myMethodNodeUser.InnerXml == "CREATE" && routingKey == "user")
+                        {
+                            Console.WriteLine("Got a message from " + myOriginNodeUser.InnerXml);
+                            Console.WriteLine("Updating origin \"" + myOriginNodeUser.InnerXml + "\" of XML...");
+
+
+
+                            docAlterUser.Load("AlterUser.xml");
+                            docAlterUser = xmlDoc;
+
+                            docAlterUser.SelectSingleNode("//user/header/origin").InnerText = "Office";
+                            docAlterUser.SelectSingleNode("//user/header/sourceEntityId").InnerText = "";
+                            docAlterUser.Save("AlterUser.xml");
+
+
+                            docAlterUser.Save(Console.Out);
+                            //Console.WriteLine(docAlter.InnerXml);
+                            //Console.WriteLine(docMessage.InnerXml);
+                            //Console.WriteLine(docMessageConverted.InnerXml);
+
+
+                            Task task = new Task(() => Producer.sendMessage(docAlterUser.InnerXml, "UUID"));
+                            task.Start();
+
+                            Console.WriteLine("Origin changed to Office, sending now it to UUID...");
+                        }
+                        //Message from UUID CREATE user now
+                        //else if (myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "CREATE" && mySourceIdUser.InnerXml == "" && routingKey == "Office")
+                        else if (myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "CREATE" && routingKey == "Office")
+                        {
+
+                            Console.WriteLine("Got a message from " + myOriginNodeUser.InnerXml);
+                            Console.WriteLine("Creating user, and putting it in database");
+
+
+                            //connection to the database
+                            string cs = @"server=10.3.56.8;userid=root;password=IUM_VDFt8ZQzc_sF;database=OfficeDB;Old Guids=True";
+                            using var con = new MySqlConnection(cs);
+                            con.Open();
+
+                            var sql = "INSERT INTO User(firstname,lastname,email,birthday,role,study) VALUES(@firstname, @lastname, @email, @birthday,@role,@study); SELECT @@IDENTITY";
+                            using var cmd = new MySqlCommand(sql, con);
+
+                            //Parse data to put into database
+                            DateTime parsedBirthday;
+
+                            parsedBirthday = DateTime.Parse(myBirthday.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
+
+                            cmd.Parameters.AddWithValue("@firstname", myFirstName.InnerXml);
+                            cmd.Parameters.AddWithValue("@lastname", myLastName.InnerXml);
+                            cmd.Parameters.AddWithValue("@email", myEmail.InnerXml);
+                            cmd.Parameters.AddWithValue("@birthday", parsedBirthday);
+                            cmd.Parameters.AddWithValue("@role", myRole.InnerXml);
+                            cmd.Parameters.AddWithValue("@study", myStudy.InnerXml);
+
+
+                            int iNewRowIdentity = Convert.ToInt32(cmd.ExecuteScalar());
+                            Console.WriteLine("User Id in database is: " + iNewRowIdentity);
+                            Console.WriteLine("User inserted in database");
+
+
+                            docAlterUser.Load("AlterUser.xml");
+                            docAlterUser = xmlDoc;
+
+                            docAlterUser.SelectSingleNode("//user/header/origin").InnerText = "Office";
+                            docAlterUser.SelectSingleNode("//user/header/sourceEntityId").InnerText = iNewRowIdentity.ToString();
+                            docAlterUser.Save("AlterUser.xml");
+
+
+                            docAlter.Save(Console.Out);
+
+
+                            Task task = new Task(() => Producer.sendMessage(docAlterUser.InnerXml, "UUID"));
+                            task.Start();
+
+                            Console.WriteLine("Sending creating user message to UUID...");
+                        }
+                        //UPDATE user comes from AD and we pass it to UUID to compare
+                        //if (myOriginNodeUser.InnerXml == "AD" && myMethodNodeUser.InnerXml == "UPDATE" && mySourceIdUser.InnerXml == "" && routingKey == "user")
+                        if (myOriginNodeUser.InnerXml == "AD" && myMethodNodeUser.InnerXml == "UPDATE" && routingKey == "user")
+                        {
+
+                            Console.WriteLine("Got a message from " + myOriginNodeUser.InnerXml);
+                            Console.WriteLine("updating user, and putting it in database");
+
+                            docAlterUser.Load("AlterUser.xml");
+                            docAlterUser = xmlDoc;
+
+                            docAlterUser.SelectSingleNode("//user/header/origin").InnerText = "Office";
+                            docAlterUser.SelectSingleNode("//user/header/sourceEntityId").InnerText = "";
+                            docAlterUser.Save("AlterUser.xml");
+                            docAlterUser.Save(Console.Out);
+
+
+
+                            Task task = new Task(() => Producer.sendMessage(docAlterUser.InnerXml, "UUID"));
+                            task.Start();
+
+                            Console.WriteLine("Origin changed to Office, sending now it to UUID...");
+                        }
+                        //update user comes from UUID we update our side and tell the UUID
+                        //else if (myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "UPDATE" && mySourceIdUser.InnerXml == "" && routingKey == "Office")
+                        else if (myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "UPDATE" && routingKey == "Office")
+                        {
+                            Console.WriteLine("Got a message from " + myOriginNodeUser.InnerXml);
+                            //Console.WriteLine("Source id is: " + myDescription.InnerXml);
+                            Console.WriteLine("Updating user data in database and calendar");
+
+
+                            string cs = @"server=10.3.56.8;userid=root;password=IUM_VDFt8ZQzc_sF;database=OfficeDB;Old Guids=True";
+                            try
+                            {
+
+
+                                using var con = new MySqlConnection(cs);
+                                con.Open();
+
+                                var sql = "UPDATE User SET firstname = @firstname, lastname  = @lastname, email = @email, birthday = @birthday, role = @role, study = @study WHERE userId = '" + mySourceIdUser.InnerXml + "'";
+                                using var cmd = new MySqlCommand(sql, con);
+
+                                //Parse data to put into database
+                                DateTime parsedBirthday;
+
+                                parsedBirthday = DateTime.Parse(myBirthday.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
+
+                                //cmd.Parameters.AddWithValue("@userId", mySourceIdUser.InnerXml);
+                                cmd.Parameters.AddWithValue("@firstname", myFirstName.InnerXml);
+                                cmd.Parameters.AddWithValue("@lastname", myLastName.InnerXml);
+                                cmd.Parameters.AddWithValue("@email", myEmail.InnerXml);
+                                cmd.Parameters.AddWithValue("@birthday", parsedBirthday);
+                                cmd.Parameters.AddWithValue("@role", myRole.InnerXml);
+                                cmd.Parameters.AddWithValue("@study", myStudy.InnerXml);
+                                cmd.Prepare();
+                                cmd.ExecuteNonQuery();
+
+                                Console.WriteLine("User inserted in database");
+                            }
+                            catch (SqlException e)
+                            {
+                                Console.WriteLine("User not yet in our database");
+                                Console.WriteLine("Exception is: " + e.Message);
+                            }
+
+                            //int iNewRowIdentity = Convert.ToInt32(cmd.ExecuteScalar());
+                            //Console.WriteLine("User Id in database is: " + iNewRowIdentity);
+
+
+
+                            docAlterUser.Load("AlterUser.xml");
+                            docAlterUser = xmlDoc;
+
+                            docAlterUser.SelectSingleNode("//user/header/origin").InnerText = "Office";
+                            //docAlter.SelectSingleNode("//user/header/userId").InnerText = mySourceIdUser.InnerXml;
+                            docAlterUser.Save("AlterUser.xml");
+
+
+                            docAlterUser.Save(Console.Out);
+
+
+                            Task task = new Task(() => Producer.sendMessage(docAlterUser.InnerXml, "UUID"));
+                            task.Start();
+
+                            Console.WriteLine("Sending update user message to UUID...");
+
+
+                        }
+                        //Delete user comes from AD we update our side and tell the UUID
+                        //if (myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "DELETE" && mySourceIdUser.InnerXml == "" && routingKey == "Office")
+                        if (myOriginNodeUser.InnerXml == "AD" && myMethodNodeUser.InnerXml == "DELETE" && routingKey == "user")
+                        {
+                            Console.WriteLine("Got a message from " + myOriginNodeUser.InnerXml);
+                            Console.WriteLine("updating user, and putting it in database");
+
+                            docAlterUser.Load("AlterUser.xml");
+                            docAlterUser = xmlDoc;
+
+                            docAlterUser.SelectSingleNode("//user/header/origin").InnerText = "Office";
+                            docAlterUser.SelectSingleNode("//user/header/sourceEntityId").InnerText = "";
+                            docAlterUser.Save("AlterUser.xml");
+                            docAlterUser.Save(Console.Out);
+
+
+
+                            Task task = new Task(() => Producer.sendMessage(docAlterUser.InnerXml, "UUID"));
+                            task.Start();
+
+                            Console.WriteLine("Origin changed to Office, sending now it to UUID...");
+                        }
+                        //else if(myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "DELETE" && mySourceIdUser.InnerXml != "" && routingKey == "Office")
+                        else if (myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "DELETE" && routingKey == "Office")
+                        {
+                            Console.WriteLine("Got a delete message from " + mySourceIdUser.InnerXml);
+                            Console.WriteLine("The full message from the UUID is: " + xmlDoc.InnerXml);
+                            //Console.WriteLine("Source id is: " + myDescription.InnerXml);
+                            Console.WriteLine("Deleting user data in database and calendar");
+
+                            string cs = @"server=10.3.56.8;userid=root;password=IUM_VDFt8ZQzc_sF;database=OfficeDB;Old Guids=True";
+                            try
+                            {
+
+                                using var con = new MySqlConnection(cs);
+                                con.Open();
+                                var sql = "DELETE FROM User WHERE userId= '" + mySourceIdUser.InnerXml + "'";
+
+                                using var cmd = new MySqlCommand(sql, con);
+
+                                cmd.ExecuteNonQuery();
+                                Console.WriteLine("User deleted from database");
+                            }
+                            catch (SqlException e)
+                            {
+                                Console.WriteLine("Exception message: " + e.Message);
+                            }
+
+                        }
                     }
                     else if(xmlValidationSubscribe)
                     {

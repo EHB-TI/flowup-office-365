@@ -23,34 +23,92 @@ class EmitLogDirect
 
             //XmlDocument doc = new XmlDocument();
             //doc.Load("CreateEvent.xml");
-            XmlDocument doc = new XmlDocument();
-            doc.Load("DeleteEvent.xml");
+            //XmlDocument doc = new XmlDocument();
+            //doc.Load("DeleteEvent.xml");
 
-            XmlSchemaSet schema = new XmlSchemaSet();
+            //XmlSchemaSet schema = new XmlSchemaSet();
 
-            schema.Add("", "EventSchema.xsd");
+            //schema.Add("", "EventSchema.xsd");
 
-            //XDocument xml = XDocument.Parse(xmlmessage, LoadOptions.SetLineInfo);
-            XDocument xml = XDocument.Parse(doc.OuterXml);
+            ////XDocument xml = XDocument.Parse(xmlmessage, LoadOptions.SetLineInfo);
+            //XDocument xml = XDocument.Parse(doc.OuterXml);
 
-            bool xmlValidation = true;
+            //bool xmlValidation = true;
 
-            xml.Validate(schema, (sender, e) =>
-            {
-                xmlValidation = false;
-            });
+            string message = "no";
 
-            if (xmlValidation)
-            {
-                Console.WriteLine("XML is geldig");
-            }
-            else
-            {
-                Console.WriteLine("XML is ongeldig");
-            }
+            string createUserMessage = "<user><header>" +
+              "<UUID>becd4e5d-fba7-400a-b68f-f240f77b9f40</UUID>" +
+              "<method>CREATE</method>" +
+              "<origin>AD</origin>" +
+              "<version>1</version>" +
+              "<sourceEntityId></sourceEntityId>" +
+              "<timestamp>" + DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K") + "</timestamp>" +
+              "</header>" +
+              "<body>" +
+              "<firstname>Keanu</firstname>" +
+              "<lastname>Piras</lastname>" +
+              "<email>keanu.piras@student.dhs.be</email>" +
+              "<birthday>2000-12-13</birthday>" +
+              "<role>student</role>" +
+              "<study>Dig-X</study>" +
+              "</body></user>";
+            string updateUserMessage = "<user><header>" +
+              "<UUID>becd4e5d-fba7-400a-b68f-f240f77b9f40</UUID>" +
+              "<method>UPDATE</method>" +
+              "<origin>AD</origin>" +
+              "<version>2</version>" +
+              "<sourceEntityId>92c7ea28-b7c0-47a6-8a30-32cb02ce656e</sourceEntityId>" +
+              "<timestamp>" + DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K") + "</timestamp>" +
+              "</header>" +
+              "<body>" +
+              "<firstname>Keanu updated</firstname>" +
+              "<lastname>Piras updated</lastname>" +
+              "<email>updatedkeanu.piras@student.dhs.be</email>" +
+              "<birthday>2000-12-13</birthday>" +
+              "<role>student</role>" +
+              "<study>Dig-X</study>" +
+              "</body></user>";
+            string deleteUserMessage = "<user><header>" +
+              "<UUID>becd4e5d-fba7-400a-b68f-f240f77b9f40</UUID>" +
+              "<method>DELETE</method>" +
+              "<origin>AD</origin>" +
+              "<version>1</version>" +
+              "<sourceEntityId></sourceEntityId>" +
+              "<timestamp>" + DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K") + "</timestamp>" +
+              "</header>" +
+              "<body>" +
+              "<firstname>Keanu updated</firstname>" +
+              "<lastname>Piras updated</lastname>" +
+              "<email>keanu.piras@student.dhs.be</email>" +
+              "<birthday>2000-12-13</birthday>" +
+              "<role>student</role>" +
+              "<study>Dig-X</study>" +
+              "</body></user>";
 
-            var severity = "event";
-            string message = doc.InnerXml;
+            //xml.Validate(schema, (sender, e) =>
+            //{
+            //    xmlValidation = false;
+            //});
+
+            //if (xmlValidation)
+            //{
+            //    Console.WriteLine("XML is geldig");
+            //}
+            //else
+            //{
+            //    Console.WriteLine("XML is ongeldig");
+
+            //}
+
+            //message = doc.InnerXml;
+            //message = createUserMessage;
+            //message = updateUserMessage;
+            message = deleteUserMessage;
+
+            //var severity = "event";
+            var severity = "user";
+            
 
             var body = Encoding.UTF8.GetBytes(message);
             channel.BasicPublish(exchange: "direct_logs",
