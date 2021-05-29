@@ -23,10 +23,10 @@ jobs:
     # Indien dotnet publish niet werkt dan moet deze stap vervangen worden met 'dotnet build --no-restore'
     # De stap dotnet publish -c Release zal dan moeten verplaatst worden naar 'Run Docker'
       run: dotnet publish -c Release
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+#    - name: Test
+#      run: dotnet test --no-build --verbosity normal
       
 # Deze stap gaat enkel door wanneer de testen een succes zijn!    
-    - name: Run Docker
-      if: success()
-      run: bash startup.sh
+#    - name: Run Docker
+#      if: success()
+#      run: bash startup.sh
