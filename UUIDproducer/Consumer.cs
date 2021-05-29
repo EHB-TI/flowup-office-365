@@ -63,8 +63,8 @@ namespace UUIDproducer
                     XDocument xml = XDocument.Parse(xmlDoc.OuterXml);
 
                     bool xmlValidation = true;
-
                     bool xmlValidationUser = true;
+
                     xml.Validate(schema, (sender, e) =>
                     {
                         xmlValidation = false;
