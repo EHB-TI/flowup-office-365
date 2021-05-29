@@ -90,7 +90,18 @@ namespace daemon_console.GraphCrud
                 Console.WriteLine(responseDelete.StatusCode);
         }
 
-        
+        public static async void unsubscribeEvent(string accessToken,string userName, string eventId)
+        {
+            var httpClient = new HttpClient();
+            var responseDelete = await httpClient.DeleteAsync($"https://graph.microsoft.com/v1.0/users/{userName}/events/{eventId}");
+
+            if (responseDelete.IsSuccessStatusCode)
+                Console.WriteLine("Event has successfully been removed for user!");
+            else
+                Console.WriteLine(responseDelete.StatusCode);
+        }
+
+
         public static string generateTransactionId()
         {
 
