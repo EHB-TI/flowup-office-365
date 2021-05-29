@@ -91,6 +91,7 @@ namespace UUIDproducer
                     }
                     XDocument xml = XDocument.Parse(xmlDoc.OuterXml);
 
+                    //fixed
                     bool xmlValidation = true;
                     bool xmlValidationUser = true;
                     bool xmlValidationSubscribe = true;
