@@ -32,7 +32,7 @@ namespace UUIDproducer
                 ///Console.WriteLine("error root:");
                 
                 XDocument xml = XDocument.Parse(message, LoadOptions.SetLineInfo);
-                Console.WriteLine(message);
+                //Console.WriteLine(message);
 
                 //bool xmlValidation = true;
 

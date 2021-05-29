@@ -108,11 +108,18 @@ namespace UUIDproducer
                         XmlNode myDescription = xmlDoc.SelectSingleNode("//description");
                         XmlNode myLocation = xmlDoc.SelectSingleNode("//location");
 
-                        //Event comes from Front end we change the Origin to Office and we pass it to UUID to compare
+                        //Event comes from Front end and we pass it to UUID to compare
                         if (myOriginNode.InnerXml == "FrontEnd" && myMethodNode.InnerXml == "CREATE" && myOrganiserSourceId.InnerXml == "" && routingKey == "event")
                         {
                             Console.WriteLine("Got a message from " + myOriginNode.InnerXml);
                             Console.WriteLine("Updating origin \"" + myOriginNode.InnerXml + "\" of XML...");
+
+
+
+                            //XmlWriterSettings settings = new XmlWriterSettings();
+                            //settings.Indent = true;
+                            //XmlWriter writer = XmlWriter.Create("Alter.xml", settings);
+                            //doc1.Save(writer);
 
 
                             docAlter.Load("Alter.xml");
@@ -121,7 +128,11 @@ namespace UUIDproducer
                             docAlter.SelectSingleNode("//event/header/origin").InnerText = "Office";
                             docAlter.Save("Alter.xml");
 
+
                             docAlter.Save(Console.Out);
+                            //Console.WriteLine(docAlter.InnerXml);
+                            //Console.WriteLine(docMessage.InnerXml);
+                            //Console.WriteLine(docMessageConverted.InnerXml);
 
 
                             Task task = new Task(() => Producer.sendMessage(docAlter.InnerXml, "UUID"));
@@ -230,8 +241,9 @@ namespace UUIDproducer
                         XmlNode myStudy = xmlDoc.SelectSingleNode("//study");
 
 
-                        //Create User
-                        if (myOriginNodeUser.InnerXml == "AD" && myMethodNodeUser.InnerXml == "CREATE" && mySourceIdUser.InnerXml == "" && routingKey == "user")
+                        //CREATE User, message from AD
+                        //if (myOriginNodeUser.InnerXml == "AD" && myMethodNodeUser.InnerXml == "CREATE" && mySourceIdUser.InnerXml == "" && routingKey == "user")
+                        if (myOriginNodeUser.InnerXml == "AD" && myMethodNodeUser.InnerXml == "CREATE" && routingKey == "user")
                         {
                             Console.WriteLine("Got a message from " + myOriginNodeUser.InnerXml);
                             Console.WriteLine("Updating origin \"" + myOriginNodeUser.InnerXml + "\" of XML...");
@@ -242,6 +254,7 @@ namespace UUIDproducer
                             docAlterUser = xmlDoc;
 
                             docAlterUser.SelectSingleNode("//user/header/origin").InnerText = "Office";
+                            docAlterUser.SelectSingleNode("//user/header/sourceEntityId").InnerText = "";
                             docAlterUser.Save("AlterUser.xml");
 
 
@@ -256,14 +269,13 @@ namespace UUIDproducer
 
                             Console.WriteLine("Origin changed to Office, sending now it to UUID...");
                         }
-                        else if (myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "CREATE" && mySourceIdUser.InnerXml == "" && routingKey == "Office")
+                        //Message from UUID CREATE user now
+                        //else if (myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "CREATE" && mySourceIdUser.InnerXml == "" && routingKey == "Office")
+                        else if (myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "CREATE" && routingKey == "Office")
                         {
 
                             Console.WriteLine("Got a message from " + myOriginNodeUser.InnerXml);
-
                             Console.WriteLine("Creating user, and putting it in database");
-                            //Console.WriteLine("Putting data in database and calendar");
-
 
 
                             //connection to the database
@@ -271,35 +283,25 @@ namespace UUIDproducer
                             using var con = new MySqlConnection(cs);
                             con.Open();
 
-
-                            var sql = "INSERT INTO User(firstname,lastname,email,birthday,role,study) VALUES(@firstname, @lastname, @email, @birthday,@role,@study);SELECT @@IDENTITY";
+                            var sql = "INSERT INTO User(firstname,lastname,email,birthday,role,study) VALUES(@firstname, @lastname, @email, @birthday,@role,@study); SELECT @@IDENTITY";
                             using var cmd = new MySqlCommand(sql, con);
-
-
-
 
                             //Parse data to put into database
                             DateTime parsedBirthday;
 
                             parsedBirthday = DateTime.Parse(myBirthday.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
 
-
-
-                            //cmd.Parameters.AddWithValue("@userId", mySourceIdUser.InnerXml);
                             cmd.Parameters.AddWithValue("@firstname", myFirstName.InnerXml);
                             cmd.Parameters.AddWithValue("@lastname", myLastName.InnerXml);
                             cmd.Parameters.AddWithValue("@email", myEmail.InnerXml);
                             cmd.Parameters.AddWithValue("@birthday", parsedBirthday);
                             cmd.Parameters.AddWithValue("@role", myRole.InnerXml);
                             cmd.Parameters.AddWithValue("@study", myStudy.InnerXml);
-                            cmd.Prepare();
-                            cmd.ExecuteNonQuery();
 
 
                             int iNewRowIdentity = Convert.ToInt32(cmd.ExecuteScalar());
                             Console.WriteLine("User Id in database is: " + iNewRowIdentity);
                             Console.WriteLine("User inserted in database");
-
 
 
                             docAlter.Load("AlterUser.xml");
@@ -318,18 +320,19 @@ namespace UUIDproducer
 
                             Console.WriteLine("Sending creating user message to UUID...");
                         }
-                        //update user comes from AD and we pass it to UUID to compare
-                        if (myOriginNodeUser.InnerXml == "AD" && myMethodNodeUser.InnerXml == "UPDATE" && mySourceIdUser.InnerXml == "" && routingKey == "user")
-
+                        //UPDATE user comes from AD and we pass it to UUID to compare
+                        //if (myOriginNodeUser.InnerXml == "AD" && myMethodNodeUser.InnerXml == "UPDATE" && mySourceIdUser.InnerXml == "" && routingKey == "user")
+                        if (myOriginNodeUser.InnerXml == "AD" && myMethodNodeUser.InnerXml == "UPDATE" && routingKey == "user")
                         {
 
                             Console.WriteLine("Got a message from " + myOriginNodeUser.InnerXml);
                             Console.WriteLine("updating user, and putting it in database");
 
                             docAlterUser.Load("AlterUser.xml");
-                            docAlter = xmlDoc;
+                            docAlterUser = xmlDoc;
 
                             docAlterUser.SelectSingleNode("//user/header/origin").InnerText = "Office";
+                            docAlterUser.SelectSingleNode("//user/header/sourceEntityId").InnerText = "";
                             docAlterUser.Save("AlterUser.xml");
                             docAlterUser.Save(Console.Out);
 
@@ -341,7 +344,8 @@ namespace UUIDproducer
                             Console.WriteLine("Origin changed to Office, sending now it to UUID...");
                         }
                         //update user comes from UUID we update our side and tell the UUID
-                        else if (myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "UPDATE" && mySourceIdUser.InnerXml == "" && routingKey == "Office")
+                        //else if (myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "UPDATE" && mySourceIdUser.InnerXml == "" && routingKey == "Office")
+                        else if (myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "UPDATE" && routingKey == "Office")
                         {
                             Console.WriteLine("Got a message from " + myOriginNodeUser.InnerXml);
                             //Console.WriteLine("Source id is: " + myDescription.InnerXml);
@@ -349,6 +353,10 @@ namespace UUIDproducer
 
 
                             string cs = @"server=10.3.56.8;userid=root;password=IUM_VDFt8ZQzc_sF;database=OfficeDB;Old Guids=True";
+                            try
+                            {
+
+                            
                             using var con = new MySqlConnection(cs);
                             con.Open();
 
@@ -370,23 +378,28 @@ namespace UUIDproducer
                             cmd.Prepare();
                             cmd.ExecuteNonQuery();
 
-
-
-                            int iNewRowIdentity = Convert.ToInt32(cmd.ExecuteScalar());
-                            Console.WriteLine("User Id in database is: " + iNewRowIdentity);
                             Console.WriteLine("User inserted in database");
+                            }
+                            catch(Exception e)
+                            {
+                                Console.WriteLine("User not yet in our database");
+                                Console.WriteLine("Exception is: " + e.Message);
+                            }
+
+                            //int iNewRowIdentity = Convert.ToInt32(cmd.ExecuteScalar());
+                            //Console.WriteLine("User Id in database is: " + iNewRowIdentity);
 
 
 
-                            docAlter.Load("AlterUser.xml");
-                            docAlter = xmlDoc;
+                            docAlterUser.Load("AlterUser.xml");
+                            docAlterUser = xmlDoc;
 
-                            docAlter.SelectSingleNode("//user/header/origin").InnerText = "Office";
-                            docAlter.SelectSingleNode("//user/header/userId").InnerText = mySourceIdUser.InnerXml;
-                            docAlter.Save("AlterUser.xml");
+                            docAlterUser.SelectSingleNode("//user/header/origin").InnerText = "Office";
+                            //docAlter.SelectSingleNode("//user/header/userId").InnerText = mySourceIdUser.InnerXml;
+                            docAlterUser.Save("AlterUser.xml");
 
 
-                            docAlter.Save(Console.Out);
+                            docAlterUser.Save(Console.Out);
 
 
                             Task task = new Task(() => Producer.sendMessage(docAlterUser.InnerXml, "UUID"));
@@ -396,16 +409,18 @@ namespace UUIDproducer
 
 
                         }
-                        //Delete user comes from UUID we update our side and tell the UUID
-                        if (myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "DELETE" && mySourceIdUser.InnerXml == "" && routingKey == "Office")
+                        //Delete user comes from AD we update our side and tell the UUID
+                        //if (myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "DELETE" && mySourceIdUser.InnerXml == "" && routingKey == "Office")
+                        if (myOriginNodeUser.InnerXml == "AD" && myMethodNodeUser.InnerXml == "DELETE" && routingKey == "user")
                         {
                             Console.WriteLine("Got a message from " + myOriginNodeUser.InnerXml);
                             Console.WriteLine("updating user, and putting it in database");
 
                             docAlterUser.Load("AlterUser.xml");
-                            docAlter = xmlDoc;
+                            docAlterUser = xmlDoc;
 
                             docAlterUser.SelectSingleNode("//user/header/origin").InnerText = "Office";
+                            docAlterUser.SelectSingleNode("//user/header/sourceEntityId").InnerText = "";
                             docAlterUser.Save("AlterUser.xml");
                             docAlterUser.Save(Console.Out);
 
@@ -416,7 +431,8 @@ namespace UUIDproducer
 
                             Console.WriteLine("Origin changed to Office, sending now it to UUID...");
                         }
-                        else if (myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "DELETE" && mySourceIdUser.InnerXml == "" && routingKey == "Office")
+                        //else if(myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "DELETE" && mySourceIdUser.InnerXml != "" && routingKey == "Office")
+                        else if(myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "DELETE" && routingKey == "Office")
                         {
                             Console.WriteLine("Got a delete message from " + mySourceIdUser.InnerXml);
                             Console.WriteLine("The full message from the UUID is: " + xmlDoc.InnerXml);
@@ -424,17 +440,27 @@ namespace UUIDproducer
                             Console.WriteLine("Deleting user data in database and calendar");
 
                             string cs = @"server=10.3.56.8;userid=root;password=IUM_VDFt8ZQzc_sF;database=OfficeDB;Old Guids=True";
+                            try
+                            {
+
                             using var con = new MySqlConnection(cs);
                             con.Open();
-
                             var sql = "DELETE FROM User WHERE userId= '" + mySourceIdUser.InnerXml + "'";
+
+                            using var cmd = new MySqlCommand(sql, con);
+
+                            cmd.ExecuteNonQuery();
+                            Console.WriteLine("User deleted from database");
+                            }catch(Exception e)
+                            {
+                                Console.WriteLine("Exception message: " + e.Message);
+                            }
 
                         }
                     }
 
-<<<<<<< Updated upstream
                     //XML from UUID
-                    else
+                    /*else
                     {
                         XmlNode myCodeNode = xmlDoc.SelectSingleNode("//code");
                         XmlNode myOriginNodeUserUser = xmlDoc.SelectSingleNode("//origin");
@@ -476,7 +502,7 @@ namespace UUIDproducer
                         Console.WriteLine("Code node" + myCodeNode.InnerXml);
 
                         //Event comes from UUID Master, we get a message back from UUID
-                        if (myobjectSourceId.InnerXml == "UUID" && myobjectSourceId.InnerXml == "" && routingKey == "Office")
+                        if (myOriginNodeUser.InnerXml == "UUID" && myobjectSourceId.InnerXml == "" && routingKey == "Office")
                         {
                             Console.WriteLine("Waiting for message from UUID...");
                             Console.WriteLine(message);
@@ -534,24 +560,125 @@ namespace UUIDproducer
                                     break;
                             }
 
-                        }
-
-=======
-
->>>>>>> Stashed changes
-                    };
-
-                    channel.BasicConsume(queue: queueName,
-                    autoAck: true,
-                    consumer: consumer);
-
-                    Console.WriteLine(" Press [enter] to exit.");
-                    Console.ReadLine();
-
+                        }*/
 
                 };
 
-            
+                channel.BasicConsume(queue: queueName,
+                autoAck: true,
+                consumer: consumer);
+
+                Console.WriteLine(" Press [enter] to exit.");
+                Console.ReadLine();
+
+
+            }
+
+            //private static string createEventXml(XDocument xmlEvent)
+            //{
+            //    //xml file attributen event
+            //    string sourceEntityId = "";
+            //    string organiserSourceEntityId = "";
+            //    string method = "";
+            //    string origin = "Office";
+            //    string version = "";
+            //    string timestamp = "";
+
+
+            //    string name = "";
+            //    string startEvent = "";
+            //    string endEvent = "";
+            //    string description = "";
+            //    string location = "";
+
+
+
+            //    IEnumerable<XElement> xElements = xmlEvent.Descendants("method");
+            //    foreach (var element in xElements)
+            //    {
+            //        method = element.Value;
+            //    }
+            //    xElements = xmlEvent.Descendants("sourceEntityId");
+            //    foreach (var element in xElements)
+            //    {
+            //        sourceEntityId = element.Value;
+            //    }
+            //    xElements = xmlEvent.Descendants("organiserSourceEntityId");
+            //    foreach (var element in xElements)
+            //    {
+            //        organiserSourceEntityId = element.Value;
+            //    }
+            //    xElements = xmlEvent.Descendants("version");
+            //    foreach (var element in xElements)
+            //    {
+            //        version = element.Value;
+            //    }
+            //    xElements = xmlEvent.Descendants("timestamp");
+            //    foreach (var element in xElements)
+            //    {
+            //        timestamp = element.Value;
+            //    }
+
+
+            //    xElements = xmlEvent.Descendants("name");
+            //    foreach (var element in xElements)
+            //    {
+            //        name = element.Value;
+            //    }
+
+            //    xElements = xmlEvent.Descendants("startEvent");
+            //    foreach (var element in xElements)
+            //    {
+            //        startEvent = element.Value;
+            //    }
+
+            //    xElements = xmlEvent.Descendants("endEvent");
+            //    foreach (var element in xElements)
+            //    {
+            //        endEvent = element.Value;
+            //    }
+            //    xElements = xmlEvent.Descendants("description");
+            //    foreach (var element in xElements)
+            //    {
+            //        description = element.Value;
+            //    }
+            //    xElements = xmlEvent.Descendants("location");
+            //    foreach (var element in xElements)
+            //    {
+            //        location = element.Value;
+            //    }
+
+            //    string message = "";
+            //    xElements = xmlEvent.Descendants("UUID");
+            //    xElements = xmlEvent.Descendants("organiserUUID");
+
+
+            //    foreach (var el in xElements)
+            //    {
+            //        message =
+            //    "<event><header>" +
+            //    "<UUID>" + el.Value + "</UUID>" +
+            //    "<sourceEntityId>" + sourceEntityId + "</sourceEntityId>" +
+            //    "<organiserUUID>" + el.Value + "</organiserUUID>" +
+            //    "<organiserSourceEntityId>" + organiserSourceEntityId + "</organiserSourceEntityId >" +
+            //    "<method>" + method + "</method>" +
+            //    "<origin>" + origin + "</origin>" +
+            //    "<version>" + version + "</version>" +
+            //    "<timestamp>" + timestamp + "</timestamp>" +
+            //    "</header>" +
+            //    "<body>" +
+            //    "<name>" + name + "</name>" +
+            //    "<startEvent>" + startEvent + "</startEvent>" +
+            //    "<endEvent>" + endEvent + "</endEvent>" +
+            //    "<description>" + description + "</description>" +
+            //    "<location>" + location + "</location>" +
+            //    "</body></event>";
+            //    }
+
+
+            //    return message;
+
+            //}
         }
     }
 }

@@ -65,7 +65,73 @@ class EmitLogDirect
               "<role>student</role>" +
               "<study>Dig-X</study>" +
               "</body></user>";
-            var body = Encoding.UTF8.GetBytes(message);
+            string createUserMessageWrong = "<user><header>" +
+              "<UUID>becd4e5d-fba7-400a-b68f-f240f77b9f40</UUID>" +
+              "<method>CREATE</method>" +
+              "<origin>AD</origin>" +
+              "<version>1</version>" +
+              "<sourceEntityId>92c7ea28-b7c0-47a6-8a30-32cb02ce656e</sourceEntityId>" +
+              "<timestamp>" + DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K") + "</timestamp>" +
+              "</header>" +
+              "<body>" +
+              "<firstname>Keanu</firstname>" +
+              "<lastname>Piras</lastname>" +
+              "<email>keanu.piras@student.dhs.be</email>" +
+              "<birthday>2000-12-13</birthday>" +
+              "<role>student</role>" +
+              "<study>Dig-X</study>" +
+              "</body></user>";
+            string createUserMessage = "<user><header>" +
+              "<UUID>becd4e5d-fba7-400a-b68f-f240f77b9f40</UUID>" +
+              "<method>CREATE</method>" +
+              "<origin>AD</origin>" +
+              "<version>1</version>" +
+              "<sourceEntityId></sourceEntityId>" +
+              "<timestamp>" + DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K") + "</timestamp>" +
+              "</header>" +
+              "<body>" +
+              "<firstname>Keanu</firstname>" +
+              "<lastname>Piras</lastname>" +
+              "<email>keanu.piras@student.dhs.be</email>" +
+              "<birthday>2000-12-13</birthday>" +
+              "<role>student</role>" +
+              "<study>Dig-X</study>" +
+              "</body></user>";
+            string updateUserMessage = "<user><header>" +
+              "<UUID>becd4e5d-fba7-400a-b68f-f240f77b9f40</UUID>" +
+              "<method>UPDATE</method>" +
+              "<origin>AD</origin>" +
+              "<version>2</version>" +
+              "<sourceEntityId>92c7ea28-b7c0-47a6-8a30-32cb02ce656e</sourceEntityId>" +
+              "<timestamp>" + DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K") + "</timestamp>" +
+              "</header>" +
+              "<body>" +
+              "<firstname>Keanu updated</firstname>" +
+              "<lastname>Piras updated</lastname>" +
+              "<email>updatedkeanu.piras@student.dhs.be</email>" +
+              "<birthday>2000-12-13</birthday>" +
+              "<role>student</role>" +
+              "<study>Dig-X</study>" +
+              "</body></user>";
+            string deleteUserMessage = "<user><header>" +
+              "<UUID>becd4e5d-fba7-400a-b68f-f240f77b9f40</UUID>" +
+              "<method>DELETE</method>" +
+              "<origin>AD</origin>" +
+              "<version>1</version>" +
+              "<sourceEntityId></sourceEntityId>" +
+              "<timestamp>" + DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K") + "</timestamp>" +
+              "</header>" +
+              "<body>" +
+              "<firstname>Keanu updated</firstname>" +
+              "<lastname>Piras updated</lastname>" +
+              "<email>keanu.piras@student.dhs.be</email>" +
+              "<birthday>2000-12-13</birthday>" +
+              "<role>student</role>" +
+              "<study>Dig-X</study>" +
+              "</body></user>";
+
+            //var body = Encoding.UTF8.GetBytes(message);
+            var body = Encoding.UTF8.GetBytes(deleteUserMessage);
             channel.BasicPublish(exchange: "direct_logs",
                                  routingKey: severity,
                                  basicProperties: null,

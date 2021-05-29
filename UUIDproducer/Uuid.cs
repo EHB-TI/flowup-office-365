@@ -121,6 +121,87 @@ namespace UUIDproducer
         }
         //________________________________________________________________________________________________________________________________________________
        //maken van MOCK event met xml file
+        public static void createRealTestUser()
+        {
+            string message =
+           "<user><header>" +
+              "<UUID>becd4e5d-fba7-400a-b68f-f240f77b9f40</UUID>" +
+              "<method>CREATE</method>" +
+              "<origin>AD</origin>" +
+              "<version>1</version>" +
+              "<sourceEntityId>92c7ea28-b7c0-47a6-8a30-32cb02ce656e</sourceEntityId>" +
+              "<timestamp>" + DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K") + "</timestamp>" +
+              "</header>" +
+              "<body>" +
+              "<firstname>Keanu</firstname>" +
+              "<lastname>Piras</lastname>" +
+              "<email>keanu.piras@student.dhs.be</email>" +
+              "<birthday>2000-12-13</birthday>" +
+              "<role>student</role>" +
+              "<study>Dig-X</study>"+
+              "</body></user>";
+
+            Task task = new Task(() => Producer.sendMessage(message, "user"));
+
+            task.Start();
+            Console.WriteLine("producer starting!");
+            Consumer.getMessage();
+
+        }
+        public static void updateRealTestUser()
+        {
+            string message =
+           "<user><header>" +
+              "<UUID>becd4e5d-fba7-400a-b68f-f240f77b9f40</UUID>" +
+              "<method>UPDATE</method>" +
+              "<origin>AD</origin>" +
+              "<version>2</version>" +
+              "<sourceEntityId>92c7ea28-b7c0-47a6-8a30-32cb02ce656e</sourceEntityId>" +
+              "<timestamp>" + DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K") + "</timestamp>" +
+              "</header>" +
+              "<body>" +
+              "<firstname>Keanu updated</firstname>" +
+              "<lastname>Piras updated</lastname>" +
+              "<email>keanu.piras@student.dhs.be updated</email>" +
+              "<birthday>2000-12-13</birthday>" +
+              "<role>student</role>" +
+              "<study>Dig-X</study>"+
+              "</body></user>";
+
+            Task task = new Task(() => Producer.sendMessage(message, "user"));
+
+            task.Start();
+            Console.WriteLine("producer starting!");
+            Consumer.getMessage();
+
+        }
+        public static void deleteRealTestUser()
+        {
+            string message =
+           "<user><header>" +
+              "<UUID>becd4e5d-fba7-400a-b68f-f240f77b9f40</UUID>" +
+              "<method>DELETE</method>" +
+              "<origin>AD</origin>" +
+              "<version>1</version>" +
+              "<sourceEntityId></sourceEntityId>" +
+              "<timestamp>" + DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K") + "</timestamp>" +
+              "</header>" +
+              "<body>" +
+              "<firstname>Keanu updated</firstname>" +
+              "<lastname>Piras updated</lastname>" +
+              "<email>keanu.piras@student.dhs.be updated</email>" +
+              "<birthday>2000-12-13</birthday>" +
+              "<role>student</role>" +
+              "<study>Dig-X</study>"+
+              "</body></user>";
+
+            Task task = new Task(() => Producer.sendMessage(message, "user"));
+
+            task.Start();
+            Console.WriteLine("producer starting!");
+            Consumer.getMessage();
+
+        }
         public static void createMockUser()
         {
             string message =
