@@ -94,7 +94,6 @@ namespace UUIDproducer
                     //fixed
                     bool xmlValidation = true;
                     bool xmlValidationUser = true;
-                    bool xmlValidation = true;
                     bool xmlValidationSubscribe = true;
 
                     xml.Validate(schema, (sender, e) =>
