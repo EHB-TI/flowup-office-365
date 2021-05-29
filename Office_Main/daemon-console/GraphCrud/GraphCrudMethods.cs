@@ -45,12 +45,12 @@ namespace daemon_console.GraphCrud
                 Start = new Microsoft.Graph.DateTimeTimeZone
                 {
                     DateTime = startTime,
-                    TimeZone = "Pacific Standard Time"
+                    TimeZone = "Romance Standard Time"
                 },
                 End = new Microsoft.Graph.DateTimeTimeZone
                 {
                     DateTime = endTime,
-                    TimeZone = "Pacific Standard Time"
+                    TimeZone = "Romance Standard Time"
                 },
                 Location = new Location
                 {

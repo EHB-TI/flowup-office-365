@@ -156,7 +156,9 @@ namespace UUIDproducer
                             List<Attendee> attendees = new List<Attendee>();
                             try
                             {
-                                Program.RunAsync("create",myEventName.InnerXml,myDescription.InnerXml,myStartEvent.InnerXml,myEndEvent.InnerXml,
+                                string startTimeEvent = myStartEvent.InnerXml.Substring(0, (myStartEvent.InnerXml.Length - 6));
+                                string endTimeEvent = myEndEvent.InnerXml.Substring(0, (myEndEvent.InnerXml.Length - 6));
+                                Program.RunAsync("create",myEventName.InnerXml,myDescription.InnerXml, startTimeEvent, endTimeEvent,
                                     myLocation.InnerXml, attendees,true,"null").GetAwaiter().GetResult();
                             }
                             catch (Exception ex)

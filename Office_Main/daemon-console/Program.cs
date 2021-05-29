@@ -114,7 +114,7 @@ namespace daemon_console
                 }
 
                 //Method to get the events from GrapCrudMethods
-                GraphCrudMethods.getEvents(result.AccessToken, Display);
+                //GraphCrudMethods.getEvents(result.AccessToken, Display);
 
 
 
