@@ -17,8 +17,7 @@ namespace UUIDproducer
             //Uuid.createMockEvent();
             //Uuid.updateMockEvent();
             //Uuid.updateMockEventFromFrontEnd();
-            Uuid.createMockUser();
-
+            Uuid.createMockEvent();
             /*
             Task task = new Task(() => Producer.send());
             task.Start();

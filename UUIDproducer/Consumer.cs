@@ -736,16 +736,25 @@ namespace UUIDproducer
                                         Console.WriteLine("Event Id in database is: " + iNewRowIdentity);
                                         Console.WriteLine("Event inserted in database");
 
-                                       
-
-                                       
-
-                                        
                                     }
                                 }
                                 //error handling for users
                                 else if (xmlValidationUser)
                                 {
+                                    //XML HEAD
+                                    XmlNode myMethodNodeUser = xmlDoc.SelectSingleNode("//method");
+                                    XmlNode myOriginNodeUser = xmlDoc.SelectSingleNode("//origin");
+                                    XmlNode mySourceIdUser = xmlDoc.SelectSingleNode("//sourceEntityId");
+                                    XmlNode myUserVersion = xmlDoc.SelectSingleNode("//version");
+
+                                    //XML BODY
+                                    XmlNode myFirstName = xmlDoc.SelectSingleNode("//firstname");
+                                    XmlNode myLastName = xmlDoc.SelectSingleNode("//lastname");
+                                    XmlNode myEmail = xmlDoc.SelectSingleNode("//email");
+                                    XmlNode myBirthday = xmlDoc.SelectSingleNode("//birthday");
+                                    XmlNode myRole = xmlDoc.SelectSingleNode("//role");
+                                    XmlNode myStudy = xmlDoc.SelectSingleNode("//study");
+
                                     if (valueIdUser.Count() > 0)
                                     {
                                         Console.WriteLine("userId:" + myobjectSourceId + " from Event table bestaat al");
@@ -757,18 +766,32 @@ namespace UUIDproducer
                                         string cs = @"server=10.3.56.8;userid=root;password=IUM_VDFt8ZQzc_sF;database=OfficeDB;Old Guids=True";
                                         using var con = new MySqlConnection(cs);
                                         con.Open();
-                                        var sql = "INSERT INTO Event(name, userId, startEvent, endEvent, description, location) VALUES(@name, @userId, @startEvent, @endEvent, @description, @location); SELECT @@IDENTITY";
+                                       
+                                        
 
-                                        using var cmd = new MySqlCommand(sql, con);
+
+                                        var sqlUser = "INSERT INTO User(firstname,lastname,email,birthday,role,study) VALUES(@firstname, @lastname, @email, @birthday,@role,@study); SELECT @@IDENTITY";
+                                        using var cmd = new MySqlCommand(sqlUser, con);
+
+                                        //Parse data to put into database
+                                        DateTime parsedBirthday;
+
+                                        parsedBirthday = DateTime.Parse(myBirthday.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
+
+                                        cmd.Parameters.AddWithValue("@firstname", myFirstName.InnerXml);
+                                        cmd.Parameters.AddWithValue("@lastname", myLastName.InnerXml);
+                                        cmd.Parameters.AddWithValue("@email", myEmail.InnerXml);
+                                        cmd.Parameters.AddWithValue("@birthday", parsedBirthday);
+                                        cmd.Parameters.AddWithValue("@role", myRole.InnerXml);
+                                        cmd.Parameters.AddWithValue("@study", myStudy.InnerXml);
+
+
+                                        int iNewRowIdentity = Convert.ToInt32(cmd.ExecuteScalar());
+                                        Console.WriteLine("User Id in database is: " + iNewRowIdentity);
+                                        Console.WriteLine("User inserted in database Office");
 
                                     }
                                 }
-                                
-
-                                
-                               
-                               
-                               
 
                                 Console.WriteLine("Code is: " + myCodeNode.InnerXml);
                                 break;
