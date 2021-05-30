@@ -82,6 +82,9 @@ namespace UUIDproducer
                     var routingKey = ea.RoutingKey;
                     Console.WriteLine(" [x] Received '{0}':'{1}'", routingKey, message);
 
+                    bool xmlValidation = true;
+                    bool xmlValidationUser = true;
+                    bool xmlValidationSubscribe = true;
 
                     //xsd event validation
                     XmlSchemaSet schema = new XmlSchemaSet();
@@ -92,33 +95,27 @@ namespace UUIDproducer
                     schemaUser.Add("", "UserSchema.xsd");
                     //XDocument xml = XDocument.Parse(message, LoadOptions.SetLineInfo);
                     XmlDocument xmlDoc = new XmlDocument();
+                    XDocument xml = new XDocument();
                     try
                     {
                         xmlDoc.LoadXml(message);
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Weird message came in: " + message);
-                    }
-                    XDocument xml = XDocument.Parse(xmlDoc.OuterXml);
+                        xml = XDocument.Parse(xmlDoc.OuterXml);
+                        xml.Validate(schema, (sender, e) =>
+                        {
+                            xmlValidation = false;
+                        });
+                        xml.Validate(schemaUser, (sender, e) =>
+                        {
+                            xmlValidationUser = false;
+                        });
+                        xml.Validate(schemaSubscribe, (sender, e) =>
+                        {
+                            xmlValidationSubscribe = false;
+                        });
+                    
 
-                    //fixed
-                    bool xmlValidation = true;
-                    bool xmlValidationUser = true;
-                    bool xmlValidationSubscribe = true;
+                    
 
-                    xml.Validate(schema, (sender, e) =>
-                    {
-                        xmlValidation = false;
-                    });
-                    xml.Validate(schemaUser, (sender, e) =>
-                    {
-                        xmlValidationUser = false;
-                    });
-                    xml.Validate(schemaSubscribe, (sender, e) =>
-                    {
-                        xmlValidationSubscribe = false;
-                    });
                   
 
                     //Alter XML to change
@@ -740,6 +737,12 @@ namespace UUIDproducer
 
                         
 
+                    }
+
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Weird message came in: " + message);
                     }
 
                 };
