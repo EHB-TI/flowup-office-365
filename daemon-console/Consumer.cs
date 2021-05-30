@@ -120,8 +120,10 @@ namespace UUIDproducer
 
                     //Alter XML to change
                     XmlDocument docAlter = new XmlDocument();
+                    XmlDocument docAlterSub = new XmlDocument();
 
-                    if (xmlValidation)
+
+                        if (xmlValidation)
                     {
                         
                         Console.WriteLine("XML is valid");
@@ -630,34 +632,119 @@ namespace UUIDproducer
                         }
                     }
 
-                    else if(xmlValidationSubscribe)
-                    {
-                        Console.WriteLine("Valid Subscribe XML");
+                        //else if (xmlValidationSubscribe)
+                        //{
+                        //    Console.WriteLine("Valid Subscribe XML");
 
-                        //XML head
-                        XmlNode myMethodNode = xmlDoc.SelectSingleNode("//method");
-                        XmlNode myOriginNode = xmlDoc.SelectSingleNode("//origin");
-                        XmlNode mySourceEntityId = xmlDoc.SelectSingleNode("//sourceEntityId");
-                        XmlNode mySubVersion = xmlDoc.SelectSingleNode("//version");
-                        //XML body
-                        XmlNode myUUID = xmlDoc.SelectSingleNode("//eventUUID");
-                        XmlNode myEventSourceEntityId = xmlDoc.SelectSingleNode("//eventSourceEntityId");
-                        XmlNode myAttendeeUUID = xmlDoc.SelectSingleNode("//attendeeUUID");
-                        XmlNode myAttendeeSourceEntityId = xmlDoc.SelectSingleNode("//attendeeSourceEntityId");
+                        //    //XML head
+                        //    XmlNode myMethodNode = xmlDoc.SelectSingleNode("//method");
+                        //    XmlNode myOriginNode = xmlDoc.SelectSingleNode("//origin");
+                        //    XmlNode mySourceEntityId = xmlDoc.SelectSingleNode("//sourceEntityId");
+                        //    XmlNode mySubVersion = xmlDoc.SelectSingleNode("//version");
+                        //    //XML body
+                        //    XmlNode myUUID = xmlDoc.SelectSingleNode("//eventUUID");
+                        //    XmlNode myEventSourceEntityId = xmlDoc.SelectSingleNode("//eventSourceEntityId");
+                        //    XmlNode myAttendeeUUID = xmlDoc.SelectSingleNode("//attendeeUUID");
+                        //    XmlNode myAttendeeSourceEntityId = xmlDoc.SelectSingleNode("//attendeeSourceEntityId");
 
-                        //Subscribe to Event
-                        if (myOriginNode.InnerXml == "FrontEnd" && myMethodNode.InnerXml == "SUBSCRIBE")
-                        {
-                            Console.WriteLine("Subscriging to event, and putting it in database");
-                        }
-                        //Unubscribe to Event
-                        if (myOriginNode.InnerXml == "FrontEnd" && myMethodNode.InnerXml == "UNSUBCRIBE")
-                        {
-                            Console.WriteLine("Unsusbscribing from event, and putting it in database");
-                        }
-                    }
-                    //XML error from UUID
-                    else
+                        //    //Message from Front End, Subscribe to Event, sending it to UUID
+                        //    if (myOriginNode.InnerXml == "FrontEnd" && myMethodNode.InnerXml == "SUBSCRIBE" && myUUID.InnerXml != "" && myAttendeeUUID.InnerXml != "")
+                        //    {
+
+                        //        Console.WriteLine("Got a message from " + myOriginNode.InnerXml);
+                        //        Console.WriteLine("Updating origin \"" + myOriginNode.InnerXml + "\" to Office");
+
+                        //        docAlterSub.Load("AlterSubscribe.xml");
+                        //        docAlterSub = xmlDoc;
+
+                        //        docAlterSub.SelectSingleNode("//event/header/origin").InnerText = "Office";
+                        //        docAlterSub.Save("AlterSubscribe.xml");
+                        //        docAlterSub.Save(Console.Out);
+
+
+                        //        Task task = new Task(() => Producer.sendMessage(docAlterSub.InnerXml, "UUID"));
+                        //        task.Start();
+
+                        //        Console.WriteLine("Origin changed to Office, sending now it to UUID...");
+
+                        //    }
+                        //    //Message from UUID, Subscribe, setting it in out database
+                        //    if (myOriginNode.InnerXml == "UUID" && myMethodNode.InnerXml == "SUBSCRIBE" && myEventSourceEntityId.InnerXml != "" && myAttendeeSourceEntityId.InnerXml != "")
+                        //    {
+                        //        Console.WriteLine("Got a message from " + myOriginNode.InnerXml);
+                        //        Console.WriteLine("Subscribing data in database and calendar");
+
+                        //        using var con = new MySqlConnection(cs);
+                        //        con.Open();
+
+                        //        var sql = "INSERT INTO Subscribe(userId, eventId) VALUES(@userId, @eventId)";
+                        //        using var cmd = new MySqlCommand(sql, con);
+
+
+                        //        cmd.Parameters.AddWithValue("@eventId", myEventSourceEntityId.InnerXml);
+                        //        cmd.Parameters.AddWithValue("@name", myAttendeeSourceEntityId.InnerXml);
+                        //        cmd.Prepare();
+                        //        cmd.ExecuteNonQuery();
+
+                        //        Console.WriteLine("Subscribe inserted in database");
+
+                        //        docAlterSub.Load("AlterSubscribe.xml");
+                        //        docAlterSub = xmlDoc;
+
+                        //        docAlterSub.SelectSingleNode("//event/header/origin").InnerText = "Office";
+                        //        docAlterSub.Save("AlterSubscribe.xml");
+
+                        //        docAlterSub.Save(Console.Out);
+
+                        //        Task task = new Task(() => Producer.sendMessage(docAlterSub.InnerXml, "UUID"));
+                        //        task.Start();
+
+                        //        Console.WriteLine("Sending subscribe message to UUID...");
+
+                        //    }
+                        //    //Unubscribe from Front end, change origin and send to UUID
+                        //    if (myOriginNode.InnerXml == "FrontEnd" && myMethodNode.InnerXml == "UNSUBCRIBE" && myUUID.InnerXml != "" && myAttendeeUUID.InnerXml != "")
+                        //    {
+                        //        Console.WriteLine("Unsusbscribing from event, and putting it in database");
+
+                        //        Console.WriteLine("Got a message from " + myOriginNode.InnerXml);
+                        //        Console.WriteLine("Updating origin from \"" + myOriginNode.InnerXml + " to \"Office\"");
+
+
+                        //        docAlterSub.Load("AlterSubscribe.xml");
+                        //        docAlterSub = xmlDoc;
+
+                        //        docAlterSub.SelectSingleNode("//event/header/origin").InnerText = "Office";
+                        //        docAlterSub.Save("AlterSubscribe.xml");
+                        //        docAlterSub.Save(Console.Out);
+
+                        //        Task task = new Task(() => Producer.sendMessage(docAlterSub.InnerXml, "UUID"));
+                        //        task.Start();
+
+                        //        Console.WriteLine("Origin changed to Office, sending delete now it to UUID...");
+                        //    }
+                        //    //Unubscribe from UUID, change it in db
+                        //    if (myOriginNode.InnerXml == "UUID" && myMethodNode.InnerXml == "UNSUBCRIBE" && myUUID.InnerXml != "" && myAttendeeUUID.InnerXml != "")
+                        //    {
+                        //        Console.WriteLine("Unsusbscribing from event, and putting it in database");
+
+                        //        Console.WriteLine("Got a subscribe message from " + myOriginNode.InnerXml);
+                        //        Console.WriteLine("The full message from the UUID is: " + xmlDoc.InnerXml);
+                        //        Console.WriteLine("Deleting event data in database and calendar");
+
+                        //        using var con = new MySqlConnection(cs);
+                        //        con.Open();
+
+                        //        var sql = "DELETE FROM Subscribe WHERE eventId = '" + myUUID.InnerXml + "' AND userId = '" + myAttendeeSourceEntityId.InnerXml + "'";
+                        //        using var cmd = new MySqlCommand(sql, con);
+
+                        //        //cmd.Prepare();
+                        //        cmd.ExecuteNonQuery();
+                        //        Console.WriteLine("Event deleted in database");
+                        //    }
+                        //}
+                        //XML error from UUID
+                        else
                     {
                         //header
                         XmlNode myCodeNode = xmlDoc.SelectSingleNode("//code");
