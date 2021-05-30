@@ -16,6 +16,7 @@ namespace daemon_console.GraphCrud
     public class GraphCrudMethods
     {
         AuthenticationConfig config = AuthenticationConfig.ReadFromJsonFile("appsettings.json");
+        static string eventId;
 
         //Get events of specific user with Graph api
         public static async void getEvents(string accessToken, Action<JObject> Display)
@@ -29,7 +30,7 @@ namespace daemon_console.GraphCrud
 
 
         //Create events of specific user with graph api
-        public static async void createEvent(string accessToken, string subject, string eventContent, string startTime, string endTime, string locationName, List<Attendee> attendees, bool allowNewTimeProposal)
+        public static async Task<string> createEvent(string accessToken, string subject, string eventContent, string startTime, string endTime, string locationName, List<Attendee> attendees, bool allowNewTimeProposal)
         {
             var httpClient = new HttpClient();
 
@@ -70,18 +71,31 @@ namespace daemon_console.GraphCrud
 
             // Send the request
             var responsePost = await httpClient.PostAsync($"https://graph.microsoft.com/v1.0/users/Admin@flowupdesiderius.onmicrosoft.com/events", content);
-
+            Console.WriteLine(responsePost);
             if (responsePost.IsSuccessStatusCode)
+            {
+                //Catch the event ID from the response to save later for an update or delete event
+                string[] subs = responsePost.Headers.Location.ToString().Split(new string[] { "events" }, StringSplitOptions.None);
+                eventId = "";
+                eventId = subs[1].Replace("('", "").Replace("')", "");
                 Console.WriteLine("Event has been added successfully!");
+                return eventId;
+                // ==>eventId check
+                
+            }
             else
+            {
                 Console.WriteLine(responsePost.StatusCode);
-
+                
+            }
+            return "";
         }
 
-        //Delete events of a specific user with GrapApi
+        //Delete an event
         public static async void deleteEvent(string accessToken, string eventId)
         {
             var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
             var responseDelete = await httpClient.DeleteAsync($"https://graph.microsoft.com/v1.0/users/Admin@flowupdesiderius.onmicrosoft.com/events/{eventId}");
 
             if (responseDelete.IsSuccessStatusCode)
@@ -90,7 +104,7 @@ namespace daemon_console.GraphCrud
                 Console.WriteLine(responseDelete.StatusCode);
         }
 
-
+        //Delete events of a specific user with GrapApi
         public static async void unsubscribeEvent(string accessToken,string userName, string eventId)
         {
             var httpClient = new HttpClient();
@@ -103,6 +117,11 @@ namespace daemon_console.GraphCrud
         }
 
 
+        //Retruns the last saved id of an created event
+        public static string returnEventId()
+        {
+            return eventId;
+        }
 
         public static string generateTransactionId()
         {

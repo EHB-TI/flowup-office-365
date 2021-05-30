@@ -11,6 +11,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
 using daemon_console;
+using daemon_console.GraphCrud;
 using Microsoft.Graph;
 using MySql.Data.MySqlClient;
 using RabbitMQ.Client;
@@ -180,13 +181,15 @@ namespace UUIDproducer
                         {
 
                             Console.WriteLine(myStartEvent.InnerXml);
-                            List<Attendee> attendees = new List<Attendee>();
+                            List<Attendee> attendeesAtCreate = new List<Attendee>();
+                            string eventId= "fout";
                             try
                             {
                                 string startTimeEvent = myStartEvent.InnerXml.Substring(0, (myStartEvent.InnerXml.Length - 6));
                                 string endTimeEvent = myEndEvent.InnerXml.Substring(0, (myEndEvent.InnerXml.Length - 6));
-                                Program.RunAsync("create",myEventName.InnerXml,myDescription.InnerXml, startTimeEvent, endTimeEvent,
-                                    myLocation.InnerXml, attendees,true,"null").GetAwaiter().GetResult();
+                                eventId= Program.RunAsync("create",myEventName.InnerXml,myDescription.InnerXml, startTimeEvent, endTimeEvent,
+                                    myLocation.InnerXml, attendeesAtCreate, true,"null").GetAwaiter().GetResult();
+                                
                             }
                             catch (Exception ex)
                             {
@@ -201,17 +204,14 @@ namespace UUIDproducer
                             using var con = new MySqlConnection(cs);
                             con.Open();
 
-
-                            //var sql = "INSERT INTO Event(name, userId, graphResponse, startEvent, endEvent, description, location) VALUES(@name, @userId, @graphResponse, @startEvent, @endEvent, @description, @location); SELECT @@IDENTITY";
-                            var sql = "INSERT INTO Event(name, userId, startEvent, endEvent, description, location) VALUES(@name, @userId, @startEvent, @endEvent, @description, @location); SELECT @@IDENTITY";
+                            Console.WriteLine(eventId);
+                            var sql = "INSERT INTO Event(name, userId, graphResponse, startEvent, endEvent, description, location) VALUES(@name, @userId, @graphResponse, @startEvent, @endEvent, @description, @location); SELECT @@IDENTITY";
+                            //var sql = "INSERT INTO Event(name, userId, startEvent, endEvent, description, location) VALUES(@name, @userId, @startEvent, @endEvent, @description, @location); SELECT @@IDENTITY";
 
                             using var cmd = new MySqlCommand(sql, con);
 
-
-
-
-                        //Parse data to put into database
-                        DateTime parsedDateStart;
+                            //Parse data to put into database
+                            DateTime parsedDateStart;
 
 
                          
@@ -222,12 +222,12 @@ namespace UUIDproducer
 
                             cmd.Parameters.AddWithValue("@name", myEventName.InnerXml);
                             cmd.Parameters.AddWithValue("@userId", myOrganiserSourceId.InnerXml);
+                            cmd.Parameters.AddWithValue("@graphResponse", eventId);
                             cmd.Parameters.AddWithValue("@startEvent", parsedDateStart);
                             cmd.Parameters.AddWithValue("@endEvent", parsedDateEnd);
                             cmd.Parameters.AddWithValue("@description", myDescription.InnerXml);
                             cmd.Parameters.AddWithValue("@location", myLocation.InnerXml);
 
-                            //cmd.Parameters.AddWithValue("@graphResponse", stringjsonData);
 
                             //int iNewRowIdentity = 0; 
                             //try
@@ -331,6 +331,9 @@ namespace UUIDproducer
                         //Delete Event comes from Front end and we pass it to UUID to compare
                         if (myOriginNode.InnerXml == "FrontEnd" && myMethodNode.InnerXml == "DELETE" && myOrganiserSourceId.InnerXml == "" && routingKey == "event")
                         {
+
+
+
                             Console.WriteLine("Got a message from " + myOriginNode.InnerXml);
                             Console.WriteLine("Updating origin from \"" + myOriginNode.InnerXml + " to \"Office\"");
 
@@ -360,11 +363,40 @@ namespace UUIDproducer
                             using var con = new MySqlConnection(cs);
                             con.Open();
 
+                            var sqlForId = "SELECT graphResponse FROM Event WHERE eventId = '" + mySourceEntityId.InnerXml + "'";
+                            using var cmd = new MySqlCommand(sqlForId, con);
+                            MySqlDataReader dr = cmd.ExecuteReader();
+                            string eventId="";
+                            if (dr.Read())
+                            {
+                                eventId = dr[0].ToString();
+                                Console.WriteLine(eventId);
+                            }
+                            dr.Close();
+                            
+
+                            try
+                            {
+                                List<Attendee> attendeesAtCreate = new List<Attendee>();
+                                string startTimeEvent = myStartEvent.InnerXml.Substring(0, (myStartEvent.InnerXml.Length - 6));
+                                string endTimeEvent = myEndEvent.InnerXml.Substring(0, (myEndEvent.InnerXml.Length - 6));
+                                Program.RunAsync("delete", "", "", "", "","", attendeesAtCreate, true, eventId).GetAwaiter().GetResult();
+
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine(ex.Message);
+                                Console.ResetColor();
+                            }
+
+                            
+
                             var sql = "DELETE FROM Event WHERE eventId = '" + mySourceEntityId.InnerXml + "'";
-                            using var cmd = new MySqlCommand(sql, con);
+                            using var cmd1 = new MySqlCommand(sql, con);
 
                             //cmd.Prepare();
-                            cmd.ExecuteNonQuery();
+                            cmd1.ExecuteNonQuery();
                             Console.WriteLine("Event deleted in database");
 
                         }
@@ -584,7 +616,6 @@ namespace UUIDproducer
 
                             try
                             {
-
                                 using var con = new MySqlConnection(cs);
                                 con.Open();
                                 var sql = "DELETE FROM User WHERE userId= '" + mySourceIdUser.InnerXml + "'";
