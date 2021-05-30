@@ -19,11 +19,15 @@ jobs:
         dotnet-version: 5.0.x
     - name: Restore dependencies
       run: dotnet restore
+    - name: Copy Secrets
+      run: cp /home/office/main_secrets/appsettings.json ./daemon-console/appsettings.json && cp /home/office/main_secrets/cs.txt ./daemon-console/cs.txt
     - name: Build
+      if: success()
     # Indien dotnet publish niet werkt dan moet deze stap vervangen worden met 'dotnet build --no-restore'
     # De stap dotnet publish -c Release zal dan moeten verplaatst worden naar 'Run Docker'
       run: dotnet publish -c Release
     - name: Test
+      if: success()
       run: dotnet test --no-build --verbosity normal
       
 # Deze stap gaat enkel door wanneer de testen een succes zijn!    
