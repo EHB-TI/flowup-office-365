@@ -707,7 +707,7 @@ namespace UUIDproducer
                                     //als bestaat niks writeline bestaat al
                                     if (valueSourceId.Count() > 0)
                                     {
-                                        Console.WriteLine("userId:" + myobjectSourceId + " from Event table bestaat al");
+                                        Console.WriteLine("userId:" + myobjectSourceId + " from Event table already exists.");
                                     }
                                     //else insert into event
                                     else
@@ -757,7 +757,7 @@ namespace UUIDproducer
 
                                     if (valueIdUser.Count() > 0)
                                     {
-                                        Console.WriteLine("userId:" + myobjectSourceId + " from Event table bestaat al");
+                                        Console.WriteLine("userId:" + myobjectSourceId + " from User table already exists.");
                                     }
                                     else
                                     {
