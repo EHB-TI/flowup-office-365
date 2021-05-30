@@ -160,13 +160,14 @@ namespace UUIDproducer
                             using var con = new MySqlConnection(cs);
                             con.Open();
 
-                            MySqlCommand cmdCheck = new MySqlCommand("SELECT COUNT(*) FROM Event WHERE userId= '" + myUserId + "'");
+                           /* MySqlCommand cmdCheck = new MySqlCommand("SELECT COUNT(*) FROM Event WHERE userId= '" + myUserId + "'");
                              object obj = cmdCheck.ExecuteScalar();
                              if (Convert.ToInt32(obj) > 0)
                              {
                                  Console.WriteLine(myUserId + "already excists in the database Office");
                                  return;
                              }
+
 
 
                             var sql=("INSERT INTO Event(name, userId, startEvent, endEvent, description, location) VALUES(@name, @userId, @startEvent, @endEvent, @description, @location); SELECT @@IDENTITY");
@@ -180,7 +181,7 @@ namespace UUIDproducer
                              {
                                  Console.WriteLine("That Event already excists in the database office");
                              }*/
-                            //var sql = "INSERT INTO Event(name, userId, startEvent, endEvent, description, location) VALUES(@name, @userId, @startEvent, @endEvent, @description, @location); SELECT @@IDENTITY";
+                            var sql = "INSERT INTO Event(name, userId, startEvent, endEvent, description, location) VALUES(@name, @userId, @startEvent, @endEvent, @description, @location); SELECT @@IDENTITY";
 
                             using var cmd = new MySqlCommand(sql, con);
                            
@@ -623,6 +624,12 @@ namespace UUIDproducer
                             xmlValidation = false;
                         });
 
+                        //1parsen naar string
+                        //2selectfrom event where.. object source id=myobjectSourceId
+                        //3if result > 0
+                        //als bestaat niks writeline bestaat al
+                        //else insert into event
+                        //same steps for users
 
                         /*XDocument xmlEvent = XDocument.Parse(message);
                         string error = "";
@@ -673,6 +680,7 @@ namespace UUIDproducer
                                 break;
                                 //Create
                             case "3000":
+
                                 Console.WriteLine("Code is: " + myCodeNode.InnerXml);
                                 break;
                             case "3001":
