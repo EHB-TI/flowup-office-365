@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,7 +22,6 @@ namespace UUIDproducer
 {
     class Consumer
     {
-        //de kant dat de bericht gaat krijgen
 
         public static void getMessage()
         {
@@ -36,8 +36,14 @@ namespace UUIDproducer
             //    Console.ResetColor();
             //}
 
-            string cs = @"server=10.3.56.8;userid=root;password=IUM_VDFt8ZQzc_sF;database=OfficeDB;Old Guids=True";
+            string cs = "";
 
+            try
+            {
+                cs = System.IO.File.ReadAllText("cs.txt");
+            
+
+            //Console.WriteLine("cs string is: " + cs);
 
             var factory = new ConnectionFactory() { HostName = "10.3.56.6" };
             //var factory = new ConnectionFactory() { HostName = "localhost" };
@@ -712,6 +718,13 @@ namespace UUIDproducer
 
                 Console.WriteLine(" Press [enter] to exit.");
                 Console.ReadLine();
+            }
+
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine("cs file could not be read:");
+                Console.WriteLine(e.Message);
             }
 
         }
