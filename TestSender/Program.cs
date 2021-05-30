@@ -86,6 +86,68 @@ class EmitLogDirect
               "<study>Dig-X</study>" +
               "</body></user>";
 
+            string createEvent = @"<event>
+                  <header>
+                    <UUID>4f2bca51-a3ba-4228-8c29-c5891cef2b6a</UUID>
+                    <sourceEntityId></sourceEntityId>
+                    <organiserUUID>910470ce-1672-4476-b220-b1bbad889e90</organiserUUID>
+                    <organiserSourceEntityId></organiserSourceEntityId>
+                    <method>CREATE</method>
+                    <origin>FrontEnd</origin>
+                    <version>1</version>
+                    <timestamp>2021-05-29T22:50:11+02:00</timestamp>
+                  </header>
+                  <body>
+                    <name>Test</name>
+                    <startEvent>2021-05-30T12:00:00+00:00</startEvent>
+                    <endEvent>2021-05-30T23:50:41+00:00</endEvent>
+                    <description>Nog een event</description>
+                    <location>Online</location>
+                  </body>
+                </event>";
+
+            string updateEvent = @"<event>
+                          <header>
+                            <UUID>4f2bca51-a3ba-4228-8c29-c5891cef2b6a</UUID>
+                            <sourceEntityId></sourceEntityId>
+                            <organiserUUID/>
+                            <organiserSourceEntityId></organiserSourceEntityId>
+                            <method>UPDATE</method>
+                            <origin>FrontEnd</origin>
+                            <version>2</version>
+                            <timestamp>2021-05-29T22:51:32+02:00</timestamp>
+                          </header>
+                          <body>
+                            <name>Test</name>
+                            <startEvent>2021-05-30T12:00:00+00:00</startEvent>
+                            <endEvent>2021-05-30T23:50:41+00:00</endEvent>
+                            <description>Nog een event bewerkt</description>
+                            <location>Online</location>
+                          </body>
+                        </event>";
+
+            string deleteEvent = @"<event>
+                      <header>
+                        <UUID>4f2bca51-a3ba-4228-8c29-c5891cef2b6a</UUID>
+                        <sourceEntityId>
+                        </sourceEntityId>
+                        <organiserUUID>910470ce-1672-4476-b220-b1bbad889e90</organiserUUID>
+                        <organiserSourceEntityId>
+                        </organiserSourceEntityId>
+                        <method>DELETE</method>
+                        <origin>FrontEnd</origin>
+                        <version />
+                        <timestamp>2021-05-29T22:52:09+02:00</timestamp>
+                      </header>
+                      <body>
+                        <name>Test</name>
+                        <startEvent>2021-05-30T12:00:00+00:00</startEvent>
+                        <endEvent>2021-05-30T23:50:41+00:00</endEvent>
+                        <description>Nog een event bewerkt</description>
+                        <location>Online</location>
+                      </body>
+                        </event>";
+
             //xml.Validate(schema, (sender, e) =>
             //{
             //    xmlValidation = false;
@@ -104,11 +166,14 @@ class EmitLogDirect
             //message = doc.InnerXml;
             //message = createUserMessage;
             //message = updateUserMessage;
-            message = deleteUserMessage;
+            //message = deleteUserMessage;
+            message = createEvent;
+            //message = updateEvent;
+            //message = deleteEvent;
 
-            //var severity = "event";
-            var severity = "user";
-            
+            var severity = "event";
+            //var severity = "user";
+
 
             var body = Encoding.UTF8.GetBytes(message);
             channel.BasicPublish(exchange: "direct_logs",
