@@ -22,6 +22,7 @@ namespace UUIDproducer
     class Consumer
     {
         //de kant dat de bericht gaat krijgen
+
         public static void getMessage()
         {
             //try
@@ -34,6 +35,9 @@ namespace UUIDproducer
             //    Console.WriteLine(ex.Message);
             //    Console.ResetColor();
             //}
+
+            string cs = @"server=10.3.56.8;userid=root;password=IUM_VDFt8ZQzc_sF;database=OfficeDB;Old Guids=True";
+
 
             var factory = new ConnectionFactory() { HostName = "10.3.56.6" };
             //var factory = new ConnectionFactory() { HostName = "localhost" };
@@ -188,7 +192,6 @@ namespace UUIDproducer
                             Console.WriteLine("Got a message from " + myOriginNode.InnerXml);
                             Console.WriteLine("Putting data in database and calendar");
 
-                            string cs = @"server=10.3.56.8;userid=root;password=IUM_VDFt8ZQzc_sF;database=OfficeDB;Old Guids=True";
                             using var con = new MySqlConnection(cs);
                             con.Open();
 
@@ -282,7 +285,6 @@ namespace UUIDproducer
                             //Console.WriteLine("Source id is: " + myDescription.InnerXml);
                             Console.WriteLine("Updating event data in database and calendar");
 
-                            string cs = @"server=10.3.56.8;userid=root;password=IUM_VDFt8ZQzc_sF;database=OfficeDB;Old Guids=True";
                             using var con = new MySqlConnection(cs);
                             con.Open();
 
@@ -349,7 +351,6 @@ namespace UUIDproducer
                             //Console.WriteLine("Source id is: " + myDescription.InnerXml);
                             Console.WriteLine("Deleting event data in database and calendar");
 
-                            string cs = @"server=10.3.56.8;userid=root;password=IUM_VDFt8ZQzc_sF;database=OfficeDB;Old Guids=True";
                             using var con = new MySqlConnection(cs);
                             con.Open();
 
@@ -417,7 +418,6 @@ namespace UUIDproducer
 
 
                             //connection to the database
-                            string cs = @"server=10.3.56.8;userid=root;password=IUM_VDFt8ZQzc_sF;database=OfficeDB;Old Guids=True";
                             using var con = new MySqlConnection(cs);
                             con.Open();
 
@@ -490,7 +490,6 @@ namespace UUIDproducer
                             Console.WriteLine("Updating user data in database and calendar");
 
 
-                            string cs = @"server=10.3.56.8;userid=root;password=IUM_VDFt8ZQzc_sF;database=OfficeDB;Old Guids=True";
                             try
                             {
 
@@ -577,7 +576,6 @@ namespace UUIDproducer
                             //Console.WriteLine("Source id is: " + myDescription.InnerXml);
                             Console.WriteLine("Deleting user data in database and calendar");
 
-                            string cs = @"server=10.3.56.8;userid=root;password=IUM_VDFt8ZQzc_sF;database=OfficeDB;Old Guids=True";
                             try
                             {
 
