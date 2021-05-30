@@ -68,7 +68,7 @@ namespace UUIDproducer
                         xmlDoc.LoadXml(message);
                     }catch(Exception e)
                     {
-                        Console.WriteLine("Weird message came in: " + message);
+                        Console.WriteLine("Weird message came in: " + e.Message);
                     }
                     XDocument xml = XDocument.Parse(xmlDoc.OuterXml);
 
@@ -160,8 +160,31 @@ namespace UUIDproducer
                             using var con = new MySqlConnection(cs);
                             con.Open();
 
-                            var sql = "INSERT INTO Event(name, userId, startEvent, endEvent, description, location) VALUES(@name, @userId, @startEvent, @endEvent, @description, @location); SELECT @@IDENTITY";
+                            MySqlCommand cmdCheck = new MySqlCommand("SELECT COUNT(*) FROM Event WHERE userId= '" + myUserId + "'");
+                             object obj = cmdCheck.ExecuteScalar();
+                             if (Convert.ToInt32(obj) > 0)
+                             {
+                                 Console.WriteLine(myUserId + "already excists in the database Office");
+                                 return;
+                             }
+
+
+                            var sql=("INSERT INTO Event(name, userId, startEvent, endEvent, description, location) VALUES(@name, @userId, @startEvent, @endEvent, @description, @location); SELECT @@IDENTITY");
+                            // int i = sql.ExecuteNonQuery();
+                             /*if (i > 0)
+                             {
+                                 Console.WriteLine("Adding Event to the database Office ");
+
+                             }
+                             else
+                             {
+                                 Console.WriteLine("That Event already excists in the database office");
+                             }*/
+                            //var sql = "INSERT INTO Event(name, userId, startEvent, endEvent, description, location) VALUES(@name, @userId, @startEvent, @endEvent, @description, @location); SELECT @@IDENTITY";
+
                             using var cmd = new MySqlCommand(sql, con);
+                           
+                            
 
 
                             //Parse data to put into database
@@ -178,7 +201,7 @@ namespace UUIDproducer
                             cmd.Parameters.AddWithValue("@location", myLocation.InnerXml);
 
                             int iNewRowIdentity = Convert.ToInt32(cmd.ExecuteScalar());
-                            Console.WriteLine("Envet Id in database is: " + iNewRowIdentity);
+                            Console.WriteLine("Event Id in database is: " + iNewRowIdentity);
                             Console.WriteLine("Event inserted in database");
 
                             docAlter.Load("Alter.xml");

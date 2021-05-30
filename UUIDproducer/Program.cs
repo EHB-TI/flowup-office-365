@@ -8,7 +8,7 @@ namespace UUIDproducer
         static void Main(string[] args)
         {
 
-            Consumer.getMessage();
+            //Consumer.getMessage();
 
 
             //Uuid.createEvent();
@@ -17,7 +17,7 @@ namespace UUIDproducer
             //Uuid.createMockEvent();
             //Uuid.updateMockEvent();
             //Uuid.updateMockEventFromFrontEnd();
-
+            Uuid.createMockUser();
 
             /*
             Task task = new Task(() => Producer.send());
