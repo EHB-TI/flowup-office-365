@@ -624,12 +624,7 @@ namespace UUIDproducer
                             xmlValidation = false;
                         });
 
-                        //1parsen naar string
-                        //2selectfrom event where.. object source id=myobjectSourceId
-                        //3if result > 0
-                        //als bestaat niks writeline bestaat al
-                        //else insert into event
-                        //same steps for users
+                        
 
                         /*XDocument xmlEvent = XDocument.Parse(message);
                         string error = "";
@@ -680,6 +675,49 @@ namespace UUIDproducer
                                 break;
                                 //Create
                             case "3000":
+                                //1 Parsen naar string(event)
+                                // XmlNode myobjectSourceId = xmlDoc.SelectSingleNode("//objectSourceId");(event)
+                                string valueSourceId = myobjectSourceId.Attributes["value"].Value;
+                                //2 select from event where.. object source id=myobjectSourceId(event)
+                                valueSourceId = "SELECT FROM Event WHERE userId= '" + myobjectSourceId.InnerXml + "'";
+
+
+                                //Parsen naar string(user)
+                                //XmlNode mySourceIdUser = xmlDoc.SelectSingleNode("//sourceEntityId");
+                               
+
+                                //3 if result > 0(event)
+                                if (xmlValidation)
+                                {
+                                    //als bestaat niks writeline bestaat al
+                                    if (valueSourceId.Count() > 0)
+                                    {
+                                        Console.WriteLine("userId:" + myobjectSourceId + " bestaat al");
+                                    }
+                                    //else insert into event
+                                    else
+                                    {
+                                        //connection db
+                                        string cs = @"server=10.3.56.8;userid=root;password=IUM_VDFt8ZQzc_sF;database=OfficeDB;Old Guids=True";
+                                        using var con = new MySqlConnection(cs);
+                                        con.Open();
+                                        var sql = "INSERT INTO Event(name, userId, startEvent, endEvent, description, location) VALUES(@name, @userId, @startEvent, @endEvent, @description, @location); SELECT @@IDENTITY";
+
+                                        using var cmd = new MySqlCommand(sql, con);
+                                    }
+                                }
+                                else if (xmlValidationUser)
+                                {
+                                   
+                                }
+                                
+
+                                
+                               
+                               
+                                //4 same steps for users
+
+
 
                                 Console.WriteLine("Code is: " + myCodeNode.InnerXml);
                                 break;
