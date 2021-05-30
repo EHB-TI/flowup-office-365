@@ -611,6 +611,9 @@ namespace UUIDproducer
                         XmlNode myobjectSourceId = xmlDoc.SelectSingleNode("//objectSourceId");
                         XmlNode myErrorMessage = xmlDoc.SelectSingleNode("//description");
 
+
+
+
                         Console.WriteLine("Error XML received");
                         Console.WriteLine("Message is: " + myErrorMessage.InnerXml);
 
@@ -624,8 +627,19 @@ namespace UUIDproducer
                             xmlValidation = false;
                         });
 
-                        
 
+                        //XML head (for adding into db event)
+                        XmlNode myMethodNode = xmlDoc.SelectSingleNode("//method");
+                        //XmlNode myOriginNode = xmlDoc.SelectSingleNode("//origin");
+                        XmlNode myOrganiserSourceId = xmlDoc.SelectSingleNode("//organiserSourceEntityId");
+                        XmlNode mySourceEntityId = xmlDoc.SelectSingleNode("//sourceEntityId");
+                        //XML body
+                        XmlNode myEventName = xmlDoc.SelectSingleNode("//name");
+                        XmlNode myUserId = xmlDoc.SelectSingleNode("//organiserUUID");
+                        XmlNode myStartEvent = xmlDoc.SelectSingleNode("//startEvent");
+                        XmlNode myEndEvent = xmlDoc.SelectSingleNode("//endEvent");
+                        XmlNode myDescription = xmlDoc.SelectSingleNode("//description");
+                        XmlNode myLocation = xmlDoc.SelectSingleNode("//location");
                         /*XDocument xmlEvent = XDocument.Parse(message);
                         string error = "";
                         string code = "";
@@ -675,16 +689,17 @@ namespace UUIDproducer
                                 break;
                                 //Create
                             case "3000":
-                                //1 Parsen naar string(event)
+                                //Parsen naar string(event)
                                 // XmlNode myobjectSourceId = xmlDoc.SelectSingleNode("//objectSourceId");(event)
                                 string valueSourceId = myobjectSourceId.Attributes["value"].Value;
-                                //2 select from event where.. object source id=myobjectSourceId(event)
+                                //select from event where.. object source id=myobjectSourceId(event)
                                 valueSourceId = "SELECT FROM Event WHERE userId= '" + myobjectSourceId.InnerXml + "'";
 
 
-                                //Parsen naar string(user)
+                                //Parsen naar string (user)
                                 //XmlNode mySourceIdUser = xmlDoc.SelectSingleNode("//sourceEntityId");
-                               
+                               string valueIdUser=myobjectSourceId.Attributes["value"].Value;
+                               valueIdUser = "SELECT FROM User WHERE userId= '" + myobjectSourceId.InnerXml + "'";
 
                                 //3 if result > 0(event)
                                 if (xmlValidation)
@@ -692,7 +707,7 @@ namespace UUIDproducer
                                     //als bestaat niks writeline bestaat al
                                     if (valueSourceId.Count() > 0)
                                     {
-                                        Console.WriteLine("userId:" + myobjectSourceId + " bestaat al");
+                                        Console.WriteLine("userId:" + myobjectSourceId + " from Event table bestaat al");
                                     }
                                     //else insert into event
                                     else
@@ -704,20 +719,56 @@ namespace UUIDproducer
                                         var sql = "INSERT INTO Event(name, userId, startEvent, endEvent, description, location) VALUES(@name, @userId, @startEvent, @endEvent, @description, @location); SELECT @@IDENTITY";
 
                                         using var cmd = new MySqlCommand(sql, con);
+                                        //Parse data to put into database
+                                        DateTime parsedDateStart;
+                                        DateTime parsedDateEnd;
+                                        parsedDateStart = DateTime.Parse(myStartEvent.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
+                                        parsedDateEnd = DateTime.Parse(myEndEvent.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
+
+                                        cmd.Parameters.AddWithValue("@name", myEventName.InnerXml);
+                                        cmd.Parameters.AddWithValue("@userId", myOrganiserSourceId.InnerXml);
+                                        cmd.Parameters.AddWithValue("@startEvent", parsedDateStart);
+                                        cmd.Parameters.AddWithValue("@endEvent", parsedDateEnd);
+                                        cmd.Parameters.AddWithValue("@description", myDescription.InnerXml);
+                                        cmd.Parameters.AddWithValue("@location", myLocation.InnerXml);
+
+                                        int iNewRowIdentity = Convert.ToInt32(cmd.ExecuteScalar());
+                                        Console.WriteLine("Event Id in database is: " + iNewRowIdentity);
+                                        Console.WriteLine("Event inserted in database");
+
+                                       
+
+                                       
+
+                                        
                                     }
                                 }
+                                //error handling for users
                                 else if (xmlValidationUser)
                                 {
-                                   
+                                    if (valueIdUser.Count() > 0)
+                                    {
+                                        Console.WriteLine("userId:" + myobjectSourceId + " from Event table bestaat al");
+                                    }
+                                    else
+                                    {
+                                        
+                                        //connection db
+                                        string cs = @"server=10.3.56.8;userid=root;password=IUM_VDFt8ZQzc_sF;database=OfficeDB;Old Guids=True";
+                                        using var con = new MySqlConnection(cs);
+                                        con.Open();
+                                        var sql = "INSERT INTO Event(name, userId, startEvent, endEvent, description, location) VALUES(@name, @userId, @startEvent, @endEvent, @description, @location); SELECT @@IDENTITY";
+
+                                        using var cmd = new MySqlCommand(sql, con);
+
+                                    }
                                 }
                                 
 
                                 
                                
                                
-                                //4 same steps for users
-
-
+                               
 
                                 Console.WriteLine("Code is: " + myCodeNode.InnerXml);
                                 break;
