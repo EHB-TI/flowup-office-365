@@ -30,7 +30,7 @@ jobs:
       if: success()
       run: dotnet test --no-build --verbosity normal
       
-# Deze stap gaat enkel door wanneer de testen een succes zijn!    
+    # Deze stap gaat enkel door wanneer de testen een succes zijn!    
     - name: Run Docker
       if: success()
       run: bash startup.sh
