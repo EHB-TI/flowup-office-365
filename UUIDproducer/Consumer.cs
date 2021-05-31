@@ -65,12 +65,9 @@ namespace UUIDproducer
                         xmlDoc.LoadXml(message);
                     }catch(Exception e)
                     {
-<<<<<<< Updated upstream
-                        Console.WriteLine("Weird message came in: " + e.Message);
-=======
+
                         Console.WriteLine("Weird message came in: " + message);
                         Console.WriteLine("Error: " + e.Message);
->>>>>>> Stashed changes
                     }
                     XDocument xml = XDocument.Parse(xmlDoc.OuterXml);
 
