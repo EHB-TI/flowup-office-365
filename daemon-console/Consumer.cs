@@ -130,7 +130,7 @@ namespace UUIDproducer
                     XmlDocument docAlterSub = new XmlDocument();
 
 
-                        if (xmlValidation)
+                    if (xmlValidation)
                     {
                         
                         Console.WriteLine("XML is valid");
@@ -842,61 +842,61 @@ namespace UUIDproducer
 
 
 
-                        
-                    //    //Event comes from UUID Master, we get a message back from UUID
-                    //    switch (myCodeNode.InnerXml)
-                    //    {
-                    //        case "1000":
-                    //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                    //            break;
-                    //        case "1001":
-                    //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                    //            break;
-                    //        case "1002":
-                    //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                    //            break;
-                    //        case "1003":
-                    //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                    //            break;
-                    //        case "1004":
-                    //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                    //            break;
-                    //        case "1005":
-                    //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                    //            break;
-                    //            //DB Error
-                    //        case "2000":
-                    //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                    //            break;
-                    //            //Create
-                    //        case "3000":
-                    //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                    //            break;
-                    //        case "3001":
-                    //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                    //            break;
-                    //        case "3002":
-                    //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                    //            break;
-                    //            //Update
-                    //        case "4000":
-                    //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                    //            break;
-                    //        case "4001":
-                    //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                    //            break;
-                    //            //Delete
-                    //        case "5000":
-                    //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                    //            break;
-                    //        default:
-                    //            Console.WriteLine("Default case");
-                    //            break;
-                    //    }
 
-                        
+                            //    //Event comes from UUID Master, we get a message back from UUID
+                            //    switch (myCodeNode.InnerXml)
+                            //    {
+                            //        case "1000":
+                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                            //            break;
+                            //        case "1001":
+                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                            //            break;
+                            //        case "1002":
+                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                            //            break;
+                            //        case "1003":
+                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                            //            break;
+                            //        case "1004":
+                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                            //            break;
+                            //        case "1005":
+                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                            //            break;
+                            //            //DB Error
+                            //        case "2000":
+                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                            //            break;
+                            //            //Create
+                            //        case "3000":
+                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                            //            break;
+                            //        case "3001":
+                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                            //            break;
+                            //        case "3002":
+                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                            //            break;
+                            //            //Update
+                            //        case "4000":
+                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                            //            break;
+                            //        case "4001":
+                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                            //            break;
+                            //            //Delete
+                            //        case "5000":
+                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                            //            break;
+                            //        default:
+                            //            Console.WriteLine("Default case");
+                            //            break;
+                            //    }
 
-                    //}
+
+
+                        }
 
                     }
                     catch (Exception e)
