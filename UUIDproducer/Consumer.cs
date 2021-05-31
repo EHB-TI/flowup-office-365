@@ -21,9 +21,9 @@ namespace UUIDproducer
         public static void getMessage()
         {
 
+            string cs = @"server=10.3.56.8;userid=root;password=IUM_VDFt8ZQzc_sF;database=OfficeDB;Old Guids=True";
 
             var factory = new ConnectionFactory() { HostName = "10.3.56.6" };
-            //var factory = new ConnectionFactory() { HostName = "localhost" };
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
             {
@@ -40,9 +40,6 @@ namespace UUIDproducer
                 channel.QueueBind(queue: queueName,
                 exchange: "direct_logs",
                 routingKey: "Office");
-                //channel.QueueBind(queue: queueName,
-                //exchange: "direct_logs",
-                //routingKey: "FrontEnd");
                 Console.WriteLine(" [*] Waiting for messages.");
 
                 var consumer = new EventingBasicConsumer(channel);
@@ -68,7 +65,12 @@ namespace UUIDproducer
                         xmlDoc.LoadXml(message);
                     }catch(Exception e)
                     {
+<<<<<<< Updated upstream
                         Console.WriteLine("Weird message came in: " + e.Message);
+=======
+                        Console.WriteLine("Weird message came in: " + message);
+                        Console.WriteLine("Error: " + e.Message);
+>>>>>>> Stashed changes
                     }
                     XDocument xml = XDocument.Parse(xmlDoc.OuterXml);
 
@@ -88,15 +90,11 @@ namespace UUIDproducer
                     {
                         xmlValidationSubscribe = false;
                     });
-                    //if (routingKey == "Office")
-                    //{
-                    // Console.WriteLine("create event");
-
-                    //}
-                    //XML from RabbitMQ
+                    
 
                     //Alter XML to change
                     XmlDocument docAlter = new XmlDocument();
+                    XmlDocument docAlterSub = new XmlDocument();
 
                     if (xmlValidation)
                     {
@@ -120,27 +118,14 @@ namespace UUIDproducer
                         if (myOriginNode.InnerXml == "FrontEnd" && myMethodNode.InnerXml == "CREATE" && myOrganiserSourceId.InnerXml == "" && routingKey == "event")
                         {
                             Console.WriteLine("Got a message from " + myOriginNode.InnerXml);
-                            Console.WriteLine("Updating origin \"" + myOriginNode.InnerXml + "\" of XML...");
-
-                           
-
-                            //XmlWriterSettings settings = new XmlWriterSettings();
-                            //settings.Indent = true;
-                            //XmlWriter writer = XmlWriter.Create("Alter.xml", settings);
-                            //doc1.Save(writer);
-
+                            Console.WriteLine("Updating origin \"" + myOriginNode.InnerXml + "\" to Office");
 
                             docAlter.Load("Alter.xml");
                             docAlter = xmlDoc;
 
                             docAlter.SelectSingleNode("//event/header/origin").InnerText = "Office";
                             docAlter.Save("Alter.xml");
-
-
                             docAlter.Save(Console.Out);
-                            //Console.WriteLine(docAlter.InnerXml);
-                            //Console.WriteLine(docMessage.InnerXml);
-                            //Console.WriteLine(docMessageConverted.InnerXml);
 
 
                             Task task = new Task(() => Producer.sendMessage(docAlter.InnerXml, "UUID"));
@@ -156,7 +141,6 @@ namespace UUIDproducer
                             Console.WriteLine("Got a message from " + myOriginNode.InnerXml);
                             Console.WriteLine("Putting data in database and calendar");
 
-                            string cs = @"server=10.3.56.8;userid=root;password=IUM_VDFt8ZQzc_sF;database=OfficeDB;Old Guids=True";
                             using var con = new MySqlConnection(cs);
                             con.Open();
 
@@ -249,7 +233,6 @@ namespace UUIDproducer
                             //Console.WriteLine("Source id is: " + myDescription.InnerXml);
                             Console.WriteLine("Updating event data in database and calendar");
 
-                            string cs = @"server=10.3.56.8;userid=root;password=IUM_VDFt8ZQzc_sF;database=OfficeDB;Old Guids=True";
                             using var con = new MySqlConnection(cs);
                             con.Open();
 
@@ -316,7 +299,6 @@ namespace UUIDproducer
                             //Console.WriteLine("Source id is: " + myDescription.InnerXml);
                             Console.WriteLine("Deleting event data in database and calendar");
 
-                            string cs = @"server=10.3.56.8;userid=root;password=IUM_VDFt8ZQzc_sF;database=OfficeDB;Old Guids=True";
                             using var con = new MySqlConnection(cs);
                             con.Open();
 
@@ -397,7 +379,6 @@ namespace UUIDproducer
 
 
                             //connection to the database
-                            string cs = @"server=10.3.56.8;userid=root;password=IUM_VDFt8ZQzc_sF;database=OfficeDB;Old Guids=True";
                             using var con = new MySqlConnection(cs);
                             con.Open();
 
@@ -470,7 +451,6 @@ namespace UUIDproducer
                             Console.WriteLine("Updating user data in database and calendar");
 
 
-                            string cs = @"server=10.3.56.8;userid=root;password=IUM_VDFt8ZQzc_sF;database=OfficeDB;Old Guids=True";
                             try
                             {
 
@@ -557,7 +537,6 @@ namespace UUIDproducer
                             //Console.WriteLine("Source id is: " + myDescription.InnerXml);
                             Console.WriteLine("Deleting user data in database and calendar");
 
-                            string cs = @"server=10.3.56.8;userid=root;password=IUM_VDFt8ZQzc_sF;database=OfficeDB;Old Guids=True";
                             try
                             {
 
@@ -592,15 +571,100 @@ namespace UUIDproducer
                         XmlNode myAttendeeUUID = xmlDoc.SelectSingleNode("//attendeeUUID");
                         XmlNode myAttendeeSourceEntityId = xmlDoc.SelectSingleNode("//attendeeSourceEntityId");
 
-                        //Subscribe to Event
-                        if (myOriginNode.InnerXml == "FrontEnd" && myMethodNode.InnerXml == "SUBSCRIBE")
+                        //Message from Front End, Subscribe to Event, sending it to UUID
+                        if (myOriginNode.InnerXml == "FrontEnd" && myMethodNode.InnerXml == "SUBSCRIBE"  && myUUID.InnerXml != ""  && myAttendeeUUID.InnerXml != "")
                         {
-                            Console.WriteLine("Subscriging to event, and putting it in database");
+
+                            Console.WriteLine("Got a message from " + myOriginNode.InnerXml);
+                            Console.WriteLine("Updating origin \"" + myOriginNode.InnerXml + "\" to Office");
+
+                            docAlterSub.Load("AlterSubscribe.xml");
+                            docAlterSub = xmlDoc;
+
+                            docAlterSub.SelectSingleNode("//event/header/origin").InnerText = "Office";
+                            docAlterSub.Save("AlterSubscribe.xml");
+                            docAlterSub.Save(Console.Out);
+
+
+                            Task task = new Task(() => Producer.sendMessage(docAlterSub.InnerXml, "UUID"));
+                            task.Start();
+
+                            Console.WriteLine("Origin changed to Office, sending now it to UUID...");
+
                         }
-                        //Unubscribe to Event
-                        if (myOriginNode.InnerXml == "FrontEnd" && myMethodNode.InnerXml == "UNSUBCRIBE")
+                        //Message from UUID, Subscribe, setting it in out database
+                        if (myOriginNode.InnerXml == "UUID" && myMethodNode.InnerXml == "SUBSCRIBE"  && myEventSourceEntityId.InnerXml != ""  && myAttendeeSourceEntityId.InnerXml != "")
+                        {
+                            Console.WriteLine("Got a message from " + myOriginNode.InnerXml);
+                            Console.WriteLine("Subscribing data in database and calendar");
+
+                            using var con = new MySqlConnection(cs);
+                            con.Open();
+
+                            var sql = "INSERT INTO Subscribe(userId, eventId) VALUES(@userId, @eventId)";
+                            using var cmd = new MySqlCommand(sql, con);
+
+
+                            cmd.Parameters.AddWithValue("@eventId", myEventSourceEntityId.InnerXml);
+                            cmd.Parameters.AddWithValue("@name", myAttendeeSourceEntityId.InnerXml);
+                            cmd.Prepare();
+                            cmd.ExecuteNonQuery();
+
+                            Console.WriteLine("Subscribe inserted in database");
+
+                            docAlterSub.Load("AlterSubscribe.xml");
+                            docAlterSub = xmlDoc;
+
+                            docAlterSub.SelectSingleNode("//event/header/origin").InnerText = "Office";
+                            docAlterSub.Save("AlterSubscribe.xml");
+
+                            docAlterSub.Save(Console.Out);
+
+                            Task task = new Task(() => Producer.sendMessage(docAlterSub.InnerXml, "UUID"));
+                            task.Start();
+
+                            Console.WriteLine("Sending subscribe message to UUID...");
+
+                        }
+                        //Unubscribe from Front end, change origin and send to UUID
+                        if (myOriginNode.InnerXml == "FrontEnd" && myMethodNode.InnerXml == "UNSUBCRIBE" && myUUID.InnerXml != "" && myAttendeeUUID.InnerXml != "")
                         {
                             Console.WriteLine("Unsusbscribing from event, and putting it in database");
+
+                            Console.WriteLine("Got a message from " + myOriginNode.InnerXml);
+                            Console.WriteLine("Updating origin from \"" + myOriginNode.InnerXml + " to \"Office\"");
+
+
+                            docAlterSub.Load("AlterSubscribe.xml");
+                            docAlterSub = xmlDoc;
+
+                            docAlterSub.SelectSingleNode("//event/header/origin").InnerText = "Office";
+                            docAlterSub.Save("AlterSubscribe.xml");
+                            docAlterSub.Save(Console.Out);
+
+                            Task task = new Task(() => Producer.sendMessage(docAlterSub.InnerXml, "UUID"));
+                            task.Start();
+
+                            Console.WriteLine("Origin changed to Office, sending delete now it to UUID...");
+                        }
+                        //Unubscribe from UUID, change it in db
+                        if (myOriginNode.InnerXml == "UUID" && myMethodNode.InnerXml == "UNSUBCRIBE" && myUUID.InnerXml != "" && myAttendeeUUID.InnerXml != "")
+                        {
+                            Console.WriteLine("Unsusbscribing from event, and putting it in database");
+
+                            Console.WriteLine("Got a subscribe message from " + myOriginNode.InnerXml);
+                            Console.WriteLine("The full message from the UUID is: " + xmlDoc.InnerXml);
+                            Console.WriteLine("Deleting event data in database and calendar");
+
+                            using var con = new MySqlConnection(cs);
+                            con.Open();
+
+                            var sql = "DELETE FROM Subscribe WHERE eventId = '" + myUUID.InnerXml + "' AND userId = '" + myAttendeeSourceEntityId.InnerXml + "'";
+                            using var cmd = new MySqlCommand(sql, con);
+
+                            //cmd.Prepare();
+                            cmd.ExecuteNonQuery();
+                            Console.WriteLine("Event deleted in database");
                         }
                     }
                     //XML error from UUID
@@ -831,111 +895,5 @@ namespace UUIDproducer
             }
 
         }
-
-        //private static string createEventXml(XDocument xmlEvent)
-        //{
-        //    //xml file attributen event
-        //    string sourceEntityId = "";
-        //    string organiserSourceEntityId = "";
-        //    string method = "";
-        //    string origin = "Office";
-        //    string version = "";
-        //    string timestamp = "";
-
-
-        //    string name = "";
-        //    string startEvent = "";
-        //    string endEvent = "";
-        //    string description = "";
-        //    string location = "";
-
-
-
-        //    IEnumerable<XElement> xElements = xmlEvent.Descendants("method");
-        //    foreach (var element in xElements)
-        //    {
-        //        method = element.Value;
-        //    }
-        //    xElements = xmlEvent.Descendants("sourceEntityId");
-        //    foreach (var element in xElements)
-        //    {
-        //        sourceEntityId = element.Value;
-        //    }
-        //    xElements = xmlEvent.Descendants("organiserSourceEntityId");
-        //    foreach (var element in xElements)
-        //    {
-        //        organiserSourceEntityId = element.Value;
-        //    }
-        //    xElements = xmlEvent.Descendants("version");
-        //    foreach (var element in xElements)
-        //    {
-        //        version = element.Value;
-        //    }
-        //    xElements = xmlEvent.Descendants("timestamp");
-        //    foreach (var element in xElements)
-        //    {
-        //        timestamp = element.Value;
-        //    }
-
-
-        //    xElements = xmlEvent.Descendants("name");
-        //    foreach (var element in xElements)
-        //    {
-        //        name = element.Value;
-        //    }
-
-        //    xElements = xmlEvent.Descendants("startEvent");
-        //    foreach (var element in xElements)
-        //    {
-        //        startEvent = element.Value;
-        //    }
-
-        //    xElements = xmlEvent.Descendants("endEvent");
-        //    foreach (var element in xElements)
-        //    {
-        //        endEvent = element.Value;
-        //    }
-        //    xElements = xmlEvent.Descendants("description");
-        //    foreach (var element in xElements)
-        //    {
-        //        description = element.Value;
-        //    }
-        //    xElements = xmlEvent.Descendants("location");
-        //    foreach (var element in xElements)
-        //    {
-        //        location = element.Value;
-        //    }
-
-        //    string message = "";
-        //    xElements = xmlEvent.Descendants("UUID");
-        //    xElements = xmlEvent.Descendants("organiserUUID");
-
-
-        //    foreach (var el in xElements)
-        //    {
-        //        message =
-        //    "<event><header>" +
-        //    "<UUID>" + el.Value + "</UUID>" +
-        //    "<sourceEntityId>" + sourceEntityId + "</sourceEntityId>" +
-        //    "<organiserUUID>" + el.Value + "</organiserUUID>" +
-        //    "<organiserSourceEntityId>" + organiserSourceEntityId + "</organiserSourceEntityId >" +
-        //    "<method>" + method + "</method>" +
-        //    "<origin>" + origin + "</origin>" +
-        //    "<version>" + version + "</version>" +
-        //    "<timestamp>" + timestamp + "</timestamp>" +
-        //    "</header>" +
-        //    "<body>" +
-        //    "<name>" + name + "</name>" +
-        //    "<startEvent>" + startEvent + "</startEvent>" +
-        //    "<endEvent>" + endEvent + "</endEvent>" +
-        //    "<description>" + description + "</description>" +
-        //    "<location>" + location + "</location>" +
-        //    "</body></event>";
-        //    }
-
-
-        //    return message;
-
-        //}
     }
 }
