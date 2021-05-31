@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -185,8 +185,47 @@ namespace UUIDproducer
                         //Create Event comes from UUID we use it and pass it again to UUID (Last step create)
                         else if (myOriginNode.InnerXml == "UUID" && myMethodNode.InnerXml == "CREATE" && myOrganiserSourceId.InnerXml != "" && routingKey == "Office")
                         {
+                            using var con = new MySqlConnection(cs);
+                            con.Open();
 
-                            Console.WriteLine(myStartEvent.InnerXml);
+
+                            string email = "";
+                            string name = "";
+
+                            var sqlForEmail = "SELECT email FROM User WHERE userId = '" + myOrganiserSourceId.InnerXml + "'";
+                            using var cmd1 = new MySqlCommand(sqlForEmail, con);
+                            MySqlDataReader dr = cmd1.ExecuteReader();
+                            
+                            if (dr.Read())
+                              {
+                                  email = dr[0].ToString();
+                                  Console.WriteLine(email);
+                              }
+                            dr.Close();
+
+                            var sqlForFirstname = "SELECT firstname FROM User WHERE userId = '" + myOrganiserSourceId.InnerXml + "'";
+                            using var cmd2 = new MySqlCommand(sqlForFirstname, con);
+                            MySqlDataReader dr1 = cmd2.ExecuteReader();
+
+                            if (dr1.Read())
+                              {
+                                  name = dr1[0].ToString();
+                                  Console.WriteLine(name);
+                              }
+                              dr1.Close();
+
+                            var sqlForLastname = "SELECT lastname FROM User WHERE userId = '" + myOrganiserSourceId.InnerXml + "'";
+                            using var cmd3 = new MySqlCommand(sqlForLastname, con);
+                            MySqlDataReader dr2 = cmd3.ExecuteReader();
+
+                             if (dr2.Read())
+                              {
+                                  name += String.Join(" ",dr2[0].ToString());
+                                  Console.WriteLine(name);
+                              }
+                             dr2.Close();
+
+                               Console.WriteLine(myStartEvent.InnerXml);
                             List<Attendee> attendeesAtCreate = new List<Attendee>();
                             string eventId= "fout";
                             try
@@ -194,7 +233,7 @@ namespace UUIDproducer
                                 string startTimeEvent = myStartEvent.InnerXml.Substring(0, (myStartEvent.InnerXml.Length - 6));
                                 string endTimeEvent = myEndEvent.InnerXml.Substring(0, (myEndEvent.InnerXml.Length - 6));
                                 eventId= Program.RunAsync("create",myEventName.InnerXml,myDescription.InnerXml, startTimeEvent, endTimeEvent,
-                                    myLocation.InnerXml, attendeesAtCreate, true,"null").GetAwaiter().GetResult();
+                                    myLocation.InnerXml, attendeesAtCreate,email,name, true,"null").GetAwaiter().GetResult();
                                 
                             }
                             catch (Exception ex)
@@ -207,8 +246,7 @@ namespace UUIDproducer
                             Console.WriteLine("Got a message from " + myOriginNode.InnerXml);
                             Console.WriteLine("Putting data in database and calendar");
 
-                            using var con = new MySqlConnection(cs);
-                            con.Open();
+                            
 
                             Console.WriteLine(eventId);
                             var sql = "INSERT INTO Event(name, userId, graphResponse, startEvent, endEvent, description, location) VALUES(@name, @userId, @graphResponse, @startEvent, @endEvent, @description, @location); SELECT @@IDENTITY";
@@ -248,8 +286,6 @@ namespace UUIDproducer
                             int iNewRowIdentity = Convert.ToInt32(cmd.ExecuteScalar());
                             Console.WriteLine("Event Id in database is: " + iNewRowIdentity);
 
-
-                           
 
                             Console.WriteLine("Event inserted in database");
 
@@ -296,12 +332,40 @@ namespace UUIDproducer
                             Console.WriteLine("Got a message from " + myOriginNode.InnerXml);
                             //Console.WriteLine("Source id is: " + myDescription.InnerXml);
                             Console.WriteLine("Updating event data in database and calendar");
-
+                            
                             using var con = new MySqlConnection(cs);
                             con.Open();
 
-                            var sql = "UPDATE Event SET name = @name, startEvent = @startEvent, endEvent = @endEvent, description = @description, location = @location WHERE eventId = '" + mySourceEntityId.InnerXml + "'";
-                            using var cmd = new MySqlCommand(sql, con);
+                                var sqlForId = "SELECT graphResponse FROM Event WHERE eventId = '" + mySourceEntityId.InnerXml + "'";
+                                using var cmd1 = new MySqlCommand(sqlForId, con);
+                                MySqlDataReader dr = cmd1.ExecuteReader();
+                                string eventId = "";
+                                if (dr.Read())
+                                {
+                                    eventId = dr[0].ToString();
+                                    Console.WriteLine(eventId);
+                                }
+                                dr.Close();
+
+
+                                try
+                                {
+                                    List<Attendee> attendeesAtCreate = new List<Attendee>();
+                                    string startTimeEvent = myStartEvent.InnerXml.Substring(0, (myStartEvent.InnerXml.Length - 6));
+                                    string endTimeEvent = myEndEvent.InnerXml.Substring(0, (myEndEvent.InnerXml.Length - 6));
+                                    Program.RunAsync("update", myEventName.InnerXml, myDescription.InnerXml, startTimeEvent, endTimeEvent,
+                                    myLocation.InnerXml, attendeesAtCreate,"","", true, eventId).GetAwaiter().GetResult();
+
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine(ex.Message);
+                                    Console.ResetColor();
+                                }
+
+                                var sql = "UPDATE Event SET name = @name, startEvent = @startEvent, endEvent = @endEvent, description = @description, location = @location WHERE eventId = '" + mySourceEntityId.InnerXml + "'";
+                                using var cmd = new MySqlCommand(sql, con);
 
 
                             //Parse data to put into database
@@ -386,7 +450,7 @@ namespace UUIDproducer
                                 List<Attendee> attendeesAtCreate = new List<Attendee>();
                                 string startTimeEvent = myStartEvent.InnerXml.Substring(0, (myStartEvent.InnerXml.Length - 6));
                                 string endTimeEvent = myEndEvent.InnerXml.Substring(0, (myEndEvent.InnerXml.Length - 6));
-                                Program.RunAsync("delete", "", "", "", "","", attendeesAtCreate, true, eventId).GetAwaiter().GetResult();
+                                Program.RunAsync("delete", "", "", "", "","", attendeesAtCreate,"","", true, eventId).GetAwaiter().GetResult();
 
                             }
                             catch (Exception ex)
@@ -540,6 +604,7 @@ namespace UUIDproducer
 
                                 using var con = new MySqlConnection(cs);
                                 con.Open();
+
 
                                 var sql = "UPDATE User SET firstname = @firstname, lastname  = @lastname, email = @email, birthday = @birthday, role = @role, study = @study WHERE userId = '" + mySourceIdUser.InnerXml + "'";
                                 using var cmd = new MySqlCommand(sql, con);
@@ -776,61 +841,62 @@ namespace UUIDproducer
                         });
 
 
+
                         
-                        //Event comes from UUID Master, we get a message back from UUID
-                        switch (myCodeNode.InnerXml)
-                        {
-                            case "1000":
-                                Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                                break;
-                            case "1001":
-                                Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                                break;
-                            case "1002":
-                                Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                                break;
-                            case "1003":
-                                Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                                break;
-                            case "1004":
-                                Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                                break;
-                            case "1005":
-                                Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                                break;
-                                //DB Error
-                            case "2000":
-                                Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                                break;
-                                //Create
-                            case "3000":
-                                Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                                break;
-                            case "3001":
-                                Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                                break;
-                            case "3002":
-                                Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                                break;
-                                //Update
-                            case "4000":
-                                Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                                break;
-                            case "4001":
-                                Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                                break;
-                                //Delete
-                            case "5000":
-                                Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                                break;
-                            default:
-                                Console.WriteLine("Default case");
-                                break;
-                        }
+                    //    //Event comes from UUID Master, we get a message back from UUID
+                    //    switch (myCodeNode.InnerXml)
+                    //    {
+                    //        case "1000":
+                    //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                    //            break;
+                    //        case "1001":
+                    //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                    //            break;
+                    //        case "1002":
+                    //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                    //            break;
+                    //        case "1003":
+                    //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                    //            break;
+                    //        case "1004":
+                    //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                    //            break;
+                    //        case "1005":
+                    //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                    //            break;
+                    //            //DB Error
+                    //        case "2000":
+                    //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                    //            break;
+                    //            //Create
+                    //        case "3000":
+                    //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                    //            break;
+                    //        case "3001":
+                    //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                    //            break;
+                    //        case "3002":
+                    //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                    //            break;
+                    //            //Update
+                    //        case "4000":
+                    //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                    //            break;
+                    //        case "4001":
+                    //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                    //            break;
+                    //            //Delete
+                    //        case "5000":
+                    //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
+                    //            break;
+                    //        default:
+                    //            Console.WriteLine("Default case");
+                    //            break;
+                    //    }
 
                         
 
-                    }
+                    //}
 
                     }
                     catch (Exception e)
