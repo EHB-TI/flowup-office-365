@@ -45,7 +45,7 @@ namespace daemon_console
             //Console.ReadKey();
         }
 
-        public static async Task RunAsync(string crudType, string eventname, string eventDescription, string startTime, string endTime, string locationName, List<Attendee> attendeesEvent,bool isChangable,string eventId)
+        public static async Task<string> RunAsync(string crudType, string eventname, string eventDescription, string startTime, string endTime, string locationName, List<Attendee> attendeesEvent, string email, string name,bool isChangable,string eventId)
         {
             AuthenticationConfig config = AuthenticationConfig.ReadFromJsonFile("appsettings.json");
 
@@ -103,21 +103,35 @@ namespace daemon_console
                 {
                     List<Attendee> attendees = new List<Attendee>();
                     //Method to create events from GrapCrudMethods
-                    GraphCrudMethods.createEvent(result.AccessToken, eventname, eventDescription, startTime, endTime, locationName, attendeesEvent, isChangable);
-                }else if(crudType == "update")
+                    string eventIdResult = GraphCrudMethods.createEvent(result.AccessToken, eventname, eventDescription, startTime, endTime, locationName, email, name, isChangable).Result;
+                    return eventIdResult;
+
+                }
+                else if(crudType == "update")
                 {
                     //Method to update event
-                }else if (crudType == "delete")
+                    GraphCrudMethods.updateEvent(result.AccessToken, eventId, eventname, eventDescription, startTime, endTime, locationName, attendeesEvent, isChangable);
+
+                }
+                else if (crudType == "delete")
                 {
                     //Method to delete events from GrapCrudMethods
                     GraphCrudMethods.deleteEvent(result.AccessToken, eventId);
+                }else if (crudType == "subscribe")
+                {
+                    //Method to subscribe to event
+                    GraphCrudMethods.subscribeEvent(result.AccessToken, email, name);
+                }else if (crudType == "unsubscribe")
+                {
+                    GraphCrudMethods.unsubscribeEvent(result.AccessToken, email, eventId);
                 }
 
                 //Method to get the events from GrapCrudMethods
                 //GraphCrudMethods.getEvents(result.AccessToken, Display);
 
-
             }
+            return "";
+
         }
 
         /// <summary>
