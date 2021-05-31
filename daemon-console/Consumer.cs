@@ -84,7 +84,7 @@ namespace UUIDproducer
 
                     bool xmlValidation = true;
                     bool xmlValidationUser = true;
-                    bool xmlValidationSubscribe = false;
+                    bool xmlValidationSubscribe = true;
                     bool xmlValidationError = true;
 
                     //xsd event validation
@@ -471,7 +471,7 @@ namespace UUIDproducer
 
                             //cmd.Prepare();
                             cmd1.ExecuteNonQuery();
-                            Console.WriteLine("Event deleted in database");
+                            Console.WriteLine("Event deleted in database(Last step)");
 
                         }
                     }
@@ -568,7 +568,7 @@ namespace UUIDproducer
                             Task task = new Task(() => Producer.sendMessage(docAlterUser.InnerXml, "UUID"));
                             task.Start();
 
-                            Console.WriteLine("Sending creating user message to UUID...");
+                            Console.WriteLine("\nSending creating user message to UUID...(Last step)");
                         }
                         //UPDATE user comes from AD and we pass it to UUID to compare
                         //if (myOriginNodeUser.InnerXml == "AD" && myMethodNodeUser.InnerXml == "UPDATE" && mySourceIdUser.InnerXml == "" && routingKey == "user")
@@ -740,33 +740,43 @@ namespace UUIDproducer
                             Task task = new Task(() => Producer.sendMessage(docAlterSub.InnerXml, "UUID"));
                             task.Start();
 
-                            Console.WriteLine("Origin changed to Office, sending now it to UUID...");
+                            Console.WriteLine("\nOrigin changed to Office, sending now it to UUID...");
 
                         }
                         //Message from UUID, Subscribe, setting it in out database
-                        if (myOriginNode.InnerXml == "UUID" && myMethodNode.InnerXml == "SUBSCRIBE" && myEventSourceEntityId.InnerXml != "" && myAttendeeSourceEntityId.InnerXml != "")
+                        else if (myOriginNode.InnerXml == "UUID" && myMethodNode.InnerXml == "SUBSCRIBE" && myEventSourceEntityId.InnerXml != "" && myAttendeeSourceEntityId.InnerXml != "")
                         {
+                                int iNewRowIdentity = -1;
                             Console.WriteLine("Got a message from " + myOriginNode.InnerXml);
                             Console.WriteLine("Subscribing data in database and calendar");
 
                             using var con = new MySqlConnection(cs);
                             con.Open();
 
-                            var sql = "INSERT INTO Subscribe(userId, eventId) VALUES(@userId, @eventId)";
-                            using var cmd = new MySqlCommand(sql, con);
+                            var sql = "INSERT INTO Subscribe(userId, eventId) VALUES(@userId, @eventId); SELECT @@IDENTITY";
+                                try
+                                {
+                                    using var cmd = new MySqlCommand(sql, con);
 
 
-                            cmd.Parameters.AddWithValue("@eventId", myEventSourceEntityId.InnerXml);
-                            cmd.Parameters.AddWithValue("@name", myAttendeeSourceEntityId.InnerXml);
-                            cmd.Prepare();
-                            cmd.ExecuteNonQuery();
-
-                            Console.WriteLine("Subscribe inserted in database");
+                                    cmd.Parameters.AddWithValue("@eventId", myEventSourceEntityId.InnerXml);
+                                    cmd.Parameters.AddWithValue("@userId", myAttendeeSourceEntityId.InnerXml);
+                                    //cmd.Prepare();
+                                    //cmd.ExecuteNonQuery();
+                                    iNewRowIdentity = Convert.ToInt32(cmd.ExecuteScalar());
+                                    Console.WriteLine("Event Id in database is: " + iNewRowIdentity);
+                                }
+                                catch (SqlException e)
+                                {
+                                    Console.WriteLine(e.Message);
+                                }
+                                Console.WriteLine("Subscribe inserted in database");
 
                             docAlterSub.Load("AlterSubscribe.xml");
                             docAlterSub = xmlDoc;
 
                             docAlterSub.SelectSingleNode("//eventSubscribe/header/origin").InnerText = "Office";
+                            docAlterSub.SelectSingleNode("//eventSubscribe/header/sourceEntityId").InnerText = iNewRowIdentity.ToString();
                             docAlterSub.Save("AlterSubscribe.xml");
 
                             docAlterSub.Save(Console.Out);
@@ -774,11 +784,11 @@ namespace UUIDproducer
                             Task task = new Task(() => Producer.sendMessage(docAlterSub.InnerXml, "UUID"));
                             task.Start();
 
-                            Console.WriteLine("Sending subscribe message to UUID...");
+                            Console.WriteLine("\nSending subscribe message to UUID with Office Subscribe entity Id (Last step)");
 
                         }
                         //Unubscribe from Front end, change origin and send to UUID
-                        if (myOriginNode.InnerXml == "FrontEnd" && myMethodNode.InnerXml == "UNSUBCRIBE" && myUUID.InnerXml != "" && myAttendeeUUID.InnerXml != "")
+                        if (myOriginNode.InnerXml == "FrontEnd" && myMethodNode.InnerXml == "UNSUBSCRIBE" && myUUID.InnerXml != "" && myAttendeeUUID.InnerXml != "")
                         {
                             Console.WriteLine("Unsusbscribing from event, and putting it in database");
 
@@ -799,7 +809,7 @@ namespace UUIDproducer
                             Console.WriteLine("Origin changed to Office, sending delete now it to UUID...");
                         }
                         //Unubscribe from UUID, change it in db
-                        if (myOriginNode.InnerXml == "UUID" && myMethodNode.InnerXml == "UNSUBCRIBE" && myUUID.InnerXml != "" && myAttendeeUUID.InnerXml != "")
+                        else if (myOriginNode.InnerXml == "UUID" && myMethodNode.InnerXml == "UNSUBSCRIBE" && myEventSourceEntityId.InnerXml != "" && myAttendeeSourceEntityId.InnerXml != "")
                         {
                             Console.WriteLine("Unsusbscribing from event, and putting it in database");
 
@@ -810,12 +820,12 @@ namespace UUIDproducer
                             using var con = new MySqlConnection(cs);
                             con.Open();
 
-                            var sql = "DELETE FROM Subscribe WHERE eventId = '" + myUUID.InnerXml + "' AND userId = '" + myAttendeeSourceEntityId.InnerXml + "'";
+                            var sql = "DELETE FROM Subscribe WHERE eventId = '" + myEventSourceEntityId.InnerXml + "' AND userId = '" + myAttendeeSourceEntityId.InnerXml + "'";
                             using var cmd = new MySqlCommand(sql, con);
 
                             //cmd.Prepare();
                             cmd.ExecuteNonQuery();
-                            Console.WriteLine("Event deleted in database");
+                            Console.WriteLine("Event deleted in database (Last step)");
                         }
                     }
                     //XML error from UUID
@@ -843,62 +853,6 @@ namespace UUIDproducer
                         {
                             xmlValidation = false;
                         });
-
-
-
-
-                            //    //Event comes from UUID Master, we get a message back from UUID
-                            //    switch (myCodeNode.InnerXml)
-                            //    {
-                            //        case "1000":
-                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                            //            break;
-                            //        case "1001":
-                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                            //            break;
-                            //        case "1002":
-                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                            //            break;
-                            //        case "1003":
-                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                            //            break;
-                            //        case "1004":
-                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                            //            break;
-                            //        case "1005":
-                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                            //            break;
-                            //            //DB Error
-                            //        case "2000":
-                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                            //            break;
-                            //            //Create
-                            //        case "3000":
-                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                            //            break;
-                            //        case "3001":
-                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                            //            break;
-                            //        case "3002":
-                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                            //            break;
-                            //            //Update
-                            //        case "4000":
-                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                            //            break;
-                            //        case "4001":
-                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                            //            break;
-                            //            //Delete
-                            //        case "5000":
-                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                            //            break;
-                            //        default:
-                            //            Console.WriteLine("Default case");
-                            //            break;
-                            //    }
-
-
 
                         }
 
