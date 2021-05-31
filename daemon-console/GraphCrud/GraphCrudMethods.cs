@@ -30,7 +30,7 @@ namespace daemon_console.GraphCrud
 
 
         //Create events of specific user with graph api
-        public static async Task<string> createEvent(string accessToken, string subject, string eventContent, string startTime, string endTime, string locationName, List<Attendee> attendees, bool allowNewTimeProposal)
+        public static async Task<string> createEvent(string accessToken, string subject, string eventContent, string startTime, string endTime, string locationName, string email, string name, bool allowNewTimeProposal)
         {
             var httpClient = new HttpClient();
 
@@ -57,7 +57,18 @@ namespace daemon_console.GraphCrud
                 {
                     DisplayName = locationName
                 },
-
+                Attendees = new List<Attendee>()
+                {
+                new Attendee
+                    {
+                    EmailAddress = new EmailAddress
+                    {   
+                Address = email,
+                Name = name
+                    },
+                    Type = AttendeeType.Required
+                        }
+                    },
                 AllowNewTimeProposals = allowNewTimeProposal,
                 TransactionId = generateTransactionId()
 
@@ -89,6 +100,56 @@ namespace daemon_console.GraphCrud
                 
             }
             return "";
+        }
+
+        public static async void updateEvent(string accessToken, string eventId, string subject, string eventContent, string startTime, string endTime, string locationName, List<Attendee> attendees, bool allowNewTimeProposal)
+        {
+            var httpClient = new HttpClient();
+
+            // Initialize the content of the post request 
+            var @event = new Event
+            {
+                Subject = subject,
+                Body = new ItemBody
+                {
+                    ContentType = BodyType.Html,
+                    Content = eventContent
+                },
+                Start = new Microsoft.Graph.DateTimeTimeZone
+                {
+                    DateTime = startTime,
+                    TimeZone = "Romance Standard Time"
+                },
+                End = new Microsoft.Graph.DateTimeTimeZone
+                {
+                    DateTime = endTime,
+                    TimeZone = "Romance Standard Time"
+                },
+                Location = new Location
+                {
+                    DisplayName = locationName
+                },
+
+                AllowNewTimeProposals = allowNewTimeProposal
+
+            };
+
+
+            string eventAsJson = JsonConvert.SerializeObject(@event);
+            var content = new StringContent(eventAsJson);
+            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+
+            // Send the request
+            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            var responsePost = await httpClient.PatchAsync($"https://graph.microsoft.com/v1.0/users/Admin@flowupdesiderius.onmicrosoft.com/events/{eventId}", content);
+
+            if (responsePost.IsSuccessStatusCode)
+                Console.WriteLine("Event has been updated successfully!");
+            else
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(responsePost.StatusCode);
+                Console.ResetColor();
+   
         }
 
         //Delete an event
