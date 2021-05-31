@@ -752,8 +752,67 @@ namespace UUIDproducer
 
                             using var con = new MySqlConnection(cs);
                             con.Open();
+                            string email = "";
+                            string name = "";
+                            string eventId = "";
 
-                            var sql = "INSERT INTO Subscribe(userId, eventId) VALUES(@userId, @eventId); SELECT @@IDENTITY";
+                                var sqlForId = "SELECT graphResponse FROM Event WHERE eventId = '" + myEventSourceEntityId.InnerXml + "'";
+                            using var cmdx = new MySqlCommand(sqlForId, con);
+                            MySqlDataReader drx = cmdx.ExecuteReader();
+                             if (drx.Read())
+                               {
+                                    eventId = drx[0].ToString();
+                                    Console.WriteLine(eventId);
+                               }
+                              drx.Close();
+
+                            var sqlForEmail = "SELECT email FROM User WHERE userId = '" + myAttendeeSourceEntityId.InnerXml + "'";
+                            using var cmd1 = new MySqlCommand(sqlForEmail, con);
+                            MySqlDataReader dr = cmd1.ExecuteReader();
+
+                            if (dr.Read())
+                              {
+                                 email = dr[0].ToString();
+                                 Console.WriteLine(email);
+                              }
+                                dr.Close();
+
+                            var sqlForFirstname = "SELECT firstname FROM User WHERE userId = '" + myAttendeeSourceEntityId.InnerXml + "'";
+                            using var cmd2 = new MySqlCommand(sqlForFirstname, con);
+                            MySqlDataReader dr1 = cmd2.ExecuteReader();
+                                if (dr1.Read())
+                                {
+                                    name = dr1[0].ToString();
+                                    Console.WriteLine(name);
+                                }
+                                dr1.Close();
+
+                                var sqlForLastname = "SELECT lastname FROM User WHERE userId = '" + myAttendeeSourceEntityId.InnerXml + "'";
+                                using var cmd3 = new MySqlCommand(sqlForLastname, con);
+                                MySqlDataReader dr2 = cmd3.ExecuteReader();
+
+                                if (dr2.Read())
+                                {
+                                    name += String.Join(" ", dr2[0].ToString());
+                                    Console.WriteLine(name);
+                                }
+                                dr2.Close();
+
+                                try
+                                {
+                                    List<Attendee> attendeesAtCreate = new List<Attendee>();
+                                    Program.RunAsync("subscribe", "", "", "", "",
+                                    "", attendeesAtCreate, name, email, true, eventId).GetAwaiter().GetResult();
+
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine(ex.Message);
+                                    Console.ResetColor();
+                                }
+
+                                var sql = "INSERT INTO Subscribe(userId, eventId) VALUES(@userId, @eventId); SELECT @@IDENTITY";
                                 try
                                 {
                                     using var cmd = new MySqlCommand(sql, con);

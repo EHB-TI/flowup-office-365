@@ -165,7 +165,7 @@ namespace daemon_console.GraphCrud
                 Console.WriteLine(responseDelete.StatusCode);
         }
 
-        public static async void subscribeEvent(string accessToken,string email,string name)
+        public static async void subscribeEvent(string accessToken,string eventId, string email,string name)
         {
             var httpClient = new HttpClient();
 
