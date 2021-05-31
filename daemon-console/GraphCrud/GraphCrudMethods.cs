@@ -165,6 +165,47 @@ namespace daemon_console.GraphCrud
                 Console.WriteLine(responseDelete.StatusCode);
         }
 
+        public static async void subscribeEvent(string accessToken,string email,string name)
+        {
+            var httpClient = new HttpClient();
+
+            // Initialize the content of the post request 
+            var @event = new Event
+            {
+                Attendees = new List<Attendee>()
+                {
+                new Attendee
+                    {
+                    EmailAddress = new EmailAddress
+                    {
+                Address = email,
+                Name = name
+                    },
+                    Type = AttendeeType.Required
+                        }
+                    }
+
+            };
+
+
+            string eventAsJson = JsonConvert.SerializeObject(@event);
+            var content = new StringContent(eventAsJson);
+            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+
+            // Send the request
+            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            var responsePost = await httpClient.PatchAsync($"https://graph.microsoft.com/v1.0/users/Admin@flowupdesiderius.onmicrosoft.com/events/{eventId}", content);
+
+            if (responsePost.IsSuccessStatusCode)
+                Console.WriteLine("Event has been updated successfully!");
+            else
+                Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(responsePost.StatusCode);
+            Console.ResetColor();
+
+        }
+
+
         //Delete events of a specific user with GrapApi
         public static async void unsubscribeEvent(string accessToken,string userName, string eventId)
         {

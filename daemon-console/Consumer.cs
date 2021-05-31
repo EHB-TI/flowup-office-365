@@ -84,7 +84,7 @@ namespace UUIDproducer
 
                     bool xmlValidation = true;
                     bool xmlValidationUser = true;
-                    bool xmlValidationSubscribe = true;
+                    bool xmlValidationSubscribe = false;
                     bool xmlValidationError = true;
 
                     //xsd event validation

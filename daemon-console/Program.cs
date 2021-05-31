@@ -117,6 +117,13 @@ namespace daemon_console
                 {
                     //Method to delete events from GrapCrudMethods
                     GraphCrudMethods.deleteEvent(result.AccessToken, eventId);
+                }else if (crudType == "subscribe")
+                {
+                    //Method to subscribe to event
+                    GraphCrudMethods.subscribeEvent(result.AccessToken, email, name);
+                }else if (crudType == "unsubscribe")
+                {
+                    GraphCrudMethods.unsubscribeEvent(result.AccessToken, email, eventId);
                 }
 
                 //Method to get the events from GrapCrudMethods
