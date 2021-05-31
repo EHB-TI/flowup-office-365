@@ -90,12 +90,16 @@ namespace UUIDproducer
                     //xsd event validation
                     XmlSchemaSet schema = new XmlSchemaSet();
                     schema.Add("", "EventSchema.xsd");
+
                     XmlSchemaSet schemaSubscribe = new XmlSchemaSet();
-                    schema.Add("", "SubscribeSchema.xsd");
+                    schemaSubscribe.Add("", "SubscribeSchema.xsd");
+
                     XmlSchemaSet schemaUser = new XmlSchemaSet();
                     schemaUser.Add("", "UserSchema.xsd");
+
                     XmlSchemaSet schemaError = new XmlSchemaSet();
-                    schemaUser.Add("", "Errorxsd.xsd");
+                    schemaError.Add("", "Errorxsd.xsd");
+
                     //XDocument xml = XDocument.Parse(message, LoadOptions.SetLineInfo);
                     XmlDocument xmlDoc = new XmlDocument();
                     XDocument xml = new XDocument();
@@ -728,7 +732,7 @@ namespace UUIDproducer
                             docAlterSub.Load("AlterSubscribe.xml");
                             docAlterSub = xmlDoc;
 
-                            docAlterSub.SelectSingleNode("//event/header/origin").InnerText = "Office";
+                            docAlterSub.SelectSingleNode("//eventSubscribe/header/origin").InnerText = "Office";
                             docAlterSub.Save("AlterSubscribe.xml");
                             docAlterSub.Save(Console.Out);
 
@@ -762,7 +766,7 @@ namespace UUIDproducer
                             docAlterSub.Load("AlterSubscribe.xml");
                             docAlterSub = xmlDoc;
 
-                            docAlterSub.SelectSingleNode("//event/header/origin").InnerText = "Office";
+                            docAlterSub.SelectSingleNode("//eventSubscribe/header/origin").InnerText = "Office";
                             docAlterSub.Save("AlterSubscribe.xml");
 
                             docAlterSub.Save(Console.Out);
@@ -785,7 +789,7 @@ namespace UUIDproducer
                             docAlterSub.Load("AlterSubscribe.xml");
                             docAlterSub = xmlDoc;
 
-                            docAlterSub.SelectSingleNode("//event/header/origin").InnerText = "Office";
+                            docAlterSub.SelectSingleNode("//eventSubscribe/header/origin").InnerText = "Office";
                             docAlterSub.Save("AlterSubscribe.xml");
                             docAlterSub.Save(Console.Out);
 
