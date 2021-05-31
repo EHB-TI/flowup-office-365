@@ -45,7 +45,7 @@ namespace daemon_console
             //Console.ReadKey();
         }
 
-        public static async Task<string> RunAsync(string crudType, string eventname, string eventDescription, string startTime, string endTime, string locationName, List<Attendee> attendeesEvent,bool isChangable,string eventId)
+        public static async Task<string> RunAsync(string crudType, string eventname, string eventDescription, string startTime, string endTime, string locationName, List<Attendee> attendeesEvent, string email, string name,bool isChangable,string eventId)
         {
             AuthenticationConfig config = AuthenticationConfig.ReadFromJsonFile("appsettings.json");
 
@@ -103,16 +103,17 @@ namespace daemon_console
                 {
                     List<Attendee> attendees = new List<Attendee>();
                     //Method to create events from GrapCrudMethods
-                    string eventIdResult = GraphCrudMethods.createEvent(result.AccessToken, eventname, eventDescription, startTime, endTime, locationName, attendeesEvent, isChangable).Result;
+                    string eventIdResult = GraphCrudMethods.createEvent(result.AccessToken, eventname, eventDescription, startTime, endTime, locationName, email, name, isChangable).Result;
                     return eventIdResult;
 
                 }
                 else if(crudType == "update")
                 {
                     //Method to update event
+                    GraphCrudMethods.updateEvent(result.AccessToken, eventId, eventname, eventDescription, startTime, endTime, locationName, attendeesEvent, isChangable);
 
-
-                }else if (crudType == "delete")
+                }
+                else if (crudType == "delete")
                 {
                     //Method to delete events from GrapCrudMethods
                     GraphCrudMethods.deleteEvent(result.AccessToken, eventId);
