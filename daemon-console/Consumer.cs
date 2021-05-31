@@ -224,7 +224,7 @@ namespace UUIDproducer
 
                              if (dr2.Read())
                               {
-                                  name += String.Join(" ",dr2[0].ToString());
+                                  name += String.Join(" ", dr2[0].ToString());
                                   Console.WriteLine(name);
                               }
                              dr2.Close();
