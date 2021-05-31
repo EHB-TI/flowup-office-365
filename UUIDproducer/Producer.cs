@@ -25,7 +25,9 @@ namespace UUIDproducer
             using (var channel = connection.CreateModel())
             {
                 channel.ExchangeDeclare(exchange: "direct_logs",
-                                        type: "direct");
+                                        type: "direct"); 
+
+                
 
                 XmlSchemaSet schema = new XmlSchemaSet();
                 schema.Add("", "EventSchema.xsd");

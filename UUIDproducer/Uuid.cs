@@ -130,10 +130,10 @@ namespace UUIDproducer
         {
             string message =
             "<event><header>" +
-            "<UUID>52b2f72f-8ed7-4d34-8b3e-c6f54c0791c8</UUID>" +
+            "<UUID>becd4e5d-fba7-400a-b68f-f240f77b9f40</UUID>" +
             "<sourceEntityId></sourceEntityId>" +
-            "<organiserUUID>910470ce-1672-4476-b220-b1bbad889e90</organiserUUID>" +
-            "<organiserSourceEntityId></organiserSourceEntityId>" +
+            "<organiserUUID></organiserUUID>" +
+            "<organiserSourceEntityId>5</organiserSourceEntityId>" +
             "<method>CREATE</method>" +
             "<origin>FrontEnd</origin>" +
             "<version>1</version>" +

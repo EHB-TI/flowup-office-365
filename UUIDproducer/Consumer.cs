@@ -31,6 +31,8 @@ namespace UUIDproducer
                 type: "direct");
                 var queueName = channel.QueueDeclare().QueueName;
 
+               
+
                 channel.QueueBind(queue: queueName,
                 exchange: "direct_logs",
                 routingKey: "event");
@@ -40,6 +42,17 @@ namespace UUIDproducer
                 channel.QueueBind(queue: queueName,
                 exchange: "direct_logs",
                 routingKey: "Office");
+<<<<<<< Updated upstream
+=======
+                //error loggings
+                
+
+               
+
+                //channel.QueueBind(queue: queueName,
+                //exchange: "direct_logs",
+                //routingKey: "FrontEnd");
+>>>>>>> Stashed changes
                 Console.WriteLine(" [*] Waiting for messages.");
 
                 var consumer = new EventingBasicConsumer(channel);
@@ -91,7 +104,11 @@ namespace UUIDproducer
 
                     //Alter XML to change
                     XmlDocument docAlter = new XmlDocument();
+<<<<<<< Updated upstream
                     XmlDocument docAlterSub = new XmlDocument();
+=======
+                    XmlDocument docAlterError = new XmlDocument();
+>>>>>>> Stashed changes
 
                     if (xmlValidation)
                     {
@@ -165,9 +182,7 @@ namespace UUIDproducer
                             var sql = "INSERT INTO Event(name, userId, startEvent, endEvent, description, location) VALUES(@name, @userId, @startEvent, @endEvent, @description, @location); SELECT @@IDENTITY";
 
                             using var cmd = new MySqlCommand(sql, con);
-                           
-                            
-
+ 
 
                             //Parse data to put into database
                             DateTime parsedDateStart;
@@ -553,7 +568,7 @@ namespace UUIDproducer
 
                         }
                     }
-                    else if(xmlValidationSubscribe)
+                    /*else if(xmlValidationSubscribe)
                     {
                         Console.WriteLine("Valid Subscribe XML");
 
@@ -663,13 +678,13 @@ namespace UUIDproducer
                             cmd.ExecuteNonQuery();
                             Console.WriteLine("Event deleted in database");
                         }
-                    }
+                    }*/
                     //XML error from UUID
                     else
                     {
                         XmlNode myCodeNode = xmlDoc.SelectSingleNode("//code");
                         XmlNode myOriginNode = xmlDoc.SelectSingleNode("//origin");
-                        XmlNode myobjectSourceId = xmlDoc.SelectSingleNode("//objectSourceId");
+                       // XmlNode myobjectSourceId = xmlDoc.SelectSingleNode("//objectSourceId");
                         XmlNode myErrorMessage = xmlDoc.SelectSingleNode("//description");
 
 
@@ -723,6 +738,21 @@ namespace UUIDproducer
                         Console.WriteLine("Code node" + myCodeNode.InnerXml);*/
 
                         //Event comes from UUID Master, we get a message back from UUID
+                        //Task task = new Task(() => Producer.sendMessage(myErrorMessage.InnerXml, "logging"));
+                        //task.Start();
+
+                        
+                        docAlterError.Load("AlterError.xml");
+                        docAlterError = xmlDoc;
+
+                        docAlterError.SelectSingleNode("//error/header/origin").InnerText = "Office";
+                        docAlterError.Save("Alter.xml");
+                        docAlterError.Save(Console.Out);
+                       
+
+
+                        Task task = new Task(() => Producer.sendMessage(docAlterError.InnerXml, "logging"));
+                        task.Start();
 
                         switch (myCodeNode.InnerXml)
                         {
@@ -750,110 +780,6 @@ namespace UUIDproducer
                                 break;
                                 //Create
                             case "3000":
-                                //Parsen naar string(event)
-                                // XmlNode myobjectSourceId = xmlDoc.SelectSingleNode("//objectSourceId");(event)
-                                string valueSourceId = myobjectSourceId.Attributes["value"].Value;
-                                //select from event where.. object source id=myobjectSourceId(event)
-                                valueSourceId = "SELECT FROM Event WHERE userId= '" + myobjectSourceId.InnerXml + "'";
-
-
-                                //Parsen naar string (user)
-                                //XmlNode mySourceIdUser = xmlDoc.SelectSingleNode("//sourceEntityId");
-                               string valueIdUser=myobjectSourceId.Attributes["value"].Value;
-                               valueIdUser = "SELECT FROM User WHERE userId= '" + myobjectSourceId.InnerXml + "'";
-
-                                //3 if result > 0(event)
-                                if (xmlValidation)
-                                {
-                                    //als bestaat niks writeline bestaat al
-                                    if (valueSourceId.Count() > 0)
-                                    {
-                                        Console.WriteLine("userId:" + myobjectSourceId + " from Event table already exists.");
-                                    }
-                                    //else insert into event
-                                    else
-                                    {
-                                        //connection db
-                                        string cs = @"server=10.3.56.8;userid=root;password=IUM_VDFt8ZQzc_sF;database=OfficeDB;Old Guids=True";
-                                        using var con = new MySqlConnection(cs);
-                                        con.Open();
-                                        var sql = "INSERT INTO Event(name, userId, startEvent, endEvent, description, location) VALUES(@name, @userId, @startEvent, @endEvent, @description, @location); SELECT @@IDENTITY";
-
-                                        using var cmd = new MySqlCommand(sql, con);
-                                        //Parse data to put into database
-                                        DateTime parsedDateStart;
-                                        DateTime parsedDateEnd;
-                                        parsedDateStart = DateTime.Parse(myStartEvent.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
-                                        parsedDateEnd = DateTime.Parse(myEndEvent.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
-
-                                        cmd.Parameters.AddWithValue("@name", myEventName.InnerXml);
-                                        cmd.Parameters.AddWithValue("@userId", myOrganiserSourceId.InnerXml);
-                                        cmd.Parameters.AddWithValue("@startEvent", parsedDateStart);
-                                        cmd.Parameters.AddWithValue("@endEvent", parsedDateEnd);
-                                        cmd.Parameters.AddWithValue("@description", myDescription.InnerXml);
-                                        cmd.Parameters.AddWithValue("@location", myLocation.InnerXml);
-
-                                        int iNewRowIdentity = Convert.ToInt32(cmd.ExecuteScalar());
-                                        Console.WriteLine("Event Id in database is: " + iNewRowIdentity);
-                                        Console.WriteLine("Event inserted in database");
-
-                                    }
-                                }
-                                //error handling for users
-                                else if (xmlValidationUser)
-                                {
-                                    //XML HEAD
-                                    XmlNode myMethodNodeUser = xmlDoc.SelectSingleNode("//method");
-                                    XmlNode myOriginNodeUser = xmlDoc.SelectSingleNode("//origin");
-                                    XmlNode mySourceIdUser = xmlDoc.SelectSingleNode("//sourceEntityId");
-                                    XmlNode myUserVersion = xmlDoc.SelectSingleNode("//version");
-
-                                    //XML BODY
-                                    XmlNode myFirstName = xmlDoc.SelectSingleNode("//firstname");
-                                    XmlNode myLastName = xmlDoc.SelectSingleNode("//lastname");
-                                    XmlNode myEmail = xmlDoc.SelectSingleNode("//email");
-                                    XmlNode myBirthday = xmlDoc.SelectSingleNode("//birthday");
-                                    XmlNode myRole = xmlDoc.SelectSingleNode("//role");
-                                    XmlNode myStudy = xmlDoc.SelectSingleNode("//study");
-
-                                    if (valueIdUser.Count() > 0)
-                                    {
-                                        Console.WriteLine("userId:" + myobjectSourceId + " from User table already exists.");
-                                    }
-                                    else
-                                    {
-                                        
-                                        //connection db
-                                        string cs = @"server=10.3.56.8;userid=root;password=IUM_VDFt8ZQzc_sF;database=OfficeDB;Old Guids=True";
-                                        using var con = new MySqlConnection(cs);
-                                        con.Open();
-                                       
-                                        
-
-
-                                        var sqlUser = "INSERT INTO User(firstname,lastname,email,birthday,role,study) VALUES(@firstname, @lastname, @email, @birthday,@role,@study); SELECT @@IDENTITY";
-                                        using var cmd = new MySqlCommand(sqlUser, con);
-
-                                        //Parse data to put into database
-                                        DateTime parsedBirthday;
-
-                                        parsedBirthday = DateTime.Parse(myBirthday.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
-
-                                        cmd.Parameters.AddWithValue("@firstname", myFirstName.InnerXml);
-                                        cmd.Parameters.AddWithValue("@lastname", myLastName.InnerXml);
-                                        cmd.Parameters.AddWithValue("@email", myEmail.InnerXml);
-                                        cmd.Parameters.AddWithValue("@birthday", parsedBirthday);
-                                        cmd.Parameters.AddWithValue("@role", myRole.InnerXml);
-                                        cmd.Parameters.AddWithValue("@study", myStudy.InnerXml);
-
-
-                                        int iNewRowIdentity = Convert.ToInt32(cmd.ExecuteScalar());
-                                        Console.WriteLine("User Id in database is: " + iNewRowIdentity);
-                                        Console.WriteLine("User inserted in database Office");
-
-                                    }
-                                }
-
                                 Console.WriteLine("Code is: " + myCodeNode.InnerXml);
                                 break;
                             case "3001":

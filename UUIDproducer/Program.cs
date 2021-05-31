@@ -8,16 +8,16 @@ namespace UUIDproducer
         static void Main(string[] args)
         {
 
-            //Consumer.getMessage();
+            Consumer.getMessage();
 
 
-            //Uuid.createEvent();
+            //Uuid.createMockUser();
 
 
             //Uuid.createMockEvent();
             //Uuid.updateMockEvent();
             //Uuid.updateMockEventFromFrontEnd();
-            Uuid.createMockEvent();
+            ///Uuid.createMockEvent();
             /*
             Task task = new Task(() => Producer.send());
             task.Start();
