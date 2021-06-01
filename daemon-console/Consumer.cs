@@ -146,6 +146,7 @@ namespace UUIDproducer
                         XmlNode myOrganiserSourceId = xmlDoc.SelectSingleNode("//organiserSourceEntityId");
                         XmlNode mySourceEntityId = xmlDoc.SelectSingleNode("//sourceEntityId");
                         //XML body
+
                         XmlNode myEventName = xmlDoc.SelectSingleNode("//name");
                         XmlNode myStartEvent = xmlDoc.SelectSingleNode("//startEvent");
                         XmlNode myEndEvent = xmlDoc.SelectSingleNode("//endEvent");
@@ -158,6 +159,10 @@ namespace UUIDproducer
                             Console.WriteLine("Got a message from " + myOriginNode.InnerXml);
                             Console.WriteLine("Updating origin \"" + myOriginNode.InnerXml + "\" of XML...");
 
+                                public string createEvent(XmlDocument xml)
+                                {
+
+                                }
                            
 
                             //XmlWriterSettings settings = new XmlWriterSettings();
@@ -168,7 +173,7 @@ namespace UUIDproducer
 
                             docAlter.Load("Alter.xml");
                             docAlter = xmlDoc;
-
+                               
                             docAlter.SelectSingleNode("//event/header/origin").InnerText = "Office";
                             docAlter.Save("Alter.xml");
 
@@ -229,7 +234,7 @@ namespace UUIDproducer
                               }
                              dr2.Close();
 
-                               Console.WriteLine(myStartEvent.InnerXml);
+                            Console.WriteLine(myStartEvent.InnerXml);
                             List<Attendee> attendeesAtCreate = new List<Attendee>();
                             string eventId= "fout";
                             try
