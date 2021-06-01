@@ -21,10 +21,10 @@ jobs:
       run: cp /home/office/main_secrets/appsettings.json ./daemon-console/appsettings.json && cp /home/office/main_secrets/cs.txt ./daemon-console/cs.txt
     - name: Clean Solution
       if: success()
-      run: dotnet clean
+      run: dotnet clean --configuration Release
     - name: Restore dependencies
       if: success()
-      run: dotnet restore
+      run: dotnet restore --verbosity detailed
     - name: Build
       if: success()
     # Indien dotnet publish niet werkt dan moet deze stap vervangen worden met 'dotnet build --no-restore'
