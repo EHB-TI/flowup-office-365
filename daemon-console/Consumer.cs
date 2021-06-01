@@ -134,7 +134,7 @@ namespace UUIDproducer
                     XmlDocument docAlterSub = new XmlDocument();
                     XmlDocument docAlterError = new XmlDocument();
 
-                        if (xmlValidation)
+                    if (xmlValidation)
                     {
                         
                         Console.WriteLine("XML is valid");
@@ -264,15 +264,15 @@ namespace UUIDproducer
 
                          
 
-                            DateTime parsedDateEnd;
-                            parsedDateStart = DateTime.Parse(myStartEvent.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
-                            parsedDateEnd = DateTime.Parse(myEndEvent.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
+                            //DateTime parsedDateEnd;
+                            //parsedDateStart = DateTime.Parse(myStartEvent.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
+                            //parsedDateEnd = DateTime.Parse(myEndEvent.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
 
                             cmd.Parameters.AddWithValue("@name", myEventName.InnerXml);
                             cmd.Parameters.AddWithValue("@userId", myOrganiserSourceId.InnerXml);
                             cmd.Parameters.AddWithValue("@graphResponse", eventId);
-                            cmd.Parameters.AddWithValue("@startEvent", parsedDateStart);
-                            cmd.Parameters.AddWithValue("@endEvent", parsedDateEnd);
+                            cmd.Parameters.AddWithValue("@startEvent", myStartEvent.InnerXml);
+                            cmd.Parameters.AddWithValue("@endEvent", myEndEvent.InnerXml);
                             cmd.Parameters.AddWithValue("@description", myDescription.InnerXml);
                             cmd.Parameters.AddWithValue("@location", myLocation.InnerXml);
 
@@ -373,14 +373,14 @@ namespace UUIDproducer
 
 
                             //Parse data to put into database
-                            DateTime parsedDateStart;
-                            DateTime parsedDateEnd;
-                            parsedDateStart = DateTime.Parse(myStartEvent.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
-                            parsedDateEnd = DateTime.Parse(myEndEvent.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
+                            //DateTime parsedDateStart;
+                            //DateTime parsedDateEnd;
+                            //parsedDateStart = DateTime.Parse(myStartEvent.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
+                            //parsedDateEnd = DateTime.Parse(myEndEvent.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
 
                             cmd.Parameters.AddWithValue("@name", myEventName.InnerXml);
-                            cmd.Parameters.AddWithValue("@startEvent", parsedDateStart);
-                            cmd.Parameters.AddWithValue("@endEvent", parsedDateEnd);
+                            cmd.Parameters.AddWithValue("@startEvent", myStartEvent.InnerXml);
+                            cmd.Parameters.AddWithValue("@endEvent", myEndEvent.InnerXml);
                             cmd.Parameters.AddWithValue("@description", myDescription.InnerXml);
                             cmd.Parameters.AddWithValue("@location", myLocation.InnerXml);
                             cmd.Prepare();
@@ -755,13 +755,26 @@ namespace UUIDproducer
                             string email = "";
                             string name = "";
                             string eventId = "";
+                            string eventName = "";
+                            string startTime = "";
+                            string endTime = "";
+                            string location = "";
+                            string description = "";
 
-                                var sqlForId = "SELECT graphResponse FROM Event WHERE eventId = '" + myEventSourceEntityId.InnerXml + "'";
+                            var sqlForId = "SELECT * FROM Event WHERE eventId = '" + myEventSourceEntityId.InnerXml + "'";
                             using var cmdx = new MySqlCommand(sqlForId, con);
                             MySqlDataReader drx = cmdx.ExecuteReader();
                              if (drx.Read())
                                {
+                                    Console.WriteLine(drx.ToString());
                                     eventId = drx[0].ToString();
+                                    eventName = drx[3].ToString();
+                                    //startTime = drx[4].ToString().Substring(0, (drx[4].ToString().Length - 6));
+                                    //endTime = drx[5].ToString().Substring(0, (drx[5].ToString().Length - 6));
+                                    startTime = drx[4].ToString();
+                                    endTime = drx[5].ToString();
+                                    location = drx[7].ToString();
+                                    description = drx[6].ToString();
                                     Console.WriteLine(eventId);
                                }
                               drx.Close();
@@ -801,8 +814,8 @@ namespace UUIDproducer
                                 try
                                 {
                                     List<Attendee> attendeesAtCreate = new List<Attendee>();
-                                    Program.RunAsync("subscribe", "", "", "", "",
-                                    "", attendeesAtCreate, name, email, true, eventId).GetAwaiter().GetResult();
+                                    Program.RunAsync("create", eventName, description, startTime, endTime,
+                                    location, attendeesAtCreate, name, email, true, eventId).GetAwaiter().GetResult();
 
                                 }
                                 catch (Exception ex)
@@ -878,8 +891,44 @@ namespace UUIDproducer
 
                             using var con = new MySqlConnection(cs);
                             con.Open();
+                                var sqlForId = "SELECT graphResponse FROM Event WHERE eventId = '" + myEventSourceEntityId.InnerXml + "'";
+                                using var cmd1 = new MySqlCommand(sqlForId, con);
+                                MySqlDataReader dr = cmd1.ExecuteReader();
+                                string eventId = "";
+                                string userEmail = "";
+                                if (dr.Read())
+                                {
+                                    eventId = dr[0].ToString();
+                                    Console.WriteLine(eventId);
+                                }
+                                dr.Close();
 
-                            var sql = "DELETE FROM Subscribe WHERE eventId = '" + myEventSourceEntityId.InnerXml + "' AND userId = '" + myAttendeeSourceEntityId.InnerXml + "'";
+                                var sqlForEmail = "SELECT email FROM User WHERE userId = '" + myAttendeeSourceEntityId.InnerXml + "'";
+                                using var cmd2 = new MySqlCommand(sqlForEmail, con);
+                                MySqlDataReader dr2 = cmd2.ExecuteReader();
+                                if (dr2.Read())
+                                {
+                                    userEmail = dr2[0].ToString();
+                                    Console.WriteLine(userEmail);
+                                }
+                                dr2.Close();
+
+
+                                try
+                                {
+                                    List<Attendee> attendeesAtCreate = new List<Attendee>();
+                                    Program.RunAsync("update", "", "", "", "",
+                                    "", attendeesAtCreate, userEmail, "", true, eventId).GetAwaiter().GetResult();
+
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine(ex.Message);
+                                    Console.ResetColor();
+                                }
+
+                                var sql = "DELETE FROM Subscribe WHERE eventId = '" + myEventSourceEntityId.InnerXml + "' AND userId = '" + myAttendeeSourceEntityId.InnerXml + "'";
                             using var cmd = new MySqlCommand(sql, con);
 
                             //cmd.Prepare();
