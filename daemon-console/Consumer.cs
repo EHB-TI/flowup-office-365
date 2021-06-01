@@ -655,7 +655,7 @@ namespace UUIDproducer
                             Task task = new Task(() => Producer.sendMessage(docAlterUser.InnerXml, "UUID"));
                             task.Start();
 
-                            Console.WriteLine("Sending update user message to UUID...");
+                            Console.WriteLine("Sending update user message to UUID(Last step)...");
 
 
                         }
@@ -968,6 +968,10 @@ namespace UUIDproducer
                         Task task = new Task(() => Producer.sendMessage(docAlterError.InnerXml, "logging"));
                         task.Start();
 
+                    }
+                    else
+                        {
+                            Console.WriteLine("XML was wrong");
                         }
 
                     }
