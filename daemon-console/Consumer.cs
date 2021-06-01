@@ -132,9 +132,9 @@ namespace UUIDproducer
                     //Alter XML to change
                     XmlDocument docAlter = new XmlDocument();
                     XmlDocument docAlterSub = new XmlDocument();
+                    XmlDocument docAlterError = new XmlDocument();
 
-
-                    if (xmlValidation)
+                        if (xmlValidation)
                     {
                         
                         Console.WriteLine("XML is valid");
@@ -903,15 +903,17 @@ namespace UUIDproducer
                         Console.WriteLine("Error XML received");
                         Console.WriteLine("Message is: " + myErrorMessage.InnerXml);
 
-                        schema = new XmlSchemaSet();
-                        schema.Add("", "Errorxsd.xsd");
-                        xml = XDocument.Parse(message, LoadOptions.SetLineInfo);
-                        xmlValidation = true;
+                        docAlterError.Load("AlterError.xml");
+                        docAlterError = xmlDoc;
 
-                        xml.Validate(schema, (sender, e) =>
-                        {
-                            xmlValidation = false;
-                        });
+                        docAlterError.SelectSingleNode("//error/header/origin").InnerText = "Office";
+                        docAlterError.Save("Alter.xml");
+                        docAlterError.Save(Console.Out);
+
+
+
+                        Task task = new Task(() => Producer.sendMessage(docAlterError.InnerXml, "logging"));
+                        task.Start();
 
                         }
 
