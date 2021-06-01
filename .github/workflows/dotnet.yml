@@ -19,6 +19,9 @@ jobs:
         dotnet-version: 5.0.x
     - name: Copy Secrets
       run: cp /home/office/main_secrets/appsettings.json ./daemon-console/appsettings.json && cp /home/office/main_secrets/cs.txt ./daemon-console/cs.txt
+    - name: Clean Solution
+      if: succes()
+      run: dotnet clean
     - name: Restore dependencies
       if: success()
       run: dotnet restore
