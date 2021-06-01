@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<log>
+  <header>
+    <code>3000</code>
+    <origin>Office</origin>
+    <timestamp></timestamp>
+  </header>
+  <body>
+    <objectUUID></objectUUID>
+    <objectSourceId></objectSourceId>
+    <objectOrigin>Office</objectOrigin>
+    <description>Succesfully added</description>
+  </body>
+</log>
