@@ -84,7 +84,7 @@ namespace UUIDproducer
 
                     bool xmlValidation = true;
                     bool xmlValidationUser = true;
-                    bool xmlValidationSubscribe = false;
+                    bool xmlValidationSubscribe = true;
                     bool xmlValidationError = true;
 
                     //xsd event validation
@@ -132,7 +132,7 @@ namespace UUIDproducer
                     //Alter XML to change
                     XmlDocument docAlter = new XmlDocument();
                     XmlDocument docAlterSub = new XmlDocument();
-
+                    XmlDocument docAlterError = new XmlDocument();
 
                     if (xmlValidation)
                     {
@@ -224,7 +224,7 @@ namespace UUIDproducer
 
                              if (dr2.Read())
                               {
-                                  name += String.Join(" ",dr2[0].ToString());
+                                  name += String.Join(" ", dr2[0].ToString());
                                   Console.WriteLine(name);
                               }
                              dr2.Close();
@@ -264,15 +264,15 @@ namespace UUIDproducer
 
                          
 
-                            DateTime parsedDateEnd;
-                            parsedDateStart = DateTime.Parse(myStartEvent.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
-                            parsedDateEnd = DateTime.Parse(myEndEvent.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
+                            //DateTime parsedDateEnd;
+                            //parsedDateStart = DateTime.Parse(myStartEvent.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
+                            //parsedDateEnd = DateTime.Parse(myEndEvent.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
 
                             cmd.Parameters.AddWithValue("@name", myEventName.InnerXml);
                             cmd.Parameters.AddWithValue("@userId", myOrganiserSourceId.InnerXml);
                             cmd.Parameters.AddWithValue("@graphResponse", eventId);
-                            cmd.Parameters.AddWithValue("@startEvent", parsedDateStart);
-                            cmd.Parameters.AddWithValue("@endEvent", parsedDateEnd);
+                            cmd.Parameters.AddWithValue("@startEvent", myStartEvent.InnerXml);
+                            cmd.Parameters.AddWithValue("@endEvent", myEndEvent.InnerXml);
                             cmd.Parameters.AddWithValue("@description", myDescription.InnerXml);
                             cmd.Parameters.AddWithValue("@location", myLocation.InnerXml);
 
@@ -373,14 +373,14 @@ namespace UUIDproducer
 
 
                             //Parse data to put into database
-                            DateTime parsedDateStart;
-                            DateTime parsedDateEnd;
-                            parsedDateStart = DateTime.Parse(myStartEvent.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
-                            parsedDateEnd = DateTime.Parse(myEndEvent.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
+                            //DateTime parsedDateStart;
+                            //DateTime parsedDateEnd;
+                            //parsedDateStart = DateTime.Parse(myStartEvent.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
+                            //parsedDateEnd = DateTime.Parse(myEndEvent.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
 
                             cmd.Parameters.AddWithValue("@name", myEventName.InnerXml);
-                            cmd.Parameters.AddWithValue("@startEvent", parsedDateStart);
-                            cmd.Parameters.AddWithValue("@endEvent", parsedDateEnd);
+                            cmd.Parameters.AddWithValue("@startEvent", myStartEvent.InnerXml);
+                            cmd.Parameters.AddWithValue("@endEvent", myEndEvent.InnerXml);
                             cmd.Parameters.AddWithValue("@description", myDescription.InnerXml);
                             cmd.Parameters.AddWithValue("@location", myLocation.InnerXml);
                             cmd.Prepare();
@@ -471,7 +471,7 @@ namespace UUIDproducer
 
                             //cmd.Prepare();
                             cmd1.ExecuteNonQuery();
-                            Console.WriteLine("Event deleted in database");
+                            Console.WriteLine("Event deleted in database(Last step)");
 
                         }
                     }
@@ -568,7 +568,7 @@ namespace UUIDproducer
                             Task task = new Task(() => Producer.sendMessage(docAlterUser.InnerXml, "UUID"));
                             task.Start();
 
-                            Console.WriteLine("Sending creating user message to UUID...");
+                            Console.WriteLine("\nSending creating user message to UUID...(Last step)");
                         }
                         //UPDATE user comes from AD and we pass it to UUID to compare
                         //if (myOriginNodeUser.InnerXml == "AD" && myMethodNodeUser.InnerXml == "UPDATE" && mySourceIdUser.InnerXml == "" && routingKey == "user")
@@ -655,7 +655,7 @@ namespace UUIDproducer
                             Task task = new Task(() => Producer.sendMessage(docAlterUser.InnerXml, "UUID"));
                             task.Start();
 
-                            Console.WriteLine("Sending update user message to UUID...");
+                            Console.WriteLine("Sending update user message to UUID(Last step)...");
 
 
                         }
@@ -740,33 +740,115 @@ namespace UUIDproducer
                             Task task = new Task(() => Producer.sendMessage(docAlterSub.InnerXml, "UUID"));
                             task.Start();
 
-                            Console.WriteLine("Origin changed to Office, sending now it to UUID...");
+                            Console.WriteLine("\nOrigin changed to Office, sending now it to UUID...");
 
                         }
                         //Message from UUID, Subscribe, setting it in out database
-                        if (myOriginNode.InnerXml == "UUID" && myMethodNode.InnerXml == "SUBSCRIBE" && myEventSourceEntityId.InnerXml != "" && myAttendeeSourceEntityId.InnerXml != "")
+                        else if (myOriginNode.InnerXml == "UUID" && myMethodNode.InnerXml == "SUBSCRIBE" && myEventSourceEntityId.InnerXml != "" && myAttendeeSourceEntityId.InnerXml != "")
                         {
+                                int iNewRowIdentity = -1;
                             Console.WriteLine("Got a message from " + myOriginNode.InnerXml);
                             Console.WriteLine("Subscribing data in database and calendar");
 
                             using var con = new MySqlConnection(cs);
                             con.Open();
+                            string email = "";
+                            string name = "";
+                            string eventId = "";
+                            string eventName = "";
+                            string startTime = "";
+                            string endTime = "";
+                            string location = "";
+                            string description = "";
 
-                            var sql = "INSERT INTO Subscribe(userId, eventId) VALUES(@userId, @eventId)";
-                            using var cmd = new MySqlCommand(sql, con);
+                            var sqlForId = "SELECT * FROM Event WHERE eventId = '" + myEventSourceEntityId.InnerXml + "'";
+                            using var cmdx = new MySqlCommand(sqlForId, con);
+                            MySqlDataReader drx = cmdx.ExecuteReader();
+                             if (drx.Read())
+                               {
+                                    Console.WriteLine(drx.ToString());
+                                    eventId = drx[0].ToString();
+                                    eventName = drx[3].ToString();
+                                    //startTime = drx[4].ToString().Substring(0, (drx[4].ToString().Length - 6));
+                                    //endTime = drx[5].ToString().Substring(0, (drx[5].ToString().Length - 6));
+                                    startTime = drx[4].ToString();
+                                    endTime = drx[5].ToString();
+                                    location = drx[7].ToString();
+                                    description = drx[6].ToString();
+                                    Console.WriteLine(eventId);
+                               }
+                              drx.Close();
+
+                            var sqlForEmail = "SELECT email FROM User WHERE userId = '" + myAttendeeSourceEntityId.InnerXml + "'";
+                            using var cmd1 = new MySqlCommand(sqlForEmail, con);
+                            MySqlDataReader dr = cmd1.ExecuteReader();
+
+                            if (dr.Read())
+                              {
+                                 email = dr[0].ToString();
+                                 Console.WriteLine(email);
+                              }
+                                dr.Close();
+
+                            var sqlForFirstname = "SELECT firstname FROM User WHERE userId = '" + myAttendeeSourceEntityId.InnerXml + "'";
+                            using var cmd2 = new MySqlCommand(sqlForFirstname, con);
+                            MySqlDataReader dr1 = cmd2.ExecuteReader();
+                                if (dr1.Read())
+                                {
+                                    name = dr1[0].ToString();
+                                    Console.WriteLine(name);
+                                }
+                                dr1.Close();
+
+                                var sqlForLastname = "SELECT lastname FROM User WHERE userId = '" + myAttendeeSourceEntityId.InnerXml + "'";
+                                using var cmd3 = new MySqlCommand(sqlForLastname, con);
+                                MySqlDataReader dr2 = cmd3.ExecuteReader();
+
+                                if (dr2.Read())
+                                {
+                                    name += String.Join(" ", dr2[0].ToString());
+                                    Console.WriteLine(name);
+                                }
+                                dr2.Close();
+
+                                try
+                                {
+                                    List<Attendee> attendeesAtCreate = new List<Attendee>();
+                                    Program.RunAsync("create", eventName, description, startTime, endTime,
+                                    location, attendeesAtCreate, name, email, true, eventId).GetAwaiter().GetResult();
+
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine(ex.Message);
+                                    Console.ResetColor();
+                                }
+
+                                var sql = "INSERT INTO Subscribe(userId, eventId) VALUES(@userId, @eventId); SELECT @@IDENTITY";
+                                try
+                                {
+                                    using var cmd = new MySqlCommand(sql, con);
 
 
-                            cmd.Parameters.AddWithValue("@eventId", myEventSourceEntityId.InnerXml);
-                            cmd.Parameters.AddWithValue("@name", myAttendeeSourceEntityId.InnerXml);
-                            cmd.Prepare();
-                            cmd.ExecuteNonQuery();
-
-                            Console.WriteLine("Subscribe inserted in database");
+                                    cmd.Parameters.AddWithValue("@eventId", myEventSourceEntityId.InnerXml);
+                                    cmd.Parameters.AddWithValue("@userId", myAttendeeSourceEntityId.InnerXml);
+                                    //cmd.Prepare();
+                                    //cmd.ExecuteNonQuery();
+                                    iNewRowIdentity = Convert.ToInt32(cmd.ExecuteScalar());
+                                    Console.WriteLine("Event Id in database is: " + iNewRowIdentity);
+                                }
+                                catch (SqlException e)
+                                {
+                                    Console.WriteLine(e.Message);
+                                }
+                                Console.WriteLine("Subscribe inserted in database");
 
                             docAlterSub.Load("AlterSubscribe.xml");
                             docAlterSub = xmlDoc;
 
                             docAlterSub.SelectSingleNode("//eventSubscribe/header/origin").InnerText = "Office";
+                            docAlterSub.SelectSingleNode("//eventSubscribe/header/sourceEntityId").InnerText = iNewRowIdentity.ToString();
                             docAlterSub.Save("AlterSubscribe.xml");
 
                             docAlterSub.Save(Console.Out);
@@ -774,11 +856,11 @@ namespace UUIDproducer
                             Task task = new Task(() => Producer.sendMessage(docAlterSub.InnerXml, "UUID"));
                             task.Start();
 
-                            Console.WriteLine("Sending subscribe message to UUID...");
+                            Console.WriteLine("\nSending subscribe message to UUID with Office Subscribe entity Id (Last step)");
 
                         }
                         //Unubscribe from Front end, change origin and send to UUID
-                        if (myOriginNode.InnerXml == "FrontEnd" && myMethodNode.InnerXml == "UNSUBCRIBE" && myUUID.InnerXml != "" && myAttendeeUUID.InnerXml != "")
+                        if (myOriginNode.InnerXml == "FrontEnd" && myMethodNode.InnerXml == "UNSUBSCRIBE" && myUUID.InnerXml != "" && myAttendeeUUID.InnerXml != "")
                         {
                             Console.WriteLine("Unsusbscribing from event, and putting it in database");
 
@@ -799,7 +881,7 @@ namespace UUIDproducer
                             Console.WriteLine("Origin changed to Office, sending delete now it to UUID...");
                         }
                         //Unubscribe from UUID, change it in db
-                        if (myOriginNode.InnerXml == "UUID" && myMethodNode.InnerXml == "UNSUBCRIBE" && myUUID.InnerXml != "" && myAttendeeUUID.InnerXml != "")
+                        else if (myOriginNode.InnerXml == "UUID" && myMethodNode.InnerXml == "UNSUBSCRIBE" && myEventSourceEntityId.InnerXml != "" && myAttendeeSourceEntityId.InnerXml != "")
                         {
                             Console.WriteLine("Unsusbscribing from event, and putting it in database");
 
@@ -809,13 +891,49 @@ namespace UUIDproducer
 
                             using var con = new MySqlConnection(cs);
                             con.Open();
+                                var sqlForId = "SELECT graphResponse FROM Event WHERE eventId = '" + myEventSourceEntityId.InnerXml + "'";
+                                using var cmd1 = new MySqlCommand(sqlForId, con);
+                                MySqlDataReader dr = cmd1.ExecuteReader();
+                                string eventId = "";
+                                string userEmail = "";
+                                if (dr.Read())
+                                {
+                                    eventId = dr[0].ToString();
+                                    Console.WriteLine(eventId);
+                                }
+                                dr.Close();
 
-                            var sql = "DELETE FROM Subscribe WHERE eventId = '" + myUUID.InnerXml + "' AND userId = '" + myAttendeeSourceEntityId.InnerXml + "'";
+                                var sqlForEmail = "SELECT email FROM User WHERE userId = '" + myAttendeeSourceEntityId.InnerXml + "'";
+                                using var cmd2 = new MySqlCommand(sqlForEmail, con);
+                                MySqlDataReader dr2 = cmd2.ExecuteReader();
+                                if (dr2.Read())
+                                {
+                                    userEmail = dr2[0].ToString();
+                                    Console.WriteLine(userEmail);
+                                }
+                                dr2.Close();
+
+
+                                try
+                                {
+                                    List<Attendee> attendeesAtCreate = new List<Attendee>();
+                                    Program.RunAsync("update", "", "", "", "",
+                                    "", attendeesAtCreate, userEmail, "", true, eventId).GetAwaiter().GetResult();
+
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine(ex.Message);
+                                    Console.ResetColor();
+                                }
+
+                                var sql = "DELETE FROM Subscribe WHERE eventId = '" + myEventSourceEntityId.InnerXml + "' AND userId = '" + myAttendeeSourceEntityId.InnerXml + "'";
                             using var cmd = new MySqlCommand(sql, con);
 
                             //cmd.Prepare();
                             cmd.ExecuteNonQuery();
-                            Console.WriteLine("Event deleted in database");
+                            Console.WriteLine("Event deleted in database (Last step)");
                         }
                     }
                     //XML error from UUID
@@ -834,72 +952,26 @@ namespace UUIDproducer
                         Console.WriteLine("Error XML received");
                         Console.WriteLine("Message is: " + myErrorMessage.InnerXml);
 
-                        schema = new XmlSchemaSet();
-                        schema.Add("", "Errorxsd.xsd");
-                        xml = XDocument.Parse(message, LoadOptions.SetLineInfo);
-                        xmlValidation = true;
+                        string dateTimeParsedXML = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K").ToString();
 
-                        xml.Validate(schema, (sender, e) =>
+                        docAlterError.Load("AlterError.xml");
+                        docAlterError = xmlDoc;
+
+                        docAlterError.SelectSingleNode("//error/header/origin").InnerText = "Office";
+                        docAlterError.SelectSingleNode("//error/header/timestamp").InnerText = dateTimeParsedXML;
+                        docAlterError.Save("Alter.xml");
+                        docAlterError.Save(Console.Out);
+
+                        string erroXMLWithoutVersion = docAlterError.InnerXml.Substring(55);
+                        Console.WriteLine(erroXMLWithoutVersion);
+
+                        Task task = new Task(() => Producer.sendMessage(docAlterError.InnerXml, "logging"));
+                        task.Start();
+
+                    }
+                    else
                         {
-                            xmlValidation = false;
-                        });
-
-
-
-
-                            //    //Event comes from UUID Master, we get a message back from UUID
-                            //    switch (myCodeNode.InnerXml)
-                            //    {
-                            //        case "1000":
-                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                            //            break;
-                            //        case "1001":
-                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                            //            break;
-                            //        case "1002":
-                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                            //            break;
-                            //        case "1003":
-                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                            //            break;
-                            //        case "1004":
-                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                            //            break;
-                            //        case "1005":
-                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                            //            break;
-                            //            //DB Error
-                            //        case "2000":
-                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                            //            break;
-                            //            //Create
-                            //        case "3000":
-                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                            //            break;
-                            //        case "3001":
-                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                            //            break;
-                            //        case "3002":
-                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                            //            break;
-                            //            //Update
-                            //        case "4000":
-                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                            //            break;
-                            //        case "4001":
-                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                            //            break;
-                            //            //Delete
-                            //        case "5000":
-                            //            Console.WriteLine("Code is: " + myCodeNode.InnerXml);
-                            //            break;
-                            //        default:
-                            //            Console.WriteLine("Default case");
-                            //            break;
-                            //    }
-
-
-
+                            Console.WriteLine("XML was wrong");
                         }
 
                     }

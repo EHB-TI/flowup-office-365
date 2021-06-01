@@ -20,12 +20,11 @@ namespace UUIDproducer
         {
             //connectie
             var factory = new ConnectionFactory() { HostName = "10.3.56.6" };
-            //var factory = new ConnectionFactory() { HostName = "localhost" };
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
             {
-                channel.ExchangeDeclare(exchange: "direct_logs",
-                                        type: "direct");
+                //channel.ExchangeDeclare(exchange: "direct_logs",
+                //                        type: "direct");
 
                 XmlSchemaSet schema = new XmlSchemaSet();
                 schema.Add("", "EventSchema.xsd");

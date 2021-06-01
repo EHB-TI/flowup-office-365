@@ -120,7 +120,7 @@ namespace daemon_console
                 }else if (crudType == "subscribe")
                 {
                     //Method to subscribe to event
-                    GraphCrudMethods.subscribeEvent(result.AccessToken, email, name);
+                    GraphCrudMethods.subscribeEvent(result.AccessToken,eventId, email, name);
                 }else if (crudType == "unsubscribe")
                 {
                     GraphCrudMethods.unsubscribeEvent(result.AccessToken, email, eventId);
