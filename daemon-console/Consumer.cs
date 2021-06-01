@@ -952,14 +952,18 @@ namespace UUIDproducer
                         Console.WriteLine("Error XML received");
                         Console.WriteLine("Message is: " + myErrorMessage.InnerXml);
 
+                        string dateTimeParsedXML = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K").ToString();
+
                         docAlterError.Load("AlterError.xml");
                         docAlterError = xmlDoc;
 
                         docAlterError.SelectSingleNode("//error/header/origin").InnerText = "Office";
+                        docAlterError.SelectSingleNode("//error/header/timestamp").InnerText = dateTimeParsedXML;
                         docAlterError.Save("Alter.xml");
                         docAlterError.Save(Console.Out);
 
-
+                        string erroXMLWithoutVersion = docAlterError.InnerXml.Substring(55);
+                        Console.WriteLine(erroXMLWithoutVersion);
 
                         Task task = new Task(() => Producer.sendMessage(docAlterError.InnerXml, "logging"));
                         task.Start();
