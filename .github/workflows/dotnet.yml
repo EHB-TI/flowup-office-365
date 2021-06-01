@@ -20,7 +20,7 @@ jobs:
     - name: Copy Secrets
       run: cp /home/office/main_secrets/appsettings.json ./daemon-console/appsettings.json && cp /home/office/main_secrets/cs.txt ./daemon-console/cs.txt
     - name: Clean Solution
-      if: succes()
+      if: success()
       run: dotnet clean
     - name: Restore dependencies
       if: success()
