@@ -13,10 +13,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    #- name: Setup .NET
-    #  uses: actions/setup-dotnet@v1
-    #  with:
-    #    dotnet-version: 5.0.x
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.x
     - name: Copy Secrets
       run: cp /home/office/main_secrets/appsettings.json ./daemon-console/appsettings.json && cp /home/office/main_secrets/cs.txt ./daemon-console/cs.txt
     - name: Restore dependencies
