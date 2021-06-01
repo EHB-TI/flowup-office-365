@@ -47,7 +47,6 @@ namespace UUIDproducer
             //Console.WriteLine("cs string is: " + cs);
 
             var factory = new ConnectionFactory() { HostName = "10.3.56.6" };
-            //var factory = new ConnectionFactory() { HostName = "localhost" };
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
             {
@@ -965,7 +964,7 @@ namespace UUIDproducer
                         string erroXMLWithoutVersion = docAlterError.InnerXml.Substring(55);
                         Console.WriteLine(erroXMLWithoutVersion);
 
-                        Task task = new Task(() => Producer.sendMessage(docAlterError.InnerXml, "logging"));
+                        Task task = new Task(() => Producer.sendMessageLogging(docAlterError.InnerXml, "logging"));
                         task.Start();
 
                     }

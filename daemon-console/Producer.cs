@@ -65,5 +65,27 @@ namespace UUIDproducer
             Console.WriteLine(" Press [enter] to exit.");
             Console.ReadLine();
         }
+        //versturen van message aan de consumer
+        public static void sendMessageLogging(string message, string severity)
+        {
+            //connectie
+            var factory = new ConnectionFactory() { HostName = "10.3.56.6" };
+            using (var connection = factory.CreateConnection())
+            using (var channel = connection.CreateModel())
+            {
+                
+                    var body = Encoding.UTF8.GetBytes(message);
+                    channel.BasicPublish(exchange: "",
+                                         routingKey: severity,
+                                         basicProperties: null,
+                                         body: body);
+
+                    Console.WriteLine(" [x] Sent logging '{0}':'{1}'", severity, message);
+
+            }
+
+            Console.WriteLine(" Press [enter] to exit.");
+            Console.ReadLine();
+        }
     }
 }
