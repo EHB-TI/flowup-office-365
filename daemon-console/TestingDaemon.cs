@@ -70,5 +70,70 @@ namespace daemon_console
             //return returnMessage;
             return xmlValidationUser;
         }
+
+        public bool getSubscribeValidation(string inputXML)
+        {
+            bool xmlValidationSub= true;
+            
+            XmlDocument xmlDoc = new XmlDocument();
+            XDocument xml = new XDocument();
+
+            xmlDoc.LoadXml(inputXML);
+            xml = XDocument.Parse(xmlDoc.OuterXml);
+            XmlSchemaSet schemaSub = new XmlSchemaSet();
+            schemaSub.Add("", "SubscribeSchema.xsd");
+
+            xml.Validate(schemaSub, (sender, e) =>
+            {
+                xmlValidationSub = false;
+            });
+
+            
+            return xmlValidationSub;
+        }
+
+
+        public bool getErrorValidation(string inputXML)
+        {
+            
+            bool xmlValidationError = true;
+           
+            XmlDocument xmlDoc = new XmlDocument();
+            XDocument xml = new XDocument();
+
+            xmlDoc.LoadXml(inputXML);
+            xml = XDocument.Parse(xmlDoc.OuterXml);
+            XmlSchemaSet schemaError = new XmlSchemaSet();
+            schemaError.Add("", "Errorxsd.xsd");
+
+            xml.Validate(schemaError, (sender, e) =>
+            {
+                xmlValidationError = false;
+            });
+
+            
+            return xmlValidationError;
+        }
+
+        public bool getLogValidation(string inputXML)
+        {
+            bool xmlValidationLog = true;
+
+            XmlDocument xmlDoc = new XmlDocument();
+            XDocument xml = new XDocument();
+
+            xmlDoc.LoadXml(inputXML);
+            xml = XDocument.Parse(xmlDoc.OuterXml);
+            XmlSchemaSet schemaLog = new XmlSchemaSet();
+            schemaLog.Add("", "LogSchema.xsd");
+
+            xml.Validate(schemaLog, (sender, e) =>
+            {
+                xmlValidationLog = false;
+            });
+
+            
+            return xmlValidationLog;
+        }
     }
 }

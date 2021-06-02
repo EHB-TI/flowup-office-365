@@ -59,6 +59,9 @@
     <None Update="EventSchema.xsd">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="LogSchema.xsd">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="SubscribeSchema.xsd">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -1,15 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-
 <log>
-  <header>
-    <code>3000</code>
-    <origin>Office</origin>
-    <timestamp></timestamp>
-  </header>
-  <body>
-    <objectUUID></objectUUID>
-    <objectSourceId></objectSourceId>
-    <objectOrigin>Office</objectOrigin>
-    <description>Succesfully added</description>
-  </body>
+	<header>
+		<code>3000</code>
+		<origin>Office</origin>
+		<timestamp>2021-05-25T12:00:00+01:00</timestamp>
+	</header>
+	<body>
+		<objectUUID>0</objectUUID>
+		<objectSourceId>66</objectSourceId>
+		<objectOrigin>Office</objectOrigin>
+		<description>Succesfully added</description>
+	</body>
 </log>
