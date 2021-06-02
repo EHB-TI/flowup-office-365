@@ -90,6 +90,15 @@ namespace UUIDproducer
                     //XDocument xml = XDocument.Parse(message, LoadOptions.SetLineInfo);
                     XmlDocument xmlDoc = new XmlDocument();
                     XDocument xml = new XDocument();
+
+                    //Alter XML to change
+                    XmlDocument docAlter = new XmlDocument();
+                    XmlDocument docAlterSub = new XmlDocument();
+                    XmlDocument docAlterError = new XmlDocument();
+                    XmlDocument docAlterLog = new XmlDocument();
+
+                    string dateTimeParsedXML = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K").ToString();
+
                     try
                     {
                         xmlDoc.LoadXml(message);
@@ -114,13 +123,9 @@ namespace UUIDproducer
 
 
 
-                        string dateTimeParsedXML = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss%K").ToString();
+                        
 
-                        //Alter XML to change
-                        XmlDocument docAlter = new XmlDocument();
-                        XmlDocument docAlterSub = new XmlDocument();
-                        XmlDocument docAlterError = new XmlDocument();
-                        XmlDocument docAlterLog = new XmlDocument();
+                        
 
                         if (xmlValidation)
                         {
@@ -293,22 +298,28 @@ namespace UUIDproducer
                                 Task task = new Task(() => Producer.sendMessage(docAlter.InnerXml, "UUID"));
                                 task.Start();
 
+                                try
+                                {
+                                    docAlterLog.Load("AlterLog.xml");
 
-                                docAlterLog.Load("AlterLog.xml");
+                                    docAlterLog.SelectSingleNode("//log/header/code").InnerText = "3000";
+                                    docAlterLog.SelectSingleNode("//log/header/timestamp").InnerText = dateTimeParsedXML;
+                                    docAlterLog.SelectSingleNode("//log/body/objectUUID").InnerText = myEventUUID.InnerXml;
+                                    docAlterLog.SelectSingleNode("//log/body/objectSourceId").InnerText = "Create Event";
+                                    docAlterLog.SelectSingleNode("//log/body/description").InnerText = "Event created by Office";
+                                    docAlterLog.Save("AlterLog.xml");
+                                    docAlterLog.Save(Console.Out);
 
-                                docAlterLog.SelectSingleNode("//log/header/code").InnerText = "3000";
-                                docAlterLog.SelectSingleNode("//log/header/timestamp").InnerText = dateTimeParsedXML;
-                                docAlterLog.SelectSingleNode("//log/body/objectUUID").InnerText = myEventUUID.InnerXml;
-                                docAlterLog.SelectSingleNode("//log/body/objectSourceId").InnerText = "Create Event";
-                                docAlterLog.SelectSingleNode("//log/body/description").InnerText = "Event created by Office";
-                                docAlterLog.Save("AlterLog.xml");
-                                docAlterLog.Save(Console.Out);
+                                    Task taskLog = new Task(() => Producer.sendMessageLogging(docAlterLog.InnerXml, "logging"));
+                                    taskLog.Start();
 
-                                Task taskLog = new Task(() => Producer.sendMessageLogging(docAlterLog.InnerXml, "logging"));
-                                taskLog.Start();
+                                }
+                                catch(Exception e)
+                                {
+                                    Console.WriteLine("Message" + e.Message);
+                                }
 
-
-                                Console.WriteLine("Sending message to UUID and Loggs(Last step)...");
+                                Console.WriteLine("\nSending message to UUID and Loggs(Last step)...");
                             }
 
                             //Update Event comes from FrontEnd and we pass it to UUID to compare
@@ -1141,10 +1152,10 @@ namespace UUIDproducer
                             docAlterError.SelectSingleNode("//error/header/origin").InnerText = "Office";
                             docAlterError.SelectSingleNode("//error/header/timestamp").InnerText = dateTimeParsedXML;
                             docAlterError.Save("Alter.xml");
-                            docAlterError.Save(Console.Out);
+                            //docAlterError.Save(Console.Out);
 
-                            string erroXMLWithoutVersion = docAlterError.InnerXml.Substring(55);
-                            Console.WriteLine(erroXMLWithoutVersion);
+                            //string erroXMLWithoutVersion = docAlterError.InnerXml.Substring(55);
+                            //Console.WriteLine(erroXMLWithoutVersion);
 
                             Task task = new Task(() => Producer.sendMessageLogging(docAlterError.InnerXml, "logging"));
                             task.Start();
@@ -1160,7 +1171,23 @@ namespace UUIDproducer
                     }
                     catch (Exception e)
                     {
+                        Console.WriteLine("Error: " + e.Message);
                         Console.WriteLine("Weird message came in: " + message);
+
+                        docAlterError.Load("AlterError.xml");
+
+                        docAlterError.SelectSingleNode("//error/header/code").InnerText = "1002";
+                        docAlterError.SelectSingleNode("//error/header/origin").InnerText = "Office";
+                        docAlterError.SelectSingleNode("//error/header/timestamp").InnerText = dateTimeParsedXML;
+                        docAlterError.SelectSingleNode("//error/body/description").InnerText = "Weird message: " + message;
+                        docAlterError.Save("Alter.xml");
+                        docAlterError.Save(Console.Out);
+
+                        //string erroXMLWithoutVersion = docAlterError.InnerXml.Substring(55);
+                        //Console.WriteLine(erroXMLWithoutVersion);
+
+                        Task task = new Task(() => Producer.sendMessageLogging(docAlterError.InnerXml, "logging"));
+                        task.Start();
                     }
 
                 };
