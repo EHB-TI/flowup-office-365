@@ -939,7 +939,7 @@ namespace UUIDproducer
                                     {
                                         List<Attendee> attendeesAtCreate = new List<Attendee>();
                                         Program.RunAsync("create", eventName, description, startTime, endTime,
-                                        location, attendeesAtCreate, name, email, true, eventId).GetAwaiter().GetResult();
+                                        location, attendeesAtCreate, email, name, true, eventId).GetAwaiter().GetResult();
 
                                     }
                                     catch (Exception ex)
