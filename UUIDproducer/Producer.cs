@@ -47,7 +47,7 @@ namespace UUIDproducer
                     //Console.WriteLine("XML valid to send");
 
                     var body = Encoding.UTF8.GetBytes(message);
-                    channel.BasicPublish(exchange: "direct_logs",
+                    channel.BasicPublish(exchange: "",
                                          routingKey: severity,
                                          basicProperties: null,
                                          body: body);
