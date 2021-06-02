@@ -38,6 +38,9 @@
     <None Update="AlterError.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="AlterLog.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="AlterSubscribe.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

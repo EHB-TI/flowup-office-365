@@ -3,13 +3,13 @@
 <error>
   <header>
     <code>1000</code>
-    <origin>AD</origin>
-    <timestamp>2021-05-25T12:00:00+01:00</timestamp>
+    <origin>Office</origin>
+    <timestamp></timestamp>
   </header>
   <body>
-    <objectUUID>333ade47-03d1-40bb-9912-9a6c86a60169</objectUUID>
-    <objectSourceId>22</objectSourceId>
-    <objectOrigin>FrontEnd</objectOrigin>
-    <description>Object does not follow XSD pattern</description>
+    <objectUUID></objectUUID>
+    <objectSourceId></objectSourceId>
+    <objectOrigin></objectOrigin>
+    <description></description>
   </body>
 </error>
