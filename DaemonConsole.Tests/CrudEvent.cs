@@ -8,6 +8,7 @@ namespace DaemonConsole.Tests
     [TestClass]
     public class CrudEvent
     {
+       
         //Alter XML to change
         XmlDocument docAlter = new XmlDocument();
         XmlDocument docAlterUser = new XmlDocument();
@@ -15,9 +16,8 @@ namespace DaemonConsole.Tests
         XmlDocument docAlterError = new XmlDocument();
         XmlDocument docAlterLog = new XmlDocument();
 
-            
-
         [TestMethod]
+        
         public void Event_XML_Validation()
         {
             // Arrange
@@ -54,6 +54,56 @@ namespace DaemonConsole.Tests
 
             // Assert
             Assert.AreEqual(r, true, "User XML not valid");
+
+        }
+        [TestMethod]
+        public void Subscribe_XML_Validation()
+        {
+            // Arrange
+            TestingDaemon tDaemond = new TestingDaemon();
+            docAlterSub.Load("AlterSubscribe.xml");
+
+            // Act
+            string myXmlSub = docAlterSub.InnerXml;
+            bool r = tDaemond.getSubscribeValidation(myXmlSub);
+
+
+            // Assert
+            Assert.AreEqual(r, true, "Subscribe XML not valid");
+
+        }
+       
+        [TestMethod]
+        public void Error_XML_Validation()
+        {
+            // Arrange
+            TestingDaemon tDaemond = new TestingDaemon();
+            docAlterError.Load("AlterError.xml");
+
+            // Act
+            string myXmlError = docAlterError.InnerXml;
+            bool r = tDaemond.getErrorValidation(myXmlError);
+
+
+            // Assert
+            Assert.AreEqual(r, false, "Error XML not valid");
+
+        }
+
+        [TestMethod]
+        public void Log_XML_Validation()
+        {
+            // Arrange
+            TestingDaemon tDaemond = new TestingDaemon();
+           docAlterLog.Load("AlterLog.xml");
+
+            // Act
+            string myXmlLog = docAlterLog.InnerXml;
+            bool r = tDaemond.getLogValidation(myXmlLog);
+
+
+            // Assert
+            Assert.AreEqual(r, false, "Log XML not valid");
 
         }
     }
