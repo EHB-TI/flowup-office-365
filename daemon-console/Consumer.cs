@@ -87,7 +87,6 @@ namespace UUIDproducer
                     XmlSchemaSet schemaError = new XmlSchemaSet();
                     schemaError.Add("", "Errorxsd.xsd");
 
-                    //XDocument xml = XDocument.Parse(message, LoadOptions.SetLineInfo);
                     XmlDocument xmlDoc = new XmlDocument();
                     XDocument xml = new XDocument();
 
@@ -152,25 +151,12 @@ namespace UUIDproducer
                                 Console.WriteLine("Got a message from " + myOriginNode.InnerXml);
                                 Console.WriteLine("Updating origin \"" + myOriginNode.InnerXml + "\" of XML...");
 
-                           
-
-                                //XmlWriterSettings settings = new XmlWriterSettings();
-                                //settings.Indent = true;
-                                //XmlWriter writer = XmlWriter.Create("Alter.xml", settings);
-                                //doc1.Save(writer);
-
-
                                 docAlter.Load("Alter.xml");
                                 docAlter = xmlDoc;
 
                                 docAlter.SelectSingleNode("//event/header/origin").InnerText = "Office";
                                 docAlter.Save("Alter.xml");
-
-
                                 docAlter.Save(Console.Out);
-                                //Console.WriteLine(docAlter.InnerXml);
-                                //Console.WriteLine(docMessage.InnerXml);
-                                //Console.WriteLine(docMessageConverted.InnerXml);
 
 
                                 Task task = new Task(() => Producer.sendMessage(docAlter.InnerXml, "UUID"));
@@ -265,12 +251,8 @@ namespace UUIDproducer
 
                                 Console.WriteLine(eventId);
                                 var sql = "INSERT INTO Event(name, userId, graphResponse, startEvent, endEvent, description, location) VALUES(@name, @userId, @graphResponse, @startEvent, @endEvent, @description, @location); SELECT @@IDENTITY";
-                                //var sql = "INSERT INTO Event(name, userId, startEvent, endEvent, description, location) VALUES(@name, @userId, @startEvent, @endEvent, @description, @location); SELECT @@IDENTITY";
 
                                 using var cmd = new MySqlCommand(sql, con);
-
-                                //Parse data to put into database
-                                DateTime parsedDateStart;
 
                                 cmd.Parameters.AddWithValue("@name", myEventName.InnerXml);
                                 cmd.Parameters.AddWithValue("@userId", myOrganiserSourceId.InnerXml);
@@ -354,48 +336,48 @@ namespace UUIDproducer
                                 using var con = new MySqlConnection(cs);
                                 con.Open();
 
-                                    var sqlForId = "SELECT graphResponse FROM Event WHERE eventId = '" + mySourceEntityId.InnerXml + "'";
-                                    using var cmd1 = new MySqlCommand(sqlForId, con);
-                                    MySqlDataReader dr = cmd1.ExecuteReader();
-                                    string eventId = "";
-                                    if (dr.Read())
-                                    {
-                                        eventId = dr[0].ToString();
-                                        Console.WriteLine(eventId);
-                                    }
-                                    dr.Close();
+                                var sqlForId = "SELECT graphResponse FROM Event WHERE eventId = '" + mySourceEntityId.InnerXml + "'";
+                                using var cmd1 = new MySqlCommand(sqlForId, con);
+                                MySqlDataReader dr = cmd1.ExecuteReader();
+                                string eventId = "";
+                                if (dr.Read())
+                                {
+                                    eventId = dr[0].ToString();
+                                    Console.WriteLine(eventId);
+                                }
+                                dr.Close();
 
 
-                                    try
-                                    {
-                                        List<Attendee> attendeesAtCreate = new List<Attendee>();
-                                        string startTimeEvent = myStartEvent.InnerXml.Substring(0, (myStartEvent.InnerXml.Length - 6));
-                                        string endTimeEvent = myEndEvent.InnerXml.Substring(0, (myEndEvent.InnerXml.Length - 6));
-                                        Program.RunAsync("update", myEventName.InnerXml, myDescription.InnerXml, startTimeEvent, endTimeEvent,
-                                        myLocation.InnerXml, attendeesAtCreate,"","", true, eventId).GetAwaiter().GetResult();
+                                try
+                                {
+                                    List<Attendee> attendeesAtCreate = new List<Attendee>();
+                                    string startTimeEvent = myStartEvent.InnerXml.Substring(0, (myStartEvent.InnerXml.Length - 6));
+                                    string endTimeEvent = myEndEvent.InnerXml.Substring(0, (myEndEvent.InnerXml.Length - 6));
+                                    Program.RunAsync("update", myEventName.InnerXml, myDescription.InnerXml, startTimeEvent, endTimeEvent,
+                                    myLocation.InnerXml, attendeesAtCreate,"","", true, eventId).GetAwaiter().GetResult();
 
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Console.ForegroundColor = ConsoleColor.Red;
-                                        Console.WriteLine(ex.Message);
-                                        Console.ResetColor();
-                                        docAlterLog.Load("AlterLog.xml");
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine(ex.Message);
+                                    Console.ResetColor();
+                                    docAlterLog.Load("AlterLog.xml");
 
-                                        docAlterLog.SelectSingleNode("//log/header/code").InnerText = "4000";
-                                        docAlterLog.SelectSingleNode("//log/header/timestamp").InnerText = dateTimeParsedXML;
-                                        docAlterLog.SelectSingleNode("//log/body/objectUUID").InnerText = myEventUUID.InnerXml;
-                                        docAlterLog.SelectSingleNode("//log/body/objectSourceId").InnerText = "Update Event";
-                                        docAlterLog.SelectSingleNode("//log/body/description").InnerText = "Probleem met RunAsync around line 396";
-                                        docAlterLog.Save("AlterLog.xml");
-                                        docAlterLog.Save(Console.Out);
+                                    docAlterLog.SelectSingleNode("//log/header/code").InnerText = "4000";
+                                    docAlterLog.SelectSingleNode("//log/header/timestamp").InnerText = dateTimeParsedXML;
+                                    docAlterLog.SelectSingleNode("//log/body/objectUUID").InnerText = myEventUUID.InnerXml;
+                                    docAlterLog.SelectSingleNode("//log/body/objectSourceId").InnerText = "Update Event";
+                                    docAlterLog.SelectSingleNode("//log/body/description").InnerText = "Probleem met RunAsync around line 396";
+                                    docAlterLog.Save("AlterLog.xml");
+                                    docAlterLog.Save(Console.Out);
 
-                                        Task taskLogAsync1 = new Task(() => Producer.sendMessageLogging(docAlterLog.InnerXml, "logging"));
-                                        taskLogAsync1.Start();
-                                    }
+                                    Task taskLogAsync1 = new Task(() => Producer.sendMessageLogging(docAlterLog.InnerXml, "logging"));
+                                    taskLogAsync1.Start();
+                                }
 
-                                    var sql = "UPDATE Event SET name = @name, startEvent = @startEvent, endEvent = @endEvent, description = @description, location = @location WHERE eventId = '" + mySourceEntityId.InnerXml + "'";
-                                    using var cmd = new MySqlCommand(sql, con);
+                                var sql = "UPDATE Event SET name = @name, startEvent = @startEvent, endEvent = @endEvent, description = @description, location = @location WHERE eventId = '" + mySourceEntityId.InnerXml + "'";
+                                using var cmd = new MySqlCommand(sql, con);
 
 
 
@@ -420,31 +402,28 @@ namespace UUIDproducer
                                 Task task = new Task(() => Producer.sendMessage(docAlter.InnerXml, "UUID"));
                                 task.Start();
 
-                                    docAlterLog.Load("AlterLog.xml");
+                                docAlterLog.Load("AlterLog.xml");
 
-                                    docAlterLog.SelectSingleNode("//log/header/code").InnerText = "4000";
-                                    docAlterLog.SelectSingleNode("//log/header/timestamp").InnerText = dateTimeParsedXML;
-                                    docAlterLog.SelectSingleNode("//log/body/objectUUID").InnerText = myEventUUID.InnerXml;
-                                    docAlterLog.SelectSingleNode("//log/body/objectSourceId").InnerText = "Update Event";
-                                    docAlterLog.SelectSingleNode("//log/body/description").InnerText = "Update Event succesfully done";
-                                    docAlterLog.Save("AlterLog.xml");
-                                    docAlterLog.Save(Console.Out);
+                                docAlterLog.SelectSingleNode("//log/header/code").InnerText = "4000";
+                                docAlterLog.SelectSingleNode("//log/header/timestamp").InnerText = dateTimeParsedXML;
+                                docAlterLog.SelectSingleNode("//log/body/objectUUID").InnerText = myEventUUID.InnerXml;
+                                docAlterLog.SelectSingleNode("//log/body/objectSourceId").InnerText = "Update Event";
+                                docAlterLog.SelectSingleNode("//log/body/description").InnerText = "Update Event succesfully done";
+                                docAlterLog.Save("AlterLog.xml");
+                                docAlterLog.Save(Console.Out);
 
-                                    Task taskLogAsync = new Task(() => Producer.sendMessageLogging(docAlterLog.InnerXml, "logging"));
-                                    taskLogAsync.Start();
+                                Task taskLogAsync = new Task(() => Producer.sendMessageLogging(docAlterLog.InnerXml, "logging"));
+                                taskLogAsync.Start();
 
-                                    Console.WriteLine("Sending update message to UUID and logs(last step)...");
+                                Console.WriteLine("Sending update message to UUID and logs(last step)...");
                             }
                         
                             //Delete Event comes from Front end and we pass it to UUID to compare
                             if (myOriginNode.InnerXml == "FrontEnd" && myMethodNode.InnerXml == "DELETE" && myOrganiserSourceId.InnerXml == "" && routingKey == "event")
                             {
 
-
-
                                 Console.WriteLine("Got a message from " + myOriginNode.InnerXml);
                                 Console.WriteLine("Updating origin from \"" + myOriginNode.InnerXml + " to \"Office\"");
-
 
                                 docAlter.Load("Alter.xml");
                                 docAlter = xmlDoc;
@@ -496,57 +475,58 @@ namespace UUIDproducer
                                     Console.ForegroundColor = ConsoleColor.Red;
                                     Console.WriteLine(ex.Message);
                                     Console.ResetColor();
-                                        docAlterLog.Load("AlterLog.xml");
+                                    docAlterLog.Load("AlterLog.xml");
 
-                                        docAlterLog.SelectSingleNode("//log/header/code").InnerText = "5000";
-                                        docAlterLog.SelectSingleNode("//log/header/timestamp").InnerText = dateTimeParsedXML;
-                                        docAlterLog.SelectSingleNode("//log/body/objectUUID").InnerText = myEventUUID.InnerXml;
-                                        docAlterLog.SelectSingleNode("//log/body/objectSourceId").InnerText = "Update Event";
-                                        docAlterLog.SelectSingleNode("//log/body/description").InnerText = "Probleem met RunAsync around line 517";
-                                        docAlterLog.Save("AlterLog.xml");
-                                        docAlterLog.Save(Console.Out);
+                                    docAlterLog.SelectSingleNode("//log/header/code").InnerText = "5000";
+                                    docAlterLog.SelectSingleNode("//log/header/timestamp").InnerText = dateTimeParsedXML;
+                                    docAlterLog.SelectSingleNode("//log/body/objectUUID").InnerText = myEventUUID.InnerXml;
+                                    docAlterLog.SelectSingleNode("//log/body/objectSourceId").InnerText = "Update Event";
+                                    docAlterLog.SelectSingleNode("//log/body/description").InnerText = "Probleem met RunAsync around line 517";
+                                    docAlterLog.Save("AlterLog.xml");
+                                    docAlterLog.Save(Console.Out);
 
-                                        Task taskLogAsync1 = new Task(() => Producer.sendMessageLogging(docAlterLog.InnerXml, "logging"));
-                                        taskLogAsync1.Start();
-                                    }
+                                    Task taskLogAsync1 = new Task(() => Producer.sendMessageLogging(docAlterLog.InnerXml, "logging"));
+                                    taskLogAsync1.Start();
+                                }
 
 
-                                    try
-                                    {
-                                        var sql = "DELETE FROM Event WHERE eventId = '" + mySourceEntityId.InnerXml + "'";
-                                        using var cmd1 = new MySqlCommand(sql, con);
-                                        cmd1.ExecuteNonQuery();
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        docAlterLog.Load("AlterLog.xml");
-
-                                        docAlterLog.SelectSingleNode("//log/header/code").InnerText = "5000";
-                                        docAlterLog.SelectSingleNode("//log/header/timestamp").InnerText = dateTimeParsedXML;
-                                        docAlterLog.SelectSingleNode("//log/body/objectUUID").InnerText = myEventUUID.InnerXml;
-                                        docAlterLog.SelectSingleNode("//log/body/objectSourceId").InnerText = "Delete Event";
-                                        docAlterLog.SelectSingleNode("//log/body/description").InnerText = "Probleem met Delete in Databank around line 540";
-                                        docAlterLog.Save("AlterLog.xml");
-                                        docAlterLog.Save(Console.Out);
-
-                                        Task taskLogAsync1 = new Task(() => Producer.sendMessageLogging(docAlterLog.InnerXml, "logging"));
-                                        taskLogAsync1.Start();
-                                    }
-
-                                        docAlterLog.Load("AlterLog.xml");
+                                try
+                                {
+                                    var sql = "DELETE FROM Event WHERE eventId = '" + mySourceEntityId.InnerXml + "'";
+                                    using var cmd1 = new MySqlCommand(sql, con);
+                                    cmd1.ExecuteNonQuery();
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine("Message: " + ex.Message);
+                                    docAlterLog.Load("AlterLog.xml");
 
                                     docAlterLog.SelectSingleNode("//log/header/code").InnerText = "5000";
                                     docAlterLog.SelectSingleNode("//log/header/timestamp").InnerText = dateTimeParsedXML;
                                     docAlterLog.SelectSingleNode("//log/body/objectUUID").InnerText = myEventUUID.InnerXml;
                                     docAlterLog.SelectSingleNode("//log/body/objectSourceId").InnerText = "Delete Event";
-                                    docAlterLog.SelectSingleNode("//log/body/description").InnerText = "Event deleted succesfully";
+                                    docAlterLog.SelectSingleNode("//log/body/description").InnerText = "Probleem met Delete in Databank around line 540 message" + ex.Message;
                                     docAlterLog.Save("AlterLog.xml");
                                     docAlterLog.Save(Console.Out);
 
-                                    Task taskLogAsync = new Task(() => Producer.sendMessageLogging(docAlterLog.InnerXml, "logging"));
-                                    taskLogAsync.Start();
+                                    Task taskLogAsync1 = new Task(() => Producer.sendMessageLogging(docAlterLog.InnerXml, "logging"));
+                                    taskLogAsync1.Start();
+                                }
 
-                                    Console.WriteLine("Event deleted in database sending to Logs(Last step)");
+                                docAlterLog.Load("AlterLog.xml");
+
+                                docAlterLog.SelectSingleNode("//log/header/code").InnerText = "5000";
+                                docAlterLog.SelectSingleNode("//log/header/timestamp").InnerText = dateTimeParsedXML;
+                                docAlterLog.SelectSingleNode("//log/body/objectUUID").InnerText = myEventUUID.InnerXml;
+                                docAlterLog.SelectSingleNode("//log/body/objectSourceId").InnerText = "Delete Event";
+                                docAlterLog.SelectSingleNode("//log/body/description").InnerText = "Event deleted succesfully";
+                                docAlterLog.Save("AlterLog.xml");
+                                docAlterLog.Save(Console.Out);
+
+                                Task taskLogAsync = new Task(() => Producer.sendMessageLogging(docAlterLog.InnerXml, "logging"));
+                                taskLogAsync.Start();
+
+                                Console.WriteLine("Event deleted in database sending to Logs(Last step)");
 
                             }
                         }
@@ -571,7 +551,6 @@ namespace UUIDproducer
 
 
                             //CREATE User, message from AD
-                            //if (myOriginNodeUser.InnerXml == "AD" && myMethodNodeUser.InnerXml == "CREATE" && mySourceIdUser.InnerXml == "" && routingKey == "user")
                             if (myOriginNodeUser.InnerXml == "AD" && myMethodNodeUser.InnerXml == "CREATE" && routingKey == "user")
                             {
                                 Console.WriteLine("Got a message from " + myOriginNodeUser.InnerXml);
@@ -596,7 +575,6 @@ namespace UUIDproducer
                                 Console.WriteLine("Origin changed to Office, sending now it to UUID...");
                             }
                             //Message from UUID CREATE user now
-                            //else if (myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "CREATE" && mySourceIdUser.InnerXml == "" && routingKey == "Office")
                             else if (myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "CREATE" && routingKey == "Office")
                             {
 
@@ -643,22 +621,21 @@ namespace UUIDproducer
                                 Task task = new Task(() => Producer.sendMessage(docAlterUser.InnerXml, "UUID"));
                                 task.Start();
 
-                                    docAlterLog.Load("AlterLog.xml");
+                                docAlterLog.Load("AlterLog.xml");
 
-                                    docAlterLog.SelectSingleNode("//log/header/code").InnerText = "3000";
-                                    docAlterLog.SelectSingleNode("//log/header/timestamp").InnerText = dateTimeParsedXML;
-                                    docAlterLog.SelectSingleNode("//log/body/objectSourceId").InnerText = "Create User";
-                                    docAlterLog.SelectSingleNode("//log/body/description").InnerText = "User created succesfully";
-                                    docAlterLog.Save("AlterLog.xml");
-                                    docAlterLog.Save(Console.Out);
+                                docAlterLog.SelectSingleNode("//log/header/code").InnerText = "3000";
+                                docAlterLog.SelectSingleNode("//log/header/timestamp").InnerText = dateTimeParsedXML;
+                                docAlterLog.SelectSingleNode("//log/body/objectSourceId").InnerText = "Create User";
+                                docAlterLog.SelectSingleNode("//log/body/description").InnerText = "User created succesfully";
+                                docAlterLog.Save("AlterLog.xml");
+                                docAlterLog.Save(Console.Out);
 
-                                    Task taskLogAsync = new Task(() => Producer.sendMessageLogging(docAlterLog.InnerXml, "logging"));
-                                    taskLogAsync.Start();
+                                Task taskLogAsync = new Task(() => Producer.sendMessageLogging(docAlterLog.InnerXml, "logging"));
+                                taskLogAsync.Start();
 
-                                    Console.WriteLine("\nSending creating user message to UUID and logs...(Last step)");
+                                Console.WriteLine("\nSending creating user message to UUID and logs...(Last step)");
                             }
                             //UPDATE user comes from AD and we pass it to UUID to compare
-                            //if (myOriginNodeUser.InnerXml == "AD" && myMethodNodeUser.InnerXml == "UPDATE" && mySourceIdUser.InnerXml == "" && routingKey == "user")
                             if (myOriginNodeUser.InnerXml == "AD" && myMethodNodeUser.InnerXml == "UPDATE" && routingKey == "user")
                             {
 
@@ -681,18 +658,14 @@ namespace UUIDproducer
                                 Console.WriteLine("Origin changed to Office, sending now it to UUID...");
                             }
                             //update user comes from UUID we update our side and tell the UUID
-                            //else if (myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "UPDATE" && mySourceIdUser.InnerXml == "" && routingKey == "Office")
                             else if (myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "UPDATE" && routingKey == "Office")
                             {
                                 Console.WriteLine("Got a message from " + myOriginNodeUser.InnerXml);
-                                //Console.WriteLine("Source id is: " + myDescription.InnerXml);
                                 Console.WriteLine("Updating user data in database and calendar");
 
 
                                 try
                                 {
-
-
                                     using var con = new MySqlConnection(cs);
                                     con.Open();
 
@@ -705,7 +678,6 @@ namespace UUIDproducer
 
                                     parsedBirthday = DateTime.Parse(myBirthday.InnerXml, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
 
-                                    //cmd.Parameters.AddWithValue("@userId", mySourceIdUser.InnerXml);
                                     cmd.Parameters.AddWithValue("@firstname", myFirstName.InnerXml);
                                     cmd.Parameters.AddWithValue("@lastname", myLastName.InnerXml);
                                     cmd.Parameters.AddWithValue("@email", myEmail.InnerXml);
@@ -737,13 +709,10 @@ namespace UUIDproducer
                                 //int iNewRowIdentity = Convert.ToInt32(cmd.ExecuteScalar());
                                 //Console.WriteLine("User Id in database is: " + iNewRowIdentity);
 
-
-
                                 docAlterUser.Load("AlterUser.xml");
                                 docAlterUser = xmlDoc;
 
                                 docAlterUser.SelectSingleNode("//user/header/origin").InnerText = "Office";
-                                //docAlter.SelectSingleNode("//user/header/userId").InnerText = mySourceIdUser.InnerXml;
                                 docAlterUser.Save("AlterUser.xml");
 
 
@@ -753,24 +722,23 @@ namespace UUIDproducer
                                 Task task = new Task(() => Producer.sendMessage(docAlterUser.InnerXml, "UUID"));
                                 task.Start();
 
-                                    docAlterLog.Load("AlterLog.xml");
+                                docAlterLog.Load("AlterLog.xml");
 
-                                    docAlterLog.SelectSingleNode("//log/header/code").InnerText = "4000";
-                                    docAlterLog.SelectSingleNode("//log/header/timestamp").InnerText = dateTimeParsedXML;
-                                    docAlterLog.SelectSingleNode("//log/body/objectSourceId").InnerText = "Update User";
-                                    docAlterLog.SelectSingleNode("//log/body/description").InnerText = "User updated succesfully";
-                                    docAlterLog.Save("AlterLog.xml");
-                                    docAlterLog.Save(Console.Out);
+                                docAlterLog.SelectSingleNode("//log/header/code").InnerText = "4000";
+                                docAlterLog.SelectSingleNode("//log/header/timestamp").InnerText = dateTimeParsedXML;
+                                docAlterLog.SelectSingleNode("//log/body/objectSourceId").InnerText = "Update User";
+                                docAlterLog.SelectSingleNode("//log/body/description").InnerText = "User updated succesfully";
+                                docAlterLog.Save("AlterLog.xml");
+                                docAlterLog.Save(Console.Out);
 
-                                    Task taskLogAsync = new Task(() => Producer.sendMessageLogging(docAlterLog.InnerXml, "logging"));
-                                    taskLogAsync.Start();
+                                Task taskLogAsync = new Task(() => Producer.sendMessageLogging(docAlterLog.InnerXml, "logging"));
+                                taskLogAsync.Start();
 
-                                    Console.WriteLine("Sending update user message to UUID and logs(Last step)...");
+                                Console.WriteLine("Sending update user message to UUID and logs(Last step)...");
 
 
                             }
                             //Delete user comes from AD we update our side and tell the UUID
-                            //if (myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "DELETE" && mySourceIdUser.InnerXml == "" && routingKey == "Office")
                             if (myOriginNodeUser.InnerXml == "AD" && myMethodNodeUser.InnerXml == "DELETE" && routingKey == "user")
                             {
                                 Console.WriteLine("Got a message from " + myOriginNodeUser.InnerXml);
@@ -791,12 +759,10 @@ namespace UUIDproducer
 
                                 Console.WriteLine("Origin changed to Office, sending now it to UUID...");
                             }
-                            //else if(myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "DELETE" && mySourceIdUser.InnerXml != "" && routingKey == "Office")
                             else if (myOriginNodeUser.InnerXml == "UUID" && myMethodNodeUser.InnerXml == "DELETE" && routingKey == "Office")
                             {
                                 Console.WriteLine("Got a delete message from " + mySourceIdUser.InnerXml);
                                 Console.WriteLine("The full message from the UUID is: " + xmlDoc.InnerXml);
-                                //Console.WriteLine("Source id is: " + myDescription.InnerXml);
                                 Console.WriteLine("Deleting user data in database and calendar");
 
                                 try
@@ -813,30 +779,30 @@ namespace UUIDproducer
                                 catch (SqlException e)
                                 {
                                     Console.WriteLine("Exception message: " + e.Message);
-                                        docAlterLog.Load("AlterLog.xml");
-
-                                        docAlterLog.SelectSingleNode("//log/header/code").InnerText = "5000";
-                                        docAlterLog.SelectSingleNode("//log/header/timestamp").InnerText = dateTimeParsedXML;
-                                        docAlterLog.SelectSingleNode("//log/body/objectSourceId").InnerText = "Delete User";
-                                        docAlterLog.SelectSingleNode("//log/body/description").InnerText = "User deleted error in db line 833";
-                                        docAlterLog.Save("AlterLog.xml");
-                                        docAlterLog.Save(Console.Out);
-
-                                        Task taskLogAsync1 = new Task(() => Producer.sendMessageLogging(docAlterLog.InnerXml, "logging"));
-                                        taskLogAsync1.Start();
-                                }
-
                                     docAlterLog.Load("AlterLog.xml");
 
                                     docAlterLog.SelectSingleNode("//log/header/code").InnerText = "5000";
                                     docAlterLog.SelectSingleNode("//log/header/timestamp").InnerText = dateTimeParsedXML;
                                     docAlterLog.SelectSingleNode("//log/body/objectSourceId").InnerText = "Delete User";
-                                    docAlterLog.SelectSingleNode("//log/body/description").InnerText = "User deleted succesfully";
+                                    docAlterLog.SelectSingleNode("//log/body/description").InnerText = "User deleted error in db line 833";
                                     docAlterLog.Save("AlterLog.xml");
                                     docAlterLog.Save(Console.Out);
 
-                                    Task taskLogAsync = new Task(() => Producer.sendMessageLogging(docAlterLog.InnerXml, "logging"));
-                                    taskLogAsync.Start();
+                                    Task taskLogAsync1 = new Task(() => Producer.sendMessageLogging(docAlterLog.InnerXml, "logging"));
+                                    taskLogAsync1.Start();
+                                }
+
+                                docAlterLog.Load("AlterLog.xml");
+
+                                docAlterLog.SelectSingleNode("//log/header/code").InnerText = "5000";
+                                docAlterLog.SelectSingleNode("//log/header/timestamp").InnerText = dateTimeParsedXML;
+                                docAlterLog.SelectSingleNode("//log/body/objectSourceId").InnerText = "Delete User";
+                                docAlterLog.SelectSingleNode("//log/body/description").InnerText = "User deleted succesfully";
+                                docAlterLog.Save("AlterLog.xml");
+                                docAlterLog.Save(Console.Out);
+
+                                Task taskLogAsync = new Task(() => Producer.sendMessageLogging(docAlterLog.InnerXml, "logging"));
+                                taskLogAsync.Start();
 
                                 Console.WriteLine("Deleting user in db sending it to logs(Last step)...");
                             }
@@ -979,8 +945,6 @@ namespace UUIDproducer
 
                                         cmd.Parameters.AddWithValue("@eventId", myEventSourceEntityId.InnerXml);
                                         cmd.Parameters.AddWithValue("@userId", myAttendeeSourceEntityId.InnerXml);
-                                        //cmd.Prepare();
-                                        //cmd.ExecuteNonQuery();
                                         iNewRowIdentity = Convert.ToInt32(cmd.ExecuteScalar());
                                         Console.WriteLine("Event Id in database is: " + iNewRowIdentity);
                                     }
@@ -1060,73 +1024,74 @@ namespace UUIDproducer
 
                                 using var con = new MySqlConnection(cs);
                                 con.Open();
-                                    var sqlForId = "SELECT graphResponse FROM Event WHERE eventId = '" + myEventSourceEntityId.InnerXml + "'";
-                                    using var cmd1 = new MySqlCommand(sqlForId, con);
-                                    MySqlDataReader dr = cmd1.ExecuteReader();
-                                    string eventId = "";
-                                    string userEmail = "";
-                                    if (dr.Read())
-                                    {
-                                        eventId = dr[0].ToString();
-                                        Console.WriteLine(eventId);
-                                    }
-                                    dr.Close();
+                                var sqlForId = "SELECT graphResponse FROM Event WHERE eventId = '" + myEventSourceEntityId.InnerXml + "'";
+                                using var cmd1 = new MySqlCommand(sqlForId, con);
+                                MySqlDataReader dr = cmd1.ExecuteReader();
+                                string eventId = "";
+                                string userEmail = "";
+                                if (dr.Read())
+                                {
+                                    eventId = dr[0].ToString();
+                                    Console.WriteLine(eventId);
+                                }
+                                dr.Close();
 
-                                    var sqlForEmail = "SELECT email FROM User WHERE userId = '" + myAttendeeSourceEntityId.InnerXml + "'";
-                                    using var cmd2 = new MySqlCommand(sqlForEmail, con);
-                                    MySqlDataReader dr2 = cmd2.ExecuteReader();
-                                    if (dr2.Read())
-                                    {
-                                    userEmail = dr2[0].ToString().Remove(dr2[0].ToString().Length - 24);
-                                    userEmail = $"{userEmail}@flowupdesiderius.onmicrosoft.com";
-                                       }
-                                    dr2.Close();
+                                var sqlForEmail = "SELECT email FROM User WHERE userId = '" + myAttendeeSourceEntityId.InnerXml + "'";
+                                using var cmd2 = new MySqlCommand(sqlForEmail, con);
+                                MySqlDataReader dr2 = cmd2.ExecuteReader();
+
+                                if (dr2.Read())
+                                {
+                                userEmail = dr2[0].ToString().Remove(dr2[0].ToString().Length - 24);
+                                userEmail = $"{userEmail}@flowupdesiderius.onmicrosoft.com";
+                                }
+                                dr2.Close();
 
 
-                                    try
-                                    {
-                                        List<Attendee> attendeesAtCreate = new List<Attendee>();
-                                        Program.RunAsync("update", "", "", "", "",
-                                        "", attendeesAtCreate, userEmail, "", true, eventId).GetAwaiter().GetResult();
+                                try
+                                {
+                                    List<Attendee> attendeesAtCreate = new List<Attendee>();
+                                    Program.RunAsync("update", "", "", "", "",
+                                    "", attendeesAtCreate, userEmail, "", true, eventId).GetAwaiter().GetResult();
 
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Console.ForegroundColor = ConsoleColor.Red;
-                                        Console.WriteLine(ex.Message);
-                                        Console.ResetColor();
-                                        docAlterLog.Load("AlterLog.xml");
-
-                                        docAlterLog.SelectSingleNode("//log/header/code").InnerText = "5000";
-                                        docAlterLog.SelectSingleNode("//log/header/timestamp").InnerText = dateTimeParsedXML;
-                                        docAlterLog.SelectSingleNode("//log/body/objectSourceId").InnerText = "Unsubscribe";
-                                        docAlterLog.SelectSingleNode("//log/body/description").InnerText = "Unsubscribe error RunAsync line 1113";
-                                        docAlterLog.Save("AlterLog.xml");
-                                        docAlterLog.Save(Console.Out);
-
-                                        Task taskLogAsync1 = new Task(() => Producer.sendMessageLogging(docAlterLog.InnerXml, "logging"));
-                                        taskLogAsync1.Start();
-                                    }
-
-                                    var sql = "DELETE FROM Subscribe WHERE eventId = '" + myEventSourceEntityId.InnerXml + "' AND userId = '" + myAttendeeSourceEntityId.InnerXml + "'";
-                                using var cmd = new MySqlCommand(sql, con);
-
-                                //cmd.Prepare();
-                                cmd.ExecuteNonQuery();
-
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine(ex.Message);
+                                    Console.ResetColor();
                                     docAlterLog.Load("AlterLog.xml");
 
                                     docAlterLog.SelectSingleNode("//log/header/code").InnerText = "5000";
                                     docAlterLog.SelectSingleNode("//log/header/timestamp").InnerText = dateTimeParsedXML;
                                     docAlterLog.SelectSingleNode("//log/body/objectSourceId").InnerText = "Unsubscribe";
-                                    docAlterLog.SelectSingleNode("//log/body/description").InnerText = "Unsubscribe succesfully";
+                                    docAlterLog.SelectSingleNode("//log/body/description").InnerText = "Unsubscribe error RunAsync line 1113";
                                     docAlterLog.Save("AlterLog.xml");
                                     docAlterLog.Save(Console.Out);
 
-                                    Task taskLogAsync = new Task(() => Producer.sendMessageLogging(docAlterLog.InnerXml, "logging"));
-                                    taskLogAsync.Start();
+                                    Task taskLogAsync1 = new Task(() => Producer.sendMessageLogging(docAlterLog.InnerXml, "logging"));
+                                    taskLogAsync1.Start();
+                                }
 
-                                    Console.WriteLine("Event deleted in database and logged(Last step)");
+                                var sql = "DELETE FROM Subscribe WHERE eventId = '" + myEventSourceEntityId.InnerXml + "' AND userId = '" + myAttendeeSourceEntityId.InnerXml + "'";
+                                using var cmd = new MySqlCommand(sql, con);
+
+                                //cmd.Prepare();
+                                cmd.ExecuteNonQuery();
+
+                                docAlterLog.Load("AlterLog.xml");
+
+                                docAlterLog.SelectSingleNode("//log/header/code").InnerText = "5000";
+                                docAlterLog.SelectSingleNode("//log/header/timestamp").InnerText = dateTimeParsedXML;
+                                docAlterLog.SelectSingleNode("//log/body/objectSourceId").InnerText = "Unsubscribe";
+                                docAlterLog.SelectSingleNode("//log/body/description").InnerText = "Unsubscribe succesfully";
+                                docAlterLog.Save("AlterLog.xml");
+                                docAlterLog.Save(Console.Out);
+
+                                Task taskLogAsync = new Task(() => Producer.sendMessageLogging(docAlterLog.InnerXml, "logging"));
+                                taskLogAsync.Start();
+
+                                Console.WriteLine("Event deleted in database and logged(Last step)");
                             }
                         }
                         //XML error from UUID
@@ -1152,21 +1117,17 @@ namespace UUIDproducer
                             docAlterError.SelectSingleNode("//error/header/origin").InnerText = "Office";
                             docAlterError.SelectSingleNode("//error/header/timestamp").InnerText = dateTimeParsedXML;
                             docAlterError.Save("Alter.xml");
-                            //docAlterError.Save(Console.Out);
-
-                            //string erroXMLWithoutVersion = docAlterError.InnerXml.Substring(55);
-                            //Console.WriteLine(erroXMLWithoutVersion);
 
                             Task task = new Task(() => Producer.sendMessageLogging(docAlterError.InnerXml, "logging"));
                             task.Start();
 
                         }
                         else
-                            {
-                                Console.WriteLine("XML was wrong, sending it to logging");
-                                Task task = new Task(() => Producer.sendMessageLogging(message, "logging"));
-                                task.Start();
-                            }
+                        {
+                            Console.WriteLine("XML was wrong, sending it to logging");
+                            Task task = new Task(() => Producer.sendMessageLogging(message, "logging"));
+                            task.Start();
+                        }
 
                     }
                     catch (Exception e)
@@ -1182,9 +1143,6 @@ namespace UUIDproducer
                         docAlterError.SelectSingleNode("//error/body/description").InnerText = "Weird message: " + message;
                         docAlterError.Save("Alter.xml");
                         docAlterError.Save(Console.Out);
-
-                        //string erroXMLWithoutVersion = docAlterError.InnerXml.Substring(55);
-                        //Console.WriteLine(erroXMLWithoutVersion);
 
                         Task task = new Task(() => Producer.sendMessageLogging(docAlterError.InnerXml, "logging"));
                         task.Start();
