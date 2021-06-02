@@ -21,7 +21,7 @@ using RabbitMQ.Client.Events;
 
 namespace UUIDproducer
 {
-    class Consumer
+    public class Consumer
     {
 
         public static void getMessage()
@@ -92,6 +92,7 @@ namespace UUIDproducer
 
                     //Alter XML to change
                     XmlDocument docAlter = new XmlDocument();
+                    XmlDocument docAlterUser = new XmlDocument();
                     XmlDocument docAlterSub = new XmlDocument();
                     XmlDocument docAlterError = new XmlDocument();
                     XmlDocument docAlterLog = new XmlDocument();
@@ -532,7 +533,6 @@ namespace UUIDproducer
                         }
                         else if (xmlValidationUser)
                         {
-                            XmlDocument docAlterUser = new XmlDocument();
                             Console.WriteLine("XML user is valid");
 
                             //XML HEAD
