@@ -1,0 +1,478 @@
+{
+	"info": {
+		"_postman_id": "2de23991-9dc8-4c8e-b0d9-50d090efcd51",
+		"name": "Microsoft_graph",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "OAuth 2.0 Client Credentials flow",
+			"item": [
+				{
+					"name": "Use Client Credential with shared secret",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "6731de76-14a6-49ae-97bc-6eba6914391e",
+									"type": "text"
+								},
+								{
+									"key": "scope",
+									"value": "https://graph.microsoft.com/.default",
+									"description": "Use the resource you want a token for plus `/.default` in order to get a token for the permissions that have been granted in the tenant for this app on that resource. ",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "JqQX2PNo9bpM0uEihUPzyrh",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token",
+							"protocol": "https",
+							"host": [
+								"login",
+								"microsoftonline",
+								"com"
+							],
+							"path": [
+								"{tenant}",
+								"oauth2",
+								"v2.0",
+								"token"
+							]
+						},
+						"description": "Make sure to use the admin consent flow first in order to grant the client permissions in your tenant.  Because the sample app secret is public, the /.default on this application doesn't actually request any permissions.  Use your own app and secret! \n\n[Documentation](https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-client-creds-grant-flow)"
+					},
+					"response": [
+						{
+							"name": "Get Client Credential - No scopes in token response due to /.default containing nothing. ",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/x-www-form-urlencoded",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "grant_type",
+											"value": "client_credentials",
+											"type": "text"
+										},
+										{
+											"key": "client_id",
+											"value": "6731de76-14a6-49ae-97bc-6eba6914391e",
+											"type": "text"
+										},
+										{
+											"key": "scope",
+											"value": "https://graph.microsoft.com/.default",
+											"type": "text"
+										},
+										{
+											"key": "requested_token_use",
+											"value": "on_behalf_of",
+											"type": "text"
+										},
+										{
+											"key": "client_secret",
+											"value": "JqQX2PNo9bpM0uEihUPzyrh",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://login.microsoftonline.com/hpsscoutgmail.onmicrosoft.com/oauth2/v2.0/token",
+									"protocol": "https",
+									"host": [
+										"login",
+										"microsoftonline",
+										"com"
+									],
+									"path": [
+										"hpsscoutgmail.onmicrosoft.com",
+										"oauth2",
+										"v2.0",
+										"token"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Expires",
+									"value": "-1"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=31536000; includeSubDomains"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "x-ms-request-id",
+									"value": "4658cfbe-cfb9-4853-bb98-c0a2bd500800"
+								},
+								{
+									"key": "P3P",
+									"value": "CP=\"DSP CUR OTPi IND OTRi ONL FIN\""
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "fpc=AoyXs_IRnyBApfFwr79NfqrUN5rrAQAAAGlqN9QOAAAA; expires=Sat, 04-May-2019 03:00:57 GMT; path=/; secure; HttpOnly"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "x-ms-gateway-slice=prod; path=/; secure; HttpOnly"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "stsservicecookie=ests; path=/; secure; HttpOnly"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Apr 2019 03:00:56 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1494"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"token_type\": \"Bearer\",\n    \"expires_in\": 3600,\n    \"ext_expires_in\": 3600,\n    \"access_token\": \"eyJ0eXAiOiJKV1QiLCJub25jZSI6IkFRQUJBQUFBQUFEQ29NcGpKWHJ4VHE5Vkc5dGUtN0ZYa1EtNnpvWU5qQ0pVQlFOVXlGZWFfazhhX0ZyWko0Y2xzMDNuQUktLURZWjZXdHh1b3NyZi1vbEhtSDhqVnZfRDc3TnpUdlVwY3F3VmZMXzVlczZGUlNBQSIsImFsZyI6IlJTMjU2IiwieDV0IjoiTi1sQzBuLTlEQUxxd2h1SFluSFE2M0dlQ1hjIiwia2lkIjoiTi1sQzBuLTlEQUxxd2h1SFluSFE2M0dlQ1hjIn0.eyJhdWQiOiJodHRwczovL2dyYXBoLm1pY3Jvc29mdC5jb20iLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC9mYTE1ZDY5Mi1lOWM3LTQ0NjAtYTc0My0yOWYyOTU2ZmQ0MjkvIiwiaWF0IjoxNTU0MzQ2NTU3LCJuYmYiOjE1NTQzNDY1NTcsImV4cCI6MTU1NDM1MDQ1NywiYWlvIjoiNDJaZ1lKZzNUMnZTcENQM3VyOEdmL0ZVRU5vdEJRQT0iLCJhcHBfZGlzcGxheW5hbWUiOiJUdXRvcmlhbCBTYW1wbGUgQXBwIiwiYXBwaWQiOiI2NzMxZGU3Ni0xNGE2LTQ5YWUtOTdiYy02ZWJhNjkxNDM5MWUiLCJhcHBpZGFjciI6IjEiLCJpZHAiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC9mYTE1ZDY5Mi1lOWM3LTQ0NjAtYTc0My0yOWYyOTU2ZmQ0MjkvIiwib2lkIjoiZTg0ZDg0OTEtMDRlZC00ODI2LWFiODMtNTg0MWIyMzI4ZTQ0Iiwic3ViIjoiZTg0ZDg0OTEtMDRlZC00ODI2LWFiODMtNTg0MWIyMzI4ZTQ0IiwidGlkIjoiZmExNWQ2OTItZTljNy00NDYwLWE3NDMtMjlmMjk1NmZkNDI5IiwidXRpIjoidnM5WVJyblBVMGk3bU1DaXZWQUlBQSIsInZlciI6IjEuMCIsInhtc190Y2R0IjoxNDE5OTY0MDk5fQ.SjhYmLuDVpBB4Bo8NbcoEMi0GdSfybIOzXOfN6k3Q7OBktzzFlxvAN1Jp82CcVEbtccCCyCj6wurt_7NB5AmSpsY8Ms0AYhjDLPpcESNWV8iDOoqYcwiet1tTmegOzuROlvPdZ3bSYuro-Ffl60CyE6a6Yw_o8H58i5gCXZMdz02rt87oK4ZSwwz_s69tGlXyDC8UiZvV6vUIDSdsaQYxTFBH9M5LxmGGIYsiU3KurIN_xwRiEuWBfzWJbK6r5wt_e4KCvqBQDsVX9VBM7J7LTEL-2Zkr5fjUTwti-BnuR70n_YrwEEiQBkzG9ZALugpekq-KW4905GZScx8Bn14lA\"\n}"
+						},
+						{
+							"name": "Get Client Credential - error due to common",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/x-www-form-urlencoded",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "grant_type",
+											"value": "client_credentials",
+											"type": "text"
+										},
+										{
+											"key": "client_id",
+											"value": "6731de76-14a6-49ae-97bc-6eba6914391e",
+											"type": "text"
+										},
+										{
+											"key": "scope",
+											"value": "user.read",
+											"type": "text"
+										},
+										{
+											"key": "requested_token_use",
+											"value": "on_behalf_of",
+											"type": "text"
+										},
+										{
+											"key": "client_secret",
+											"value": "JqQX2PNo9bpM0uEihUPzyrh",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://login.microsoftonline.com/common/oauth2/token",
+									"protocol": "https",
+									"host": [
+										"login",
+										"microsoftonline",
+										"com"
+									],
+									"path": [
+										"common",
+										"oauth2",
+										"token"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Expires",
+									"value": "-1"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=31536000; includeSubDomains"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "x-ms-request-id",
+									"value": "4658cfbe-cfb9-4853-bb98-c0a2f4440800"
+								},
+								{
+									"key": "P3P",
+									"value": "CP=\"DSP CUR OTPi IND OTRi ONL FIN\""
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "fpc=AoyXs_IRnyBApfFwr79Nfqo; expires=Sat, 04-May-2019 02:59:27 GMT; path=/; secure; HttpOnly"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "x-ms-gateway-slice=prod; path=/; secure; HttpOnly"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "stsservicecookie=ests; path=/; secure; HttpOnly"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 04 Apr 2019 02:59:27 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "468"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"error\": \"invalid_request\",\n    \"error_description\": \"AADSTS50059: No tenant-identifying information found in either the request or implied by any provided credentials.\\r\\nTrace ID: 4658cfbe-cfb9-4853-bb98-c0a2f4440800\\r\\nCorrelation ID: 8e86a163-4047-4115-8d3e-03d9f7a79cbf\\r\\nTimestamp: 2019-04-04 02:59:27Z\",\n    \"error_codes\": [\n        50059\n    ],\n    \"timestamp\": \"2019-04-04 02:59:27Z\",\n    \"trace_id\": \"4658cfbe-cfb9-4853-bb98-c0a2f4440800\",\n    \"correlation_id\": \"8e86a163-4047-4115-8d3e-03d9f7a79cbf\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Admin Consent request",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://login.microsoftonline.com/{tenant}/adminconsent?client_id=6731de76-14a6-49ae-97bc-6eba6914391e&state=12345&redirect_uri=http://localhost/myapp/permissions",
+							"protocol": "https",
+							"host": [
+								"login",
+								"microsoftonline",
+								"com"
+							],
+							"path": [
+								"{tenant}",
+								"adminconsent"
+							],
+							"query": [
+								{
+									"key": "client_id",
+									"value": "6731de76-14a6-49ae-97bc-6eba6914391e"
+								},
+								{
+									"key": "state",
+									"value": "12345"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "http://localhost/myapp/permissions"
+								}
+							]
+						},
+						"description": "Replace {tenant} with either `common` or a tenant ID.  You should replace the client ID here as well as in the Client Credentials request so that you are giving your own app permissions.  This tutorial app has no requested application permissions, so giving this app consent won't give it any permissions in your tenant."
+					},
+					"response": [
+						{
+							"name": "Admin authorization request",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://login.microsoftonline.com/{tenant}/adminconsent?client_id=6731de76-14a6-49ae-97bc-6eba6914391e&state=12345&redirect_uri=http://localhost/myapp/permissions",
+									"protocol": "https",
+									"host": [
+										"login",
+										"microsoftonline",
+										"com"
+									],
+									"path": [
+										"{tenant}",
+										"adminconsent"
+									],
+									"query": [
+										{
+											"key": "client_id",
+											"value": "6731de76-14a6-49ae-97bc-6eba6914391e"
+										},
+										{
+											"key": "state",
+											"value": "12345"
+										},
+										{
+											"key": "redirect_uri",
+											"value": "http://localhost/myapp/permissions"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [],
+							"body": "http://localhost/myapp/permissions?tenant={tenant}&state=state=12345&admin_consent=True"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "GetuserEvents",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "client_authentication",
+							"value": "body",
+							"type": "string"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "http://localhost",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "https://login.microsoftonline.com/common/oauth2/v2.0/token",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "B_BJf2Q059.ERPMl3O~gjY3.2-.WJsk-57",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "950419c4-2b41-4ef3-91fa-4bc8b699242a",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "useBrowser",
+							"value": false,
+							"type": "boolean"
+						},
+						{
+							"key": "scope",
+							"value": "https://graph.microsoft.com/.default",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "authorization_code",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://graph.microsoft.com/v1.0/users/",
+					"protocol": "https",
+					"host": [
+						"graph",
+						"microsoft",
+						"com"
+					],
+					"path": [
+						"v1.0",
+						"users",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PostEvent",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": ""
+				}
+			},
+			"response": []
+		}
+	]
+}
