@@ -191,8 +191,10 @@ namespace UUIDproducer
                             
                                 if (dr.Read())
                                   {
-                                      email = dr[0].ToString();
-                                      Console.WriteLine(email);
+                                    email = dr[0].ToString();
+                                    email = dr[0].ToString().Remove(dr[0].ToString().Length - 24);
+                                    email = $"{email}@flowupdesiderius.onmicrosoft.com";
+                                    Console.WriteLine(email);
                                   }
                                 dr.Close();
 
@@ -906,8 +908,9 @@ namespace UUIDproducer
 
                                 if (dr.Read())
                                   {
-                                     email = dr[0].ToString();
-                                     Console.WriteLine(email);
+                                    email = dr[0].ToString().Remove(dr[0].ToString().Length - 24);
+                                    email = $"{email}@flowupdesiderius.onmicrosoft.com";
+                                    Console.WriteLine(email);
                                   }
                                     dr.Close();
 
@@ -1063,9 +1066,9 @@ namespace UUIDproducer
                                     MySqlDataReader dr2 = cmd2.ExecuteReader();
                                     if (dr2.Read())
                                     {
-                                        userEmail = dr2[0].ToString();
-                                        Console.WriteLine(userEmail);
-                                    }
+                                    userEmail = dr2[0].ToString().Remove(dr2[0].ToString().Length - 24);
+                                    userEmail = $"{userEmail}@flowupdesiderius.onmicrosoft.com";
+                                       }
                                     dr2.Close();
 
 
